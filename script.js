@@ -114,7 +114,7 @@ function initSystem() {
 
         // === PHẦN MỚI THÊM: TẠO DỮ LIỆU GIẢ LẬP CHO ĐƯỜNG MÀU XANH ===
         // Logic: Lấy giá thật + sai số ngẫu nhiên (-30 đến +30 giá) để tạo cảm giác AI đang đoán
-        const fakeAI = price + (Math.random() * 60 - 30); 
+        const fakeAI = price + (Math.random() * 40 - 15); 
 
         // Đẩy dữ liệu vào mảng
         const timeNow = new Date().toLocaleTimeString();
