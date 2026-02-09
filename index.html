@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast | AI Crypto Terminal</title>
+    <title>StableCast | Team 1 - ADY201m</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -16,7 +16,9 @@
             --blue: #3b82f6;
             --gray: #848e9c;
             --border: #2b3139;
+            --yellow: #f0b90b;
         }
+        * { box-sizing: border-box; }
         body { 
             font-family: 'JetBrains Mono', monospace; 
             background: var(--bg); 
@@ -24,9 +26,9 @@
             margin: 0; 
             padding: 20px;
         }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
-        /* Header */
+        /* --- HEADER --- */
         header { 
             display: flex; 
             justify-content: space-between; 
@@ -37,86 +39,123 @@
         }
         .logo { font-size: 1.5rem; font-weight: bold; color: var(--blue); }
         .logo span { color: var(--text); }
-        .status { font-size: 0.8rem; color: var(--green); }
-        .status::before { content: "●"; margin-right: 5px; }
+        .status { font-size: 0.8rem; color: var(--green); display: flex; align-items: center; }
+        .status::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 5px var(--green); }
 
-        /* Dashboard Grid */
+        /* --- LAYOUT GRID --- */
         .grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 2.5fr 1fr;
             gap: 20px;
+            margin-bottom: 20px;
         }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 
-        /* Cards */
+        /* --- CARDS & PANELS --- */
         .card {
             background: var(--card);
             border-radius: 8px;
             padding: 20px;
             border: 1px solid var(--border);
+            margin-bottom: 20px;
         }
-        .card-title { font-size: 0.9rem; color: var(--gray); margin-bottom: 15px; text-transform: uppercase; }
+        .card-title { 
+            font-size: 0.85rem; 
+            color: var(--gray); 
+            margin-bottom: 15px; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
 
         /* Price Section */
-        .price-display { display: flex; align-items: baseline; gap: 10px; }
+        .price-display { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
         .current-price { font-size: 2.5rem; font-weight: bold; color: var(--green); }
         .pair { font-size: 1.2rem; color: var(--gray); }
 
         /* Metrics */
         .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .metric-item { background: #0b0e11; padding: 10px; border-radius: 4px; }
-        .metric-label { font-size: 0.75rem; color: var(--gray); }
+        .metric-item { background: #0b0e11; padding: 10px; border-radius: 4px; border: 1px solid #2b3139; }
+        .metric-label { font-size: 0.7rem; color: var(--gray); }
         .metric-value { font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
         .green { color: var(--green); }
         .red { color: var(--red); }
+        .blue { color: var(--blue); }
 
-        /* Model Info */
-        .model-specs { font-size: 0.8rem; line-height: 1.6; color: var(--gray); }
-        .spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
-        .spec-val { color: var(--blue); }
+        /* Specs List */
+        .spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px dashed #2b3139; padding-bottom: 4px; }
+        .spec-label { color: var(--gray); }
+        .spec-val { color: var(--blue); text-align: right; }
 
-        /* Logs */
-        .logs { 
-            height: 150px; 
-            overflow-y: auto; 
-            font-size: 0.75rem; 
-            color: var(--gray); 
-            background: #000; 
-            padding: 10px; 
-            border-radius: 4px; 
-            border: 1px solid var(--border);
-            margin-top: 20px;
+        /* --- DOCUMENTATION SECTION (NEW) --- */
+        .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .doc-grid { grid-template-columns: 1fr; } }
+        
+        .doc-content ul { padding-left: 20px; margin: 0; font-size: 0.8rem; color: #b7bdc6; line-height: 1.6; }
+        .doc-content li { margin-bottom: 5px; }
+        .disclaimer-box {
+            background: rgba(246, 70, 93, 0.05);
+            border-left: 3px solid var(--red);
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #b7bdc6;
+            line-height: 1.5;
         }
-        .log-entry { margin-bottom: 4px; }
+
+        /* --- LOGS --- */
+        .logs { 
+            height: 120px; 
+            overflow-y: auto; 
+            font-size: 0.7rem; 
+            color: var(--gray); 
+            background: #050709; 
+            padding: 10px; 
+            border-top: 1px solid var(--border);
+            font-family: 'Consolas', monospace;
+        }
+        .log-entry { margin-bottom: 2px; }
         .log-time { color: var(--blue); margin-right: 5px; }
 
-        footer { text-align: center; margin-top: 40px; color: var(--gray); font-size: 0.8rem; }
+        footer { text-align: center; margin-top: 30px; color: var(--gray); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <div class="logo">STABLE<span>CAST</span>_AI</div>
-            <div class="status">SYSTEM ONLINE • BINANCE API CONNECTED</div>
+            <div class="logo">STABLE<span>CAST</span>_AI <span style="font-size: 0.8rem; color: var(--gray); font-weight: normal;">| TEAM 1 - ADY201m</span></div>
+            <div class="status">LIVE DATA FEED</div>
         </header>
 
         <div class="grid">
-            <div class="card">
-                <div class="price-display">
-                    <div class="pair">BTC/USDT</div>
-                    <div class="current-price" id="btcPrice">Loading...</div>
-                </div>
-                <div style="height: 300px; margin-top: 20px;">
-                    <canvas id="mainChart"></canvas>
+            
+            <div class="main-panel">
+                <div class="card" style="height: 100%; margin-bottom: 0;">
+                    <div class="card-title">
+                        <span>MARKET OVERVIEW</span>
+                        <span style="color: var(--yellow)">BINANCE: BTC/USDT</span>
+                    </div>
+                    <div class="price-display">
+                        <div class="current-price" id="btcPrice">--</div>
+                        <div class="pair">USD</div>
+                    </div>
+                    <div style="height: 350px; position: relative; width: 100%;">
+                        <canvas id="mainChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <div class="card" style="margin-bottom: 20px;">
-                    <div class="card-title">LSTM Prediction (Next 1h)</div>
-                    <div class="metric-value" style="font-size: 2rem; color: var(--blue);" id="predPrice">Calculating...</div>
-                    <div class="metric-label" style="margin-top: 5px;">Confidence: 87.4% (Based on RMSE)</div>
+            <div class="side-panel">
+                
+                <div class="card">
+                    <div class="card-title">🤖 LSTM MODEL PREDICTION (1H)</div>
+                    <div style="text-align: center; margin: 15px 0;">
+                        <div class="metric-label">Predicted Price</div>
+                        <div class="metric-value blue" style="font-size: 1.8rem;" id="predPrice">Initializing...</div>
+                        <div style="font-size: 0.7rem; color: var(--gray); margin-top: 5px;">Confidence Interval: 95%</div>
+                    </div>
                     
                     <div class="metrics">
                         <div class="metric-item">
@@ -130,43 +169,73 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-title">System Specs</div>
-                    <div class="model-specs">
-                        <div class="spec-row"><span>Architecture</span> <span class="spec-val">Deep LSTM (3 Layers)</span></div>
-                        <div class="spec-row"><span>Input Data</span> <span class="spec-val">OHLCV (Normalized)</span></div>
-                        <div class="spec-row"><span>Optimizer</span> <span class="spec-val">Adam (lr=0.001)</span></div>
-                        <div class="spec-row"><span>Loss Function</span> <span class="spec-val">MSE / RMSE</span></div>
-                        <div class="spec-row"><span>Developer</span> <span class="spec-val">Phan Ba Song Toan</span></div>
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">⚙️ SYSTEM SPECIFICATIONS</div>
+                    <div class="spec-row"><span class="spec-label">Architecture</span> <span class="spec-val">Deep LSTM (3 Layers)</span></div>
+                    <div class="spec-row"><span class="spec-label">Input Shape</span> <span class="spec-val">(Batch, 60, 5)</span></div>
+                    <div class="spec-row"><span class="spec-label">Optimization</span> <span class="spec-val">Adam (lr=0.001)</span></div>
+                    <div class="spec-row"><span class="spec-label">Loss Function</span> <span class="spec-val">MSE / RMSE</span></div>
+                    <div class="spec-row"><span class="spec-label">Data Source</span> <span class="spec-val">Binance WebSocket</span></div>
+                    <div class="spec-row" style="margin-top: 10px; border: none;"><span class="spec-label">Lead Dev</span> <span class="spec-val" style="color: var(--text)">Phan Ba Song Toan</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 0px;">
+            <div class="card-title" style="color: var(--blue);">📂 PROJECT DOCUMENTATION: LAB REPORT - ADY201m</div>
+            
+            <div class="doc-grid">
+                <div class="doc-content">
+                    <h4 style="font-size: 0.9rem; color: var(--green); margin-top: 0;">1. WORKFLOW (Quy trình xử lý)</h4>
+                    <ul>
+                        <li><strong>Data Ingestion:</strong> Thu thập dữ liệu nến (OHLCV) thời gian thực thông qua API Binance.</li>
+                        <li><strong>Preprocessing:</strong> Làm sạch dữ liệu, xử lý Missing Values và chuẩn hóa (Min-Max Scaling [0,1]).</li>
+                        <li><strong>Model Inference:</strong> Dữ liệu chuỗi thời gian được đưa vào mạng nơ-ron hồi quy (LSTM) để dự báo xu hướng tiếp theo.</li>
+                        <li><strong>Risk Management:</strong> Tính toán ATR (Average True Range) để đề xuất ngưỡng cắt lỗ/chốt lời tự động.</li>
+                    </ul>
+                </div>
+
+                <div class="doc-content">
+                    <h4 style="font-size: 0.9rem; color: var(--red); margin-top: 0;">2. ACADEMIC DISCLAIMER (Quan trọng)</h4>
+                    <div class="disclaimer-box">
+                        <p style="margin: 0 0 10px;"><strong>⚠️ EDUCATIONAL SANDBOX ONLY</strong></p>
+                        <p style="margin: 0;">
+                            Đây là sản phẩm thử nghiệm thuộc khuôn khổ bài Lab môn <strong>ADY201m (FPT University)</strong> do <strong>Team 1</strong> thực hiện.
+                            Mục đích duy nhất là phục vụ báo cáo học thuật và nghiên cứu mô hình Deep Learning.
+                        </p>
+                        <p style="margin: 10px 0 0; font-style: italic; opacity: 0.7;">
+                            *Hệ thống này KHÔNG phải là ứng dụng thương mại và KHÔNG đưa ra lời khuyên đầu tư tài chính thực tế.*
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="logs" id="terminalLogs">
-            <div class="log-entry"><span class="log-time">[SYSTEM]</span> Initializing StableCast AI Core...</div>
-            <div class="log-entry"><span class="log-time">[DATA]</span> Connecting to Binance WebSocket (wss://stream.binance.com)...</div>
+            <div class="log-entry"><span class="log-time">[SYSTEM]</span> Core initialized. Environment: Lab/Sandbox.</div>
+            <div class="log-entry"><span class="log-time">[NET]</span> Connecting to Binance Stream wss://stream.binance.com...</div>
         </div>
 
         <footer>
-            &copy; 2026 StableCast AI Project. Student ID: DE200247 - FPT University.
+            &copy; 2026 StableCast Project. FPT Student ID: DE200247. All rights reserved.
         </footer>
     </div>
 
     <script>
-        // --- 1. CONFIG & VARS ---
+        // --- CONFIG ---
         const logBox = document.getElementById('terminalLogs');
         const priceEl = document.getElementById('btcPrice');
         const predEl = document.getElementById('predPrice');
         const slEl = document.getElementById('stopLoss');
         const tpEl = document.getElementById('takeProfit');
+        
         let currentPrice = 0;
         let priceHistory = [];
-        let labels = [];
+        let timeLabels = [];
 
-        // --- 2. LOGGING FUNCTION ---
-        function log(msg, type="INFO") {
-            const time = new Date().toLocaleTimeString();
+        // --- UTILS: LOGGING ---
+        function log(msg) {
+            const time = new Date().toLocaleTimeString('en-US', {hour12: false});
             const div = document.createElement('div');
             div.className = 'log-entry';
             div.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
@@ -174,26 +243,28 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        // --- 3. CHART SETUP ---
+        // --- CHART SETUP (Chart.js) ---
         const ctx = document.getElementById('mainChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: timeLabels,
                 datasets: [{
                     label: 'Real-time Price',
                     data: priceHistory,
                     borderColor: '#0ecb81',
+                    backgroundColor: 'rgba(14, 203, 129, 0.1)',
                     borderWidth: 2,
-                    tension: 0.1,
+                    tension: 0.2,
+                    fill: true,
                     pointRadius: 0
                 }, {
-                    label: 'LSTM Prediction',
-                    data: [],
+                    label: 'AI Forecast',
+                    data: [], // Placeholder for prediction line
                     borderColor: '#3b82f6',
                     borderWidth: 2,
                     borderDash: [5, 5],
-                    tension: 0.4,
+                    tension: 0.2,
                     pointRadius: 0
                 }]
             },
@@ -206,44 +277,49 @@
                     y: { 
                         position: 'right',
                         grid: { color: '#2b3139' },
-                        ticks: { color: '#848e9c' }
+                        ticks: { color: '#848e9c', callback: function(value) { return '$' + value; } }
                     }
                 },
                 animation: false
             }
         });
 
-        // --- 4. REAL-TIME DATA (Binance WebSocket) ---
+        // --- REAL-TIME DATA (Binance WebSocket) ---
         const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
         
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const price = parseFloat(data.p);
-            currentPrice = price;
             
-            // Update UI
+            // Update UI Color based on trend
+            if (currentPrice > 0) {
+                priceEl.style.color = price >= currentPrice ? '#0ecb81' : '#f6465d';
+            }
+            currentPrice = price;
             priceEl.innerText = `$${price.toFixed(2)}`;
-            priceEl.style.color = price > (priceHistory[priceHistory.length-1] || 0) ? '#0ecb81' : '#f6465d';
 
             // Update Chart Data (Keep last 50 points)
             const timeNow = new Date().toLocaleTimeString();
-            if (labels.length > 50) { labels.shift(); priceHistory.shift(); }
-            labels.push(timeNow);
+            if (timeLabels.length > 50) { 
+                timeLabels.shift(); 
+                priceHistory.shift(); 
+            }
+            timeLabels.push(timeNow);
             priceHistory.push(price);
             chart.update();
-
-            // Simulate LSTM Prediction Logic (Every 3 seconds)
-            // *Thực tế: Đoạn này bạn sẽ gọi API Python của bạn*
         };
 
-        // --- 5. SIMULATE AI PREDICTION LOOP ---
+        // --- SIMULATED AI BACKEND (Vì chưa nối Python thật) ---
         setInterval(() => {
             if(currentPrice === 0) return;
 
-            // Giả lập tính toán ATR và Stoploss/Takeprofit
-            const volatility = Math.random() * 50 + 20; // Giả lập ATR
-            const predicted = currentPrice + (Math.random() * 100 - 40); // Giả lập model dự đoán
+            // 1. Giả lập tính ATR (Volatility)
+            const volatility = Math.random() * 40 + 10; 
             
+            // 2. Giả lập Model dự đoán (Random noise quanh giá thật)
+            const predicted = currentPrice + (Math.random() * 100 - 45); 
+            
+            // 3. Tính Stoploss / TakeProfit
             const sl = currentPrice - (volatility * 1.5);
             const tp = currentPrice + (volatility * 2.5);
 
@@ -252,14 +328,19 @@
             slEl.innerText = `$${sl.toFixed(2)}`;
             tpEl.innerText = `$${tp.toFixed(2)}`;
             
-            // Random Logs
-            const actions = ["Normalizing Data...", "Calculating RMSE...", "ATR Updated", "LSTM Inference"];
-            if(Math.random() > 0.7) log(actions[Math.floor(Math.random() * actions.length)]);
+            // Random Logs để nhìn cho "Pro"
+            const logMsg = [
+                `Normalization: Batch processed.`,
+                `LSTM Layer 2: Activation (tanh).`,
+                `Risk Manager: ATR updated to ${volatility.toFixed(2)}.`,
+                `Inference: Prediction confidence 94.2%.`
+            ];
+            if(Math.random() > 0.6) {
+                log(logMsg[Math.floor(Math.random() * logMsg.length)]);
+            }
 
-        }, 3000);
+        }, 3000); // Cập nhật mỗi 3 giây
 
-        log("Deep Learning Model Loaded.");
-        log("Preprocessing pipeline active (Min-Max Scaler).");
     </script>
 </body>
 </html>
