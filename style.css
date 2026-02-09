@@ -1,81 +1,174 @@
+/* === 1. BIẾN GLOBAL & RESET === */
 :root {
-    --bg: #0b0e11; --card: #181d23; --text: #eaecef;
-    --green: #0ecb81; --red: #f6465d; --blue: #3b82f6;
-    --gray: #848e9c; --border: #2b3139; --yellow: #f0b90b;
-}
-* { box-sizing: border-box; }
-body { 
-    font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); margin: 0; 
-    /* Ẩn thanh cuộn khi đang ở màn hình login */
-    overflow: hidden; 
-}
-/* Khi đã đăng nhập thành công thì cho phép cuộn */
-body.logged-in { overflow: auto; padding: 20px; }
-
-.container { max-width: 1200px; margin: 0 auto; }
-
-/* --- LOGIN SCREEN (Lớp phủ bảo vệ) --- */
-.login-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background-color: #0b0e11; z-index: 9999;
-    display: flex; justify-content: center; align-items: center;
-    background-image: radial-gradient(circle at center, #151a21 0%, #0b0e11 100%);
-    transition: opacity 0.5s ease-in-out;
-}
-.login-box {
-    background: #181d23; padding: 40px; border-radius: 12px;
-    border: 1px solid #2b3139; width: 90%; max-width: 400px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.6); text-align: center;
-}
-.login-logo { font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 5px; }
-.login-logo span { color: var(--text); }
-.login-title { font-size: 0.8rem; color: var(--gray); letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase; }
-.input-group { margin-bottom: 20px; text-align: left; }
-.input-group label { display: block; font-size: 0.75rem; color: var(--gray); margin-bottom: 8px; }
-.input-group input {
-    width: 100%; padding: 12px; background: #0b0e11; border: 1px solid #2b3139;
-    border-radius: 6px; color: white; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.3s;
-}
-.input-group input:focus { border-color: var(--blue); }
-button#loginBtn {
-    width: 100%; padding: 12px; background: var(--blue); color: white;
-    border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
-    font-family: 'JetBrains Mono', monospace; transition: 0.3s;
-}
-button#loginBtn:hover { background: #2b6cb0; }
-.login-msg { height: 20px; margin-top: 15px; font-size: 0.8rem; }
-.login-footer { margin-top: 30px; font-size: 0.7rem; color: #464d57; line-height: 1.5; }
-
-/* --- Ẩn nội dung chính cho đến khi đăng nhập --- */
-.main-app-container {
-    display: none; /* Mặc định ẩn */
-    opacity: 0;
-    transition: opacity 0.8s ease-in;
+    --bg-deep: #0b0c10;
+    --bg-card: #0b0e11;
+    --accent-green: #0ecb81;
+    --accent-blue: #3b82f6;
+    --text-main: #c5c6c7;
+    --text-dim: #848e9c;
+    --border-color: #2b3139;
+    --glow-shadow: 0 0 15px rgba(14, 203, 129, 0.2);
 }
 
-/* --- CSS CHUNG CHO APP --- */
-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
-.logo { font-size: 1.5rem; font-weight: bold; color: var(--blue); } .logo span { color: var(--text); }
-.status { font-size: 0.8rem; color: var(--green); display: flex; align-items: center; }
-.status::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 5px var(--green); }
-.grid { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 20px; }
-@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-.card { background: var(--card); border-radius: 8px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-.card-title { font-size: 0.85rem; color: var(--gray); margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; }
-.price-display { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
-.current-price { font-size: 2.5rem; font-weight: bold; color: var(--green); }
-.pair { font-size: 1.2rem; color: var(--gray); }
-.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-.metric-item { background: #0b0e11; padding: 10px; border-radius: 4px; border: 1px solid #2b3139; }
-.metric-label { font-size: 0.7rem; color: var(--gray); }
-.metric-value { font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
-.green { color: var(--green); } .red { color: var(--red); } .blue { color: var(--blue); }
-.spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px dashed #2b3139; padding-bottom: 4px; }
-.spec-label { color: var(--gray); } .spec-val { color: var(--blue); text-align: right; }
-.doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 600px) { .doc-grid { grid-template-columns: 1fr; } }
-.doc-content ul { padding-left: 20px; margin: 0; font-size: 0.8rem; color: #b7bdc6; line-height: 1.6; }
-.disclaimer-box { background: rgba(246, 70, 93, 0.05); border-left: 3px solid var(--red); padding: 10px; font-size: 0.8rem; color: #b7bdc6; line-height: 1.5; }
-.logs { height: 120px; overflow-y: auto; font-size: 0.7rem; color: var(--gray); background: #050709; padding: 10px; border-top: 1px solid var(--border); font-family: 'Consolas', monospace; }
-.log-entry { margin-bottom: 2px; } .log-time { color: var(--blue); margin-right: 5px; }
-footer { text-align: center; margin-top: 30px; color: var(--gray); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 10px; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+body {
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* === 2. HIỆU ỨNG TRUYỀN HÌNH (SCANLINE) === */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 9999;
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+}
+
+/* === 3. HEADER & NAV === */
+header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px 0;
+    background: rgba(11, 12, 16, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.nav-tabs {
+    background: #111 !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.nav-btn:hover {
+    color: #fff;
+    background: rgba(14, 203, 129, 0.1);
+}
+
+/* === 4. CARDS & DASHBOARD === */
+.card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 4px 4px 0px #000;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+    border-color: var(--accent-blue) !important;
+    transform: translateY(-2px);
+}
+
+.price-display {
+    font-family: 'JetBrains Mono';
+    text-shadow: 0 0 20px rgba(14, 203, 129, 0.3);
+}
+
+.prediction-box {
+    border: 1px solid var(--accent-blue) !important;
+    background: linear-gradient(145deg, #0b0e11, #131722) !important;
+}
+
+.spec-val-highlight {
+    color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* === 5. CHAT SYSTEM (LUME AI) === */
+.chat-window {
+    border: 1px solid var(--accent-blue) !important;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+}
+
+.chat-title-bar {
+    padding: 15px 20px;
+    background: #131722;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.msg-in {
+    background: #1f2937 !important;
+    border-left: 3px solid var(--accent-blue);
+}
+
+.msg-out {
+    background: var(--accent-green) !important;
+    color: #000 !important;
+    font-weight: bold;
+    border-right: 3px solid #0a8e5a;
+}
+
+.msg-time {
+    font-size: 0.65rem;
+    margin-top: 5px;
+    opacity: 0.6;
+}
+
+/* === 6. PROFILE & COMMUNITY === */
+.profile-avatar {
+    border: 4px solid var(--accent-green) !important;
+    padding: 5px;
+    background: var(--bg-deep);
+}
+
+.feed-post {
+    border-left: 2px solid transparent;
+    transition: 0.3s;
+}
+
+.feed-post:hover {
+    background: #111;
+    border-left: 2px solid var(--accent-green);
+}
+
+.feed-textarea:focus {
+    border-color: var(--accent-green) !important;
+    box-shadow: var(--glow-shadow);
+}
+
+/* === 7. BUTTONS & INPUTS === */
+button {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s !important;
+}
+
+.save-btn:active, .post-btn:active {
+    transform: scale(0.98);
+}
+
+.form-input:focus {
+    border-color: var(--accent-blue) !important;
+    background: #050505 !important;
+}
+
+/* === 8. ANIMATIONS === */
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+}
+
+.lume-avatar-glow {
+    animation: pulse-glow 3s infinite;
+}
