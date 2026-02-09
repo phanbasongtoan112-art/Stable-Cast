@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StableCast | Team 1 - ADY201m</title>
     
-    <link rel="icon" href="favicon.png?v=3" type="image/png">
-
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -25,7 +23,7 @@
             </div>
             
             <div class="input-group">
-                <label>Access Key</label>
+                <label>Access Key (Pass: 123456)</label>
                 <input type="password" id="password" placeholder="••••••••">
             </div>
 
@@ -38,99 +36,89 @@
         </div>
     </div>
 
-    <div class="container">
-        <header>
-            <div class="logo">STABLE<span>CAST</span>_AI <span style="font-size: 0.8rem; color: var(--gray); font-weight: normal;">| TEAM 1 - ADY201m</span></div>
-            <div class="status">LIVE DATA FEED</div>
-        </header>
+    <div class="main-app-container">
+        <div class="container">
+            <header>
+                <div class="logo">STABLE<span>CAST</span>_AI <span style="font-size: 0.8rem; color: var(--gray); font-weight: normal;">| TEAM 1 - ADY201m</span></div>
+                <div class="status">LIVE DATA FEED</div>
+            </header>
 
-        <div class="grid">
-            
-            <div class="main-panel">
-                <div class="card" style="height: 100%; margin-bottom: 0;">
-                    <div class="card-title">
-                        <span>MARKET OVERVIEW</span>
-                        <span style="color: var(--yellow)">BINANCE: BTC/USDT</span>
-                    </div>
-                    <div class="price-display">
-                        <div class="current-price" id="btcPrice">--</div>
-                        <div class="pair">USD</div>
-                    </div>
-                    <div style="height: 350px; position: relative; width: 100%;">
-                        <canvas id="mainChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="side-panel">
-                
-                <div class="card">
-                    <div class="card-title">🤖 LSTM MODEL PREDICTION (1H)</div>
-                    <div style="text-align: center; margin: 15px 0;">
-                        <div class="metric-label">Predicted Price</div>
-                        <div class="metric-value blue" style="font-size: 1.8rem;" id="predPrice">Initializing...</div>
-                        <div style="font-size: 0.7rem; color: var(--gray); margin-top: 5px;">Confidence Interval: 95%</div>
-                    </div>
-                    
-                    <div class="metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Stop Loss (ATR)</div>
-                            <div class="metric-value red" id="stopLoss">--</div>
+            <div class="grid">
+                <div class="main-panel">
+                    <div class="card" style="height: 100%; margin-bottom: 0;">
+                        <div class="card-title">
+                            <span>MARKET OVERVIEW</span>
+                            <span style="color: var(--yellow)">BINANCE: BTC/USDT</span>
                         </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Take Profit</div>
-                            <div class="metric-value green" id="takeProfit">--</div>
+                        <div class="price-display">
+                            <div class="current-price" id="btcPrice">--</div>
+                            <div class="pair">USD</div>
+                        </div>
+                        <div style="height: 350px; position: relative; width: 100%;">
+                            <canvas id="mainChart"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-bottom: 0;">
-                    <div class="card-title">⚙️ SYSTEM SPECIFICATIONS</div>
-                    <div class="spec-row"><span class="spec-label">Architecture</span> <span class="spec-val">Deep LSTM (3 Layers)</span></div>
-                    <div class="spec-row"><span class="spec-label">Input Shape</span> <span class="spec-val">(Batch, 60, 5)</span></div>
-                    <div class="spec-row"><span class="spec-label">Optimization</span> <span class="spec-val">Adam (lr=0.001)</span></div>
-                    <div class="spec-row"><span class="spec-label">Loss Function</span> <span class="spec-val">MSE / RMSE</span></div>
-                    <div class="spec-row"><span class="spec-label">Data Source</span> <span class="spec-val">Binance WebSocket</span></div>
-                    <div class="spec-row" style="margin-top: 10px; border: none;"><span class="spec-label">Lead Dev</span> <span class="spec-val" style="color: var(--text)">Phan Ba Song Toan</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card" style="margin-top: 0px;">
-            <div class="card-title" style="color: var(--blue);">📂 PROJECT DOCUMENTATION: LAB REPORT - ADY201m</div>
-            <div class="doc-grid">
-                <div class="doc-content">
-                    <h4 style="font-size: 0.9rem; color: var(--green); margin-top: 0;">1. WORKFLOW (Quy trình)</h4>
-                    <ul>
-                        <li><strong>Data Ingestion:</strong> Thu thập dữ liệu nến (OHLCV) thời gian thực từ API Binance.</li>
-                        <li><strong>Preprocessing:</strong> Làm sạch dữ liệu và chuẩn hóa (Min-Max Scaling [0,1]).</li>
-                        <li><strong>Model Inference:</strong> Dữ liệu được đưa qua mạng nơ-ron hồi quy (LSTM) để dự báo.</li>
-                        <li><strong>Risk Management:</strong> Tính toán ATR để đề xuất điểm cắt lỗ/chốt lời.</li>
-                    </ul>
-                </div>
-                <div class="doc-content">
-                    <h4 style="font-size: 0.9rem; color: var(--red); margin-top: 0;">2. ACADEMIC DISCLAIMER</h4>
-                    <div class="disclaimer-box">
-                        <p style="margin: 0 0 10px;"><strong>⚠️ EDUCATIONAL SANDBOX ONLY</strong></p>
-                        <p style="margin: 0;">
-                            Sản phẩm thử nghiệm thuộc khuôn khổ bài Lab môn <strong>ADY201m (FPT University)</strong> do <strong>Team 1</strong> thực hiện.
-                        </p>
-                        <p style="margin: 10px 0 0; font-style: italic; opacity: 0.7;">
-                            *Hệ thống KHÔNG đưa ra lời khuyên đầu tư tài chính thực tế.*
-                        </p>
+                <div class="side-panel">
+                    <div class="card">
+                        <div class="card-title">🤖 LSTM MODEL PREDICTION (1H)</div>
+                        <div style="text-align: center; margin: 15px 0;">
+                            <div class="metric-label">Predicted Price</div>
+                            <div class="metric-value blue" style="font-size: 1.8rem;" id="predPrice">Initializing...</div>
+                            <div style="font-size: 0.7rem; color: var(--gray); margin-top: 5px;">Confidence Interval: 95%</div>
+                        </div>
+                        <div class="metrics">
+                            <div class="metric-item">
+                                <div class="metric-label">Stop Loss (ATR)</div>
+                                <div class="metric-value red" id="stopLoss">--</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Take Profit</div>
+                                <div class="metric-value green" id="takeProfit">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-title">⚙️ SYSTEM SPECIFICATIONS</div>
+                        <div class="spec-row"><span class="spec-label">Architecture</span> <span class="spec-val">Deep LSTM (3 Layers)</span></div>
+                        <div class="spec-row"><span class="spec-label">Input Shape</span> <span class="spec-val">(Batch, 60, 5)</span></div>
+                        <div class="spec-row"><span class="spec-label">Optimization</span> <span class="spec-val">Adam (lr=0.001)</span></div>
+                        <div class="spec-row"><span class="spec-label">Data Source</span> <span class="spec-val">Binance WebSocket</span></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="logs" id="terminalLogs">
-            <div class="log-entry"><span class="log-time">[SYSTEM]</span> Core initialized. Environment: Lab/Sandbox.</div>
-            <div class="log-entry"><span class="log-time">[NET]</span> Connecting to Binance Stream wss://stream.binance.com...</div>
-        </div>
+            <div class="card" style="margin-top: 0px;">
+                <div class="card-title" style="color: var(--blue);">📂 PROJECT DOCUMENTATION: LAB REPORT - ADY201m</div>
+                <div class="doc-grid">
+                    <div class="doc-content">
+                        <h4 style="font-size: 0.9rem; color: var(--green); margin-top: 0;">1. WORKFLOW (Quy trình)</h4>
+                        <ul>
+                            <li><strong>Data Ingestion:</strong> Thu thập dữ liệu nến (OHLCV) real-time từ Binance.</li>
+                            <li><strong>Preprocessing:</strong> Chuẩn hóa dữ liệu (Min-Max Scaling).</li>
+                            <li><strong>Model Inference:</strong> Dự báo xu hướng bằng mô hình Deep LSTM.</li>
+                        </ul>
+                    </div>
+                    <div class="doc-content">
+                        <h4 style="font-size: 0.9rem; color: var(--red); margin-top: 0;">2. ACADEMIC DISCLAIMER</h4>
+                        <div class="disclaimer-box">
+                            <p style="margin: 0 0 10px;"><strong>⚠️ EDUCATIONAL SANDBOX ONLY</strong></p>
+                            <p style="margin: 0;">Sản phẩm thử nghiệm thuộc khuôn khổ bài Lab môn <strong>ADY201m</strong>.</p>
+                            <p style="margin: 10px 0 0; font-style: italic; opacity: 0.7;">*KHÔNG phải lời khuyên đầu tư tài chính.*</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <footer>
-            &copy; 2026 StableCast Project. FPT Student ID: DE200247. All rights reserved.
-        </footer>
+            <div class="logs" id="terminalLogs">
+                <div class="log-entry"><span class="log-time">[SYSTEM]</span> Boot sequence initiated. Awaiting authentication...</div>
+            </div>
+
+            <footer>
+                &copy; 2026 StableCast Project. FPT Student ID: DE200247.
+            </footer>
+        </div>
     </div>
 
     <script src="script.js"></script>
