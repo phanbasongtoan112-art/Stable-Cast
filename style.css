@@ -19,94 +19,81 @@ body {
 }
 .container { max-width: 1200px; margin: 0 auto; }
 
+/* --- LOGIN SCREEN --- */
+.login-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #0b0e11; z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    background-image: radial-gradient(circle at center, #151a21 0%, #0b0e11 100%);
+}
+.login-box {
+    background: #181d23; padding: 40px; border-radius: 12px;
+    border: 1px solid #2b3139; width: 100%; max-width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+}
+.login-logo { font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 5px; }
+.login-logo span { color: var(--text); }
+.login-title { font-size: 0.8rem; color: var(--gray); letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase; }
+.input-group { margin-bottom: 20px; text-align: left; }
+.input-group label { display: block; font-size: 0.75rem; color: var(--gray); margin-bottom: 8px; }
+.input-group input {
+    width: 100%; padding: 12px; background: #0b0e11; border: 1px solid #2b3139;
+    border-radius: 6px; color: white; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.3s;
+}
+.input-group input:focus { border-color: var(--blue); }
+button#loginBtn {
+    width: 100%; padding: 12px; background: var(--blue); color: white;
+    border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; transition: 0.3s;
+}
+button#loginBtn:hover { background: #2b6cb0; }
+.login-msg { height: 20px; margin-top: 15px; font-size: 0.8rem; }
+.login-footer { margin-top: 30px; font-size: 0.7rem; color: #464d57; line-height: 1.5; }
+
 /* --- HEADER --- */
 header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    border-bottom: 1px solid var(--border); 
-    padding-bottom: 15px; 
-    margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;
 }
 .logo { font-size: 1.5rem; font-weight: bold; color: var(--blue); }
 .logo span { color: var(--text); }
 .status { font-size: 0.8rem; color: var(--green); display: flex; align-items: center; }
 .status::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 5px var(--green); }
 
-/* --- LAYOUT GRID --- */
-.grid {
-    display: grid;
-    grid-template-columns: 2.5fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-}
+/* --- GRID & CARDS --- */
+.grid { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 20px; }
 @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-
-/* --- CARDS & PANELS --- */
 .card {
-    background: var(--card);
-    border-radius: 8px;
-    padding: 20px;
-    border: 1px solid var(--border);
-    margin-bottom: 20px;
+    background: var(--card); border-radius: 8px; padding: 20px;
+    border: 1px solid var(--border); margin-bottom: 20px;
 }
 .card-title { 
-    font-size: 0.85rem; 
-    color: var(--gray); 
-    margin-bottom: 15px; 
-    text-transform: uppercase; 
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
+    font-size: 0.85rem; color: var(--gray); margin-bottom: 15px; 
+    text-transform: uppercase; border-bottom: 1px solid var(--border);
+    padding-bottom: 8px; display: flex; justify-content: space-between;
 }
-
-/* Price Section */
 .price-display { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
 .current-price { font-size: 2.5rem; font-weight: bold; color: var(--green); }
 .pair { font-size: 1.2rem; color: var(--gray); }
 
-/* Metrics */
+/* --- METRICS & SPECS --- */
 .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
 .metric-item { background: #0b0e11; padding: 10px; border-radius: 4px; border: 1px solid #2b3139; }
 .metric-label { font-size: 0.7rem; color: var(--gray); }
 .metric-value { font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
-.green { color: var(--green); }
-.red { color: var(--red); }
-.blue { color: var(--blue); }
-
-/* Specs List */
+.green { color: var(--green); } .red { color: var(--red); } .blue { color: var(--blue); }
 .spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px dashed #2b3139; padding-bottom: 4px; }
-.spec-label { color: var(--gray); }
-.spec-val { color: var(--blue); text-align: right; }
+.spec-label { color: var(--gray); } .spec-val { color: var(--blue); text-align: right; }
 
-/* --- DOCUMENTATION SECTION --- */
+/* --- DOCS & LOGS --- */
 .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 600px) { .doc-grid { grid-template-columns: 1fr; } }
-
 .doc-content ul { padding-left: 20px; margin: 0; font-size: 0.8rem; color: #b7bdc6; line-height: 1.6; }
-.doc-content li { margin-bottom: 5px; }
-.disclaimer-box {
-    background: rgba(246, 70, 93, 0.05);
-    border-left: 3px solid var(--red);
-    padding: 10px;
-    font-size: 0.8rem;
-    color: #b7bdc6;
-    line-height: 1.5;
-}
-
-/* --- LOGS --- */
+.disclaimer-box { background: rgba(246, 70, 93, 0.05); border-left: 3px solid var(--red); padding: 10px; font-size: 0.8rem; color: #b7bdc6; line-height: 1.5; }
 .logs { 
-    height: 120px; 
-    overflow-y: auto; 
-    font-size: 0.7rem; 
-    color: var(--gray); 
-    background: #050709; 
-    padding: 10px; 
-    border-top: 1px solid var(--border);
+    height: 120px; overflow-y: auto; font-size: 0.7rem; color: var(--gray); 
+    background: #050709; padding: 10px; border-top: 1px solid var(--border);
     font-family: 'Consolas', monospace;
 }
-.log-entry { margin-bottom: 2px; }
-.log-time { color: var(--blue); margin-right: 5px; }
-
+.log-entry { margin-bottom: 2px; } .log-time { color: var(--blue); margin-right: 5px; }
 footer { text-align: center; margin-top: 30px; color: var(--gray); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 10px; }
