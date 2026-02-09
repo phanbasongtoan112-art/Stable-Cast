@@ -38,6 +38,7 @@ const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
 const closeEditModal = document.getElementById('closeEditModal');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
+const editAvatarInput = document.getElementById('editAvatarInput'); // Input File
 
 // CHAT ELEMENTS
 const openChatBtn = document.getElementById('openChatBtn');
@@ -49,6 +50,7 @@ const chatContainer = document.getElementById('chatContainer');
 
 // Biến hệ thống
 let currentPrice = 0;
+let predictedPriceGlobal = 0; // Để Lume dùng
 let priceHistory = [];
 let forecastHistory = [];
 let timeLabels = [];
@@ -62,7 +64,7 @@ let aiInterval;
 const savedUser = localStorage.getItem('stableCastUser');
 const savedEmail = localStorage.getItem('stableCastEmail');
 const savedAvatar = localStorage.getItem('stableCastAvatar');
-const savedRole = localStorage.getItem('stableCastRole'); // New
+const savedRole = localStorage.getItem('stableCastRole');
 
 if (savedUser) {
     document.getElementById('loginOverlay').style.display = 'none';
@@ -99,45 +101,54 @@ function updateProfileInfo(name, email, avatarUrl, role) {
 }
 
 // ============================================================
-// 2. EDIT PROFILE LOGIC (New)
+// 2. EDIT PROFILE & UPLOAD IMAGE LOGIC
 // ============================================================
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
         editProfileModal.style.display = 'flex';
-        // Điền sẵn thông tin cũ
         document.getElementById('editNameInput').value = document.getElementById('profile-name-txt').innerText;
         document.getElementById('editRoleInput').value = document.getElementById('profile-role-txt').innerText;
-        document.getElementById('editAvatarInput').value = document.getElementById('profile-avatar-img').src;
     });
 }
 
 if(closeEditModal) {
-    closeEditModal.addEventListener('click', () => {
-        editProfileModal.style.display = 'none';
-    });
+    closeEditModal.addEventListener('click', () => { editProfileModal.style.display = 'none'; });
 }
 
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
         const newName = document.getElementById('editNameInput').value;
         const newRole = document.getElementById('editRoleInput').value;
-        const newAvatar = document.getElementById('editAvatarInput').value;
-
-        // Cập nhật giao diện
-        updateProfileInfo(newName, null, newAvatar, newRole);
-
-        // Lưu vào LocalStorage
-        localStorage.setItem('stableCastUser', newName);
-        localStorage.setItem('stableCastRole', newRole);
-        localStorage.setItem('stableCastAvatar', newAvatar);
-
-        editProfileModal.style.display = 'none';
-        alert("Profile Updated Successfully!");
+        
+        // Xử lý ảnh Upload
+        if (editAvatarInput.files && editAvatarInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result; // Ảnh dạng chuỗi
+                
+                // Cập nhật & Lưu
+                updateProfileInfo(newName, null, base64Image, newRole);
+                localStorage.setItem('stableCastUser', newName);
+                localStorage.setItem('stableCastRole', newRole);
+                localStorage.setItem('stableCastAvatar', base64Image); // Lưu ảnh vào Storage
+                
+                editProfileModal.style.display = 'none';
+                alert("Profile & Avatar Updated!");
+            }
+            reader.readAsDataURL(editAvatarInput.files[0]);
+        } else {
+            // Không up ảnh mới, chỉ lưu tên
+            updateProfileInfo(newName, null, null, newRole);
+            localStorage.setItem('stableCastUser', newName);
+            localStorage.setItem('stableCastRole', newRole);
+            editProfileModal.style.display = 'none';
+            alert("Profile Info Updated!");
+        }
     });
 }
 
 // ============================================================
-// 3. CHAT SYSTEM LOGIC (New)
+// 3. LUME AI CHAT SYSTEM (Smart Assistant)
 // ============================================================
 if(openChatBtn) {
     openChatBtn.addEventListener('click', () => { chatOverlay.style.display = 'flex'; });
@@ -154,41 +165,78 @@ function addMessage(text, type) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// Bot trả lời tự động
-const botReplies = [
-    "I agree with that analysis.",
-    "The market volatility is quite high today.",
-    "Watching the resistance level at $69,500.",
-    "Have you deployed the new XGBoost model yet?",
-    "HODL! 🚀",
-    "My signals are showing a bearish divergence."
-];
+// === TRÍ TUỆ NHÂN TẠO CỦA LUME (Mô phỏng) ===
+function generateLumeResponse(input) {
+    const lowerInput = input.toLowerCase();
+    
+    // 1. Hỏi giá
+    if (lowerInput.includes('price') || lowerInput.includes('current')) {
+        return `The current market price for BTC/USDT is <b>$${currentPrice.toFixed(2)}</b>. The market is active.`;
+    }
+    
+    // 2. Hỏi xu hướng / Dự đoán
+    if (lowerInput.includes('trend') || lowerInput.includes('prediction') || lowerInput.includes('forecast') || lowerInput.includes('buy') || lowerInput.includes('sell')) {
+        const trend = predictedPriceGlobal > currentPrice ? "UPWARD (Bullish)" : "DOWNWARD (Bearish)";
+        const diff = Math.abs(predictedPriceGlobal - currentPrice).toFixed(2);
+        return `Based on my Ensemble Model analysis, the short-term trend is <b>${trend}</b>.<br>My forecast target is <b>$${predictedPriceGlobal.toFixed(2)}</b> (Difference: $${diff}). Please check the Stop Loss levels.`;
+    }
 
-function botReply() {
+    // 3. Hỏi về hệ thống
+    if (lowerInput.includes('model') || lowerInput.includes('ai') || lowerInput.includes('system')) {
+        return `I am operating on a Hybrid Architecture combining <b>Long Short-Term Memory (LSTM)</b> for sequence prediction and <b>XGBoost</b> for feature classification. Accuracy is currently rated at ~98%.`;
+    }
+
+    // 4. Hỏi rủi ro
+    if (lowerInput.includes('risk') || lowerInput.includes('stop loss') || lowerInput.includes('safe')) {
+        const sl = document.getElementById('stopLoss').innerText;
+        return `Risk management is crucial. Based on current volatility (ATR), I recommend setting your Stop Loss at <b>${sl}</b> to minimize potential drawdown.`;
+    }
+
+    // 5. Chào hỏi
+    if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('lume')) {
+        return `Hello Operator! I am Lume, ready to analyze the charts. How can I assist your trading session?`;
+    }
+
+    // Mặc định
+    return `I'm analyzing that specific parameter. In the meantime, keep an eye on the volume indicators. Can you clarify your request regarding the market data?`;
+}
+
+function botReply(userText) {
+    // Hiệu ứng "Đang nhập..."
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message msg-in';
+    typingDiv.style.fontStyle = 'italic';
+    typingDiv.style.color = '#888';
+    typingDiv.innerText = "Lume is analyzing...";
+    chatContainer.appendChild(typingDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
     setTimeout(() => {
-        const randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
-        addMessage(randomReply, 'msg-in');
-    }, 1000 + Math.random() * 2000); // Trả lời sau 1-3 giây
+        chatContainer.removeChild(typingDiv); // Xóa dòng đang nhập
+        const reply = generateLumeResponse(userText); // Lấy câu trả lời thông minh
+        addMessage(reply, 'msg-in');
+    }, 1500); // Trả lời sau 1.5 giây
 }
 
 if(sendMsgBtn) {
-    sendMsgBtn.addEventListener('click', () => {
+    const handleSend = () => {
         const text = msgInput.value.trim();
         if(text) {
             addMessage(text, 'msg-out');
             msgInput.value = '';
-            botReply(); // Kích hoạt bot
+            botReply(text); // Gọi Lume trả lời
         }
-    });
-    // Enter để gửi
+    };
+    sendMsgBtn.addEventListener('click', handleSend);
     msgInput.addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') sendMsgBtn.click();
+        if(e.key === 'Enter') handleSend();
     });
 }
 
 // ============================================================
-// 4. AUTH & CORE SYSTEM (Giữ nguyên)
+// 4. AUTH & CORE SYSTEM (Giữ nguyên logic cũ)
 // ============================================================
+// ... (Phần code bên dưới giữ nguyên logic Auth và InitSystem như cũ)
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
         isRegisterMode = !isRegisterMode;
@@ -217,9 +265,7 @@ function unlockInterface(user) {
         localStorage.setItem('stableCastEmail', userEmail);
         localStorage.setItem('stableCastAvatar', userAvatar);
     }
-
     updateProfileInfo(userName, userEmail, userAvatar);
-
     const overlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
     
@@ -343,6 +389,7 @@ function setupChartAndSocket() {
 }
 
 function updateDashboard(predictedVal, direction, source) {
+    predictedPriceGlobal = predictedVal; // Cập nhật biến toàn cục cho Lume dùng
     predEl.innerText = `$${predictedVal.toFixed(2)}`;
     predEl.style.color = direction === 'UP' ? '#0ecb81' : '#f6465d'; 
     const volatility = Math.abs(predictedVal - currentPrice) * 1.5 + 25; 
