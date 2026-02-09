@@ -1,119 +1,99 @@
-// --- CONFIGURATION ---
-const logBox = document.getElementById('terminalLogs');
-const priceEl = document.getElementById('btcPrice');
-const predEl = document.getElementById('predPrice');
-const slEl = document.getElementById('stopLoss');
-const tpEl = document.getElementById('takeProfit');
-
-let currentPrice = 0;
-let priceHistory = [];
-let timeLabels = [];
-
-// --- UTILS: LOGGING FUNCTION ---
-function log(msg) {
-    const time = new Date().toLocaleTimeString('en-US', {hour12: false});
-    const div = document.createElement('div');
-    div.className = 'log-entry';
-    div.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
-    logBox.appendChild(div);
-    logBox.scrollTop = logBox.scrollHeight;
+:root {
+    --bg: #0b0e11;
+    --card: #181d23;
+    --text: #eaecef;
+    --green: #0ecb81;
+    --red: #f6465d;
+    --blue: #3b82f6;
+    --gray: #848e9c;
+    --border: #2b3139;
+    --yellow: #f0b90b;
 }
+* { box-sizing: border-box; }
+body { 
+    font-family: 'JetBrains Mono', monospace; 
+    background: var(--bg); 
+    color: var(--text); 
+    margin: 0; 
+    padding: 20px;
+}
+.container { max-width: 1200px; margin: 0 auto; }
 
-// --- CHART SETUP (Chart.js) ---
-const ctx = document.getElementById('mainChart').getContext('2d');
-const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: timeLabels,
-        datasets: [{
-            label: 'Real-time Price',
-            data: priceHistory,
-            borderColor: '#0ecb81',
-            backgroundColor: 'rgba(14, 203, 129, 0.1)',
-            borderWidth: 2,
-            tension: 0.2,
-            fill: true,
-            pointRadius: 0
-        }, {
-            label: 'AI Forecast',
-            data: [], // Placeholder for prediction line
-            borderColor: '#3b82f6',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            tension: 0.2,
-            pointRadius: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true, labels: { color: '#848e9c' } } },
-        scales: {
-            x: { display: false },
-            y: { 
-                position: 'right',
-                grid: { color: '#2b3139' },
-                ticks: { color: '#848e9c', callback: function(value) { return '$' + value; } }
-            }
-        },
-        animation: false
-    }
-});
+/* --- LOGIN SCREEN --- */
+.login-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #0b0e11; z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    background-image: radial-gradient(circle at center, #151a21 0%, #0b0e11 100%);
+}
+.login-box {
+    background: #181d23; padding: 40px; border-radius: 12px;
+    border: 1px solid #2b3139; width: 100%; max-width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+}
+.login-logo { font-size: 1.8rem; font-weight: bold; color: var(--blue); margin-bottom: 5px; }
+.login-logo span { color: var(--text); }
+.login-title { font-size: 0.8rem; color: var(--gray); letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase; }
+.input-group { margin-bottom: 20px; text-align: left; }
+.input-group label { display: block; font-size: 0.75rem; color: var(--gray); margin-bottom: 8px; }
+.input-group input {
+    width: 100%; padding: 12px; background: #0b0e11; border: 1px solid #2b3139;
+    border-radius: 6px; color: white; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.3s;
+}
+.input-group input:focus { border-color: var(--blue); }
+button#loginBtn {
+    width: 100%; padding: 12px; background: var(--blue); color: white;
+    border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; transition: 0.3s;
+}
+button#loginBtn:hover { background: #2b6cb0; }
+.login-msg { height: 20px; margin-top: 15px; font-size: 0.8rem; }
+.login-footer { margin-top: 30px; font-size: 0.7rem; color: #464d57; line-height: 1.5; }
 
-// --- REAL-TIME DATA (Binance WebSocket) ---
-const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+/* --- HEADER --- */
+header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;
+}
+.logo { font-size: 1.5rem; font-weight: bold; color: var(--blue); }
+.logo span { color: var(--text); }
+.status { font-size: 0.8rem; color: var(--green); display: flex; align-items: center; }
+.status::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 5px var(--green); }
 
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    const price = parseFloat(data.p);
-    
-    // Update UI Color based on trend
-    if (currentPrice > 0) {
-        priceEl.style.color = price >= currentPrice ? '#0ecb81' : '#f6465d';
-    }
-    currentPrice = price;
-    priceEl.innerText = `$${price.toFixed(2)}`;
+/* --- GRID & CARDS --- */
+.grid { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 20px; }
+@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+.card {
+    background: var(--card); border-radius: 8px; padding: 20px;
+    border: 1px solid var(--border); margin-bottom: 20px;
+}
+.card-title { 
+    font-size: 0.85rem; color: var(--gray); margin-bottom: 15px; 
+    text-transform: uppercase; border-bottom: 1px solid var(--border);
+    padding-bottom: 8px; display: flex; justify-content: space-between;
+}
+.price-display { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.current-price { font-size: 2.5rem; font-weight: bold; color: var(--green); }
+.pair { font-size: 1.2rem; color: var(--gray); }
 
-    // Update Chart Data (Keep last 50 points)
-    const timeNow = new Date().toLocaleTimeString();
-    if (timeLabels.length > 50) { 
-        timeLabels.shift(); 
-        priceHistory.shift(); 
-    }
-    timeLabels.push(timeNow);
-    priceHistory.push(price);
-    chart.update();
-};
+/* --- METRICS & SPECS --- */
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+.metric-item { background: #0b0e11; padding: 10px; border-radius: 4px; border: 1px solid #2b3139; }
+.metric-label { font-size: 0.7rem; color: var(--gray); }
+.metric-value { font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
+.green { color: var(--green); } .red { color: var(--red); } .blue { color: var(--blue); }
+.spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px dashed #2b3139; padding-bottom: 4px; }
+.spec-label { color: var(--gray); } .spec-val { color: var(--blue); text-align: right; }
 
-// --- SIMULATED AI BACKEND (Placeholder for Python API) ---
-// *Ghi chú: Đây là nơi sau này bạn sẽ thay bằng fetch() gọi tới server Python*
-setInterval(() => {
-    if(currentPrice === 0) return;
-
-    // 1. Giả lập tính ATR (Volatility)
-    const volatility = Math.random() * 40 + 10; 
-    
-    // 2. Giả lập Model dự đoán (Random noise quanh giá thật)
-    const predicted = currentPrice + (Math.random() * 100 - 45); 
-    
-    // 3. Tính Stoploss / TakeProfit
-    const sl = currentPrice - (volatility * 1.5);
-    const tp = currentPrice + (volatility * 2.5);
-
-    // Update UI
-    predEl.innerText = `$${predicted.toFixed(2)}`;
-    slEl.innerText = `$${sl.toFixed(2)}`;
-    tpEl.innerText = `$${tp.toFixed(2)}`;
-    
-    // Random Logs để nhìn cho "Pro"
-    const logMsg = [
-        `Normalization: Batch processed.`,
-        `LSTM Layer 2: Activation (tanh).`,
-        `Risk Manager: ATR updated to ${volatility.toFixed(2)}.`,
-        `Inference: Prediction confidence 94.2%.`
-    ];
-    if(Math.random() > 0.6) {
-        log(logMsg[Math.floor(Math.random() * logMsg.length)]);
-    }
-
-}, 3000); // Cập nhật mỗi 3 giây
+/* --- DOCS & LOGS --- */
+.doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 600px) { .doc-grid { grid-template-columns: 1fr; } }
+.doc-content ul { padding-left: 20px; margin: 0; font-size: 0.8rem; color: #b7bdc6; line-height: 1.6; }
+.disclaimer-box { background: rgba(246, 70, 93, 0.05); border-left: 3px solid var(--red); padding: 10px; font-size: 0.8rem; color: #b7bdc6; line-height: 1.5; }
+.logs { 
+    height: 120px; overflow-y: auto; font-size: 0.7rem; color: var(--gray); 
+    background: #050709; padding: 10px; border-top: 1px solid var(--border);
+    font-family: 'Consolas', monospace;
+}
+.log-entry { margin-bottom: 2px; } .log-time { color: var(--blue); margin-right: 5px; }
+footer { text-align: center; margin-top: 30px; color: var(--gray); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 10px; }
