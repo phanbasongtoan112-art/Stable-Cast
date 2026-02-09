@@ -4,13 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StableCast | Team 1 - ADY201m</title>
+    
     <link rel="icon" href="favicon.png?v=3" type="image/png">
+
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <div class="login-logo">STABLE<span>CAST</span>_AI</div>
+            <div class="login-title">SECURE TERMINAL ACCESS</div>
+            
+            <div class="input-group">
+                <label>Student ID / User</label>
+                <input type="text" id="username" placeholder="Enter ID..." value="DE200247">
+            </div>
+            
+            <div class="input-group">
+                <label>Access Key</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+
+            <button id="loginBtn" onclick="handleLogin()">AUTHENTICATE</button>
+            <div id="loginMsg" class="login-msg"></div>
+            
+            <div class="login-footer">
+                Authorized Personnel Only.<br>System Monitor: Team 1 - ADY201m
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <header>
@@ -72,28 +98,25 @@
 
         <div class="card" style="margin-top: 0px;">
             <div class="card-title" style="color: var(--blue);">📂 PROJECT DOCUMENTATION: LAB REPORT - ADY201m</div>
-            
             <div class="doc-grid">
                 <div class="doc-content">
-                    <h4 style="font-size: 0.9rem; color: var(--green); margin-top: 0;">1. WORKFLOW (Quy trình xử lý)</h4>
+                    <h4 style="font-size: 0.9rem; color: var(--green); margin-top: 0;">1. WORKFLOW (Quy trình)</h4>
                     <ul>
-                        <li><strong>Data Ingestion:</strong> Thu thập dữ liệu nến (OHLCV) thời gian thực thông qua API Binance.</li>
-                        <li><strong>Preprocessing:</strong> Làm sạch dữ liệu, xử lý Missing Values và chuẩn hóa (Min-Max Scaling [0,1]).</li>
-                        <li><strong>Model Inference:</strong> Dữ liệu chuỗi thời gian được đưa vào mạng nơ-ron hồi quy (LSTM) để dự báo xu hướng tiếp theo.</li>
-                        <li><strong>Risk Management:</strong> Tính toán ATR (Average True Range) để đề xuất ngưỡng cắt lỗ/chốt lời tự động.</li>
+                        <li><strong>Data Ingestion:</strong> Thu thập dữ liệu nến (OHLCV) thời gian thực từ API Binance.</li>
+                        <li><strong>Preprocessing:</strong> Làm sạch dữ liệu và chuẩn hóa (Min-Max Scaling [0,1]).</li>
+                        <li><strong>Model Inference:</strong> Dữ liệu được đưa qua mạng nơ-ron hồi quy (LSTM) để dự báo.</li>
+                        <li><strong>Risk Management:</strong> Tính toán ATR để đề xuất điểm cắt lỗ/chốt lời.</li>
                     </ul>
                 </div>
-
                 <div class="doc-content">
-                    <h4 style="font-size: 0.9rem; color: var(--red); margin-top: 0;">2. ACADEMIC DISCLAIMER (Quan trọng)</h4>
+                    <h4 style="font-size: 0.9rem; color: var(--red); margin-top: 0;">2. ACADEMIC DISCLAIMER</h4>
                     <div class="disclaimer-box">
                         <p style="margin: 0 0 10px;"><strong>⚠️ EDUCATIONAL SANDBOX ONLY</strong></p>
                         <p style="margin: 0;">
-                            Đây là sản phẩm thử nghiệm thuộc khuôn khổ bài Lab môn <strong>ADY201m (FPT University)</strong> do <strong>Team 1</strong> thực hiện.
-                            Mục đích duy nhất là phục vụ báo cáo học thuật và nghiên cứu mô hình Deep Learning.
+                            Sản phẩm thử nghiệm thuộc khuôn khổ bài Lab môn <strong>ADY201m (FPT University)</strong> do <strong>Team 1</strong> thực hiện.
                         </p>
                         <p style="margin: 10px 0 0; font-style: italic; opacity: 0.7;">
-                            *Hệ thống này KHÔNG phải là ứng dụng thương mại và KHÔNG đưa ra lời khuyên đầu tư tài chính thực tế.*
+                            *Hệ thống KHÔNG đưa ra lời khuyên đầu tư tài chính thực tế.*
                         </p>
                     </div>
                 </div>
@@ -113,5 +136,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
