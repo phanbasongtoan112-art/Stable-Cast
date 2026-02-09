@@ -32,9 +32,11 @@ let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
 // ============================================================
 // 0. AUTO-LOGIN & INIT
 // ============================================================
+// Chạy khi trang load xong
 window.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('stableCastUser');
     if (savedUser) {
+        // Ẩn login ngay lập tức
         const loginOverlay = document.getElementById('loginOverlay');
         if(loginOverlay) loginOverlay.style.display = 'none';
         
@@ -48,10 +50,12 @@ window.addEventListener('DOMContentLoaded', () => {
         startTimeTracking();
         renderFeed();
         
+        // Khởi động chart sau 1 chút để DOM ổn định
         setTimeout(() => { initSystem(); }, 500);
     }
 });
 
+// Helper: Nếu chuỗi rỗng -> Trả về "None"
 function checkEmpty(val) {
     if (!val || val.trim() === "") return "None";
     return val;
@@ -105,7 +109,7 @@ if(btnCommunity) btnCommunity.addEventListener('click', () => switchView('commun
 if(btnProfile) btnProfile.addEventListener('click', () => switchView('profile'));
 
 // ============================================================
-// 2. EDIT PROFILE
+// 2. EDIT PROFILE (Handling "None")
 // ============================================================
 const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
@@ -116,6 +120,7 @@ const editAvatarInput = document.getElementById('editAvatarInput');
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
         if(editProfileModal) editProfileModal.style.display = 'flex';
+        // Pre-fill inputs safely
         const setVal = (id, targetId) => {
             const el = document.getElementById(id);
             const target = document.getElementById(targetId);
@@ -135,6 +140,7 @@ if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileMod
 
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
+        // Collect Data with checkEmpty
         const getVal = (id) => {
             const el = document.getElementById(id);
             return el ? checkEmpty(el.value) : "None";
@@ -151,6 +157,7 @@ if(saveProfileBtn) {
             avatar: null
         };
 
+        // Handle Avatar
         if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -245,6 +252,7 @@ function renderFeed() {
     });
 }
 
+// Global function for onclick
 window.connectUser = function(postId) {
     const postIndex = communityPosts.findIndex(p => p.id === postId);
     if (postIndex > -1 && !communityPosts[postIndex].connected) {
@@ -322,6 +330,7 @@ if(sendMsgBtn) {
         if(text) {
             addMessage(text, 'msg-out');
             msgInput.value = '';
+            // Bot typing effect
             setTimeout(() => {
                 const reply = generateLumeResponse(text);
                 addMessage(reply, 'msg-in');
@@ -388,8 +397,10 @@ function initSystem() {
         if(chart) chart.update();
     };
 
-    setInterval(() => {
+    // AI Simulation
+    aiInterval = setInterval(() => {
         if(currentPrice === 0) return;
+        // Mock prediction logic since we don't have backend
         const fakePrice = currentPrice + (Math.random() * 40 - 15);
         predictedPriceGlobal = fakePrice;
         
@@ -405,11 +416,13 @@ function initSystem() {
     }, 2000);
 }
 
+// Login Button Logic
 const mainBtn = document.getElementById('mainAuthBtn');
 if(mainBtn) {
     mainBtn.addEventListener('click', () => {
+        // Simplified Login for Demo
         const user = document.getElementById('email').value || "Guest";
         localStorage.setItem('stableCastUser', user);
-        location.reload();
+        location.reload(); // Reload to trigger auto-login
     });
 }
