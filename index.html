@@ -18,9 +18,9 @@
         body { 
             background-color: #0b0c10; 
             color: #c5c6c7; 
-            overflow-y: auto; 
+            overflow-y: auto; /* Cho phép cuộn */
             min-height: 100vh; 
-            padding-bottom: 20px;
+            padding-bottom: 40px; /* Thêm khoảng trống dưới cùng để footer không bị sát quá */
         }
         
         /* === LOGIN SCREEN === */
@@ -68,7 +68,7 @@
         .main-app-container { display: none; opacity: 0; transition: opacity 1s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
         
         /* HEADER */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         
         /* LOGO STYLE */
         .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
@@ -76,41 +76,54 @@
         .status-dot { height: 10px; width: 10px; background-color: #0ecb81; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #0ecb81; margin-right: 5px; animation: pulse 2s infinite;}
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* GRID LAYOUT (Đã sửa chiều cao) */
+        /* GRID LAYOUT - SỬA LỖI ĐÈ GIAO DIỆN */
         .dashboard-grid { 
             display: grid; 
             grid-template-columns: 2.2fr 1fr; 
             gap: 20px; 
-            /* SỬA: Giảm từ 72vh xuống 55vh cho gọn */
-            height: 55vh; 
+            /* Thay vì fix cứng chiều cao, ta dùng min-height để nó tự giãn */
+            min-height: 550px; 
+            height: auto;
+            margin-bottom: 30px; /* Đẩy Logs xuống xa hơn */
         }
         
-        .card { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 4px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
         /* CHART SECTION */
-        /* SỬA: Giảm font size xuống 3rem */
-        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 10px 0; letter-spacing: -1px; }
-        
-        /* SỬA: Giảm chiều cao khung chart xuống 75% */
-        .chart-container { position: relative; height: 75%; width: 100%; }
+        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
 
         /* RIGHT PANEL INFO */
-        .prediction-box { text-align: center; padding: 20px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 15px; }
-        .pred-label { color: #848e9c; font-size: 0.85rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .pred-price { font-size: 2.5rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
+        .prediction-box { text-align: center; padding: 25px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 20px; }
+        .pred-label { color: #848e9c; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .pred-price { font-size: 2.8rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
         
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
         .info-label { color: #848e9c; }
         .info-val { color: #fff; font-weight: bold; }
 
         /* SYSTEM SPECS BOX */
-        .specs-title { color: #848e9c; margin-bottom: 10px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .specs-title { color: #848e9c; margin-bottom: 15px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
         .spec-val-highlight { color: #3b82f6; font-family: monospace; }
 
-        /* TERMINAL LOGS (Tăng chiều cao lên chút để bù khoảng trống) */
-        .logs-container { margin-top: 20px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #3b82f6; font-family: 'Courier New', monospace; }
+        /* TERMINAL LOGS (Nằm tách biệt hẳn xuống dưới) */
+        .logs-container { 
+            margin-top: 30px; /* Cách xa biểu đồ */
+            background: #000; border: 1px solid #333; 
+            height: 180px; overflow-y: auto; 
+            padding: 15px; font-size: 0.85rem; 
+            color: #3b82f6; font-family: 'Courier New', monospace; 
+        }
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-time { color: #555; margin-right: 10px; }
+
+        /* FOOTER INFO */
+        .footer-info {
+            text-align: center; margin-top: 25px; 
+            color: #555; font-size: 0.8rem; 
+            border-top: 1px solid #222; padding-top: 15px;
+        }
+        .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
 
         /* SCROLLBAR */
         ::-webkit-scrollbar { width: 8px; }
@@ -132,6 +145,12 @@
                 <label>PASSCODE</label>
                 <input type="password" id="password" placeholder="••••••">
             </div>
+            
+            <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
+                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888; display: inline;">Remember Access Session</label>
+            </div>
+
             <button id="mainAuthBtn">AUTHENTICATE</button>
             <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
             <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
@@ -157,14 +176,14 @@
 
         <div class="dashboard-grid">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; color: #848e9c; font-size: 0.9rem; margin-bottom: 5px;">
+                <div style="display: flex; justify-content: space-between; color: #848e9c; font-size: 0.9rem; margin-bottom: 10px;">
                     <span>MARKET OVERVIEW</span>
                     <span style="color: #f0b90b; font-weight: bold;">BINANCE: BTC/USDT</span>
                 </div>
                 
                 <div class="price-display" id="btcPrice">LOADING...</div>
                 
-                <div style="font-size: 0.8rem; margin-bottom: 10px; display: flex; gap: 20px;">
+                <div style="font-size: 0.8rem; margin-bottom: 15px; display: flex; gap: 20px;">
                     <span style="color: #0ecb81;">▬ Real-time Price</span>
                     <span style="color: #3b82f6; border-bottom: 2px dashed #3b82f6;">--- AI Forecast</span>
                 </div>
@@ -181,7 +200,7 @@
                     <div style="color: #555; font-size: 0.8rem; margin-top: 5px;">Confidence Interval: 98.2%</div>
                 </div>
 
-                <div class="card" style="margin-bottom: 15px;">
+                <div class="card" style="margin-bottom: 20px;">
                     <div class="info-row">
                         <span class="info-label">Stop Loss (ATR)</span>
                         <span class="info-val" id="stopLoss" style="color: #f6465d;">---</span>
@@ -218,8 +237,9 @@
             <div class="log-entry"><span class="log-time">[SYSTEM]</span> Ready to connect...</div>
         </div>
         
-        <div style="text-align: center; margin-top: 15px; color: #333; font-size: 0.75rem;">
-            © 2026 StableCast Project. FPT University.
+        <div class="footer-info">
+            © 2026 StableCast Project. FPT University.<br>
+            Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span>
         </div>
     </div>
 
