@@ -97,7 +97,7 @@
         .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
         .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
 
-        /* === NEW: MODAL EDIT PROFILE === */
+        /* === MODAL EDIT PROFILE === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-box { background: #111; border: 1px solid #333; padding: 30px; width: 400px; border-radius: 8px; position: relative; }
         .modal-header { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; }
@@ -105,41 +105,50 @@
         .close-modal:hover { color: #f6465d; }
         .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; }
         .form-input:focus { border-color: #3b82f6; }
+        
+        /* Custom Input File */
+        .file-upload-label { display: block; padding: 10px; background: #1a1a1a; border: 1px dashed #555; text-align: center; color: #888; cursor: pointer; margin-bottom: 15px; font-size: 0.9rem; transition: 0.3s; }
+        .file-upload-label:hover { border-color: #0ecb81; color: #0ecb81; }
+        
         .save-btn { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; cursor: pointer; font-weight: bold; }
         .save-btn:hover { background: #2563eb; }
 
-        /* === NEW: CHAT SYSTEM (COMMS CENTER) === */
+        /* === CHAT SYSTEM (MESSAGES) === */
         .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
-        .chat-window { width: 900px; height: 600px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        .chat-window { width: 950px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         
         /* Cột trái: Friend List */
-        .chat-sidebar { width: 300px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .chat-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
         .chat-header { padding: 20px; border-bottom: 1px solid #333; font-weight: bold; color: #0ecb81; display: flex; justify-content: space-between; align-items: center; }
         .friend-list { flex: 1; overflow-y: auto; }
         .friend-item { padding: 15px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1a1a; transition: 0.2s; }
         .friend-item:hover { background: #1a1a1a; }
-        .friend-item.active { background: #1a1a1a; border-left: 3px solid #0ecb81; }
-        .friend-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .friend-info h4 { font-size: 0.9rem; color: #fff; margin-bottom: 3px; }
+        .friend-item.active { background: #1f2937; border-left: 3px solid #3b82f6; }
+        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .friend-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 3px; font-weight: bold; }
         .friend-info p { font-size: 0.75rem; color: #888; }
-        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; }
+        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
 
         /* Cột phải: Chat Content */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
-        .chat-title-bar { padding: 15px 20px; border-bottom: 1px solid #333; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .chat-title-bar { padding: 15px 20px; border-bottom: 1px solid #333; color: #fff; display: flex; justify-content: space-between; align-items: center; background: #131722; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        .message { max-width: 70%; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; position: relative; }
-        .msg-in { align-self: flex-start; background: #1a1a1a; color: #ccc; border-bottom-left-radius: 0; }
-        .msg-out { align-self: flex-end; background: #004d40; color: #fff; border-bottom-right-radius: 0; border: 1px solid #00695c; }
-        .msg-time { font-size: 0.7rem; color: #555; margin-top: 5px; text-align: right; }
+        .message { max-width: 75%; padding: 12px 18px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; position: relative; }
+        .msg-in { align-self: flex-start; background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 0; border: 1px solid #374151; }
+        .msg-out { align-self: flex-end; background: #059669; color: #fff; border-bottom-right-radius: 0; border: 1px solid #047857; }
+        .msg-time { font-size: 0.7rem; color: #9ca3af; margin-top: 5px; text-align: right; opacity: 0.8; }
 
         .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
-        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 10px; color: #fff; outline: none; border-radius: 4px; }
-        .send-btn { background: #0ecb81; color: #000; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .send-btn:hover { opacity: 0.9; }
+        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: #fff; outline: none; border-radius: 6px; }
+        .chat-input:focus { border-color: #3b82f6; }
+        .send-btn { background: #3b82f6; color: #fff; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        .send-btn:hover { background: #2563eb; }
         .close-chat-btn { color: #888; cursor: pointer; font-size: 1.2rem; }
         .close-chat-btn:hover { color: #f6465d; }
+
+        /* Lume Avatar Special Style */
+        .lume-avatar-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
 
     </style>
 </head>
@@ -152,7 +161,7 @@
             <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
             <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
-                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Session</label>
+                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
             </div>
             <button id="mainAuthBtn">AUTHENTICATE</button>
             <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
@@ -216,7 +225,7 @@
                 <div class="profile-name" id="profile-name-txt">OPERATOR NAME</div>
                 <div class="profile-role" id="profile-role-txt">Lead Developer | FPT University</div>
                 <div class="profile-actions">
-                    <button class="action-btn" id="openChatBtn"><i class="fas fa-comment-alt"></i> Comms Center</button>
+                    <button class="action-btn" id="openChatBtn"><i class="fas fa-comment-alt"></i> Messages</button>
                     <button class="action-btn" id="editProfileBtn"><i class="fas fa-cog"></i> Edit Profile</button>
                 </div>
             </div>
@@ -250,17 +259,21 @@
     <div id="editProfileModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <span>EDIT OPERATOR PROFILE</span>
+                <span>EDIT PROFILE</span>
                 <i class="fas fa-times close-modal" id="closeEditModal"></i>
             </div>
+            
             <label style="color: #888; font-size: 0.8rem;">DISPLAY NAME</label>
             <input type="text" id="editNameInput" class="form-input" placeholder="Enter new name">
             
             <label style="color: #888; font-size: 0.8rem;">JOB TITLE</label>
             <input type="text" id="editRoleInput" class="form-input" placeholder="e.g. Senior Trader">
             
-            <label style="color: #888; font-size: 0.8rem;">AVATAR IMAGE URL</label>
-            <input type="text" id="editAvatarInput" class="form-input" placeholder="https://example.com/image.jpg">
+            <label style="color: #888; font-size: 0.8rem;">AVATAR IMAGE</label>
+            <label class="file-upload-label" for="editAvatarInput">
+                <i class="fas fa-cloud-upload-alt"></i> Click to Upload Image
+            </label>
+            <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
             
             <button class="save-btn" id="saveProfileBtn">SAVE CHANGES</button>
         </div>
@@ -270,31 +283,15 @@
         <div class="chat-window">
             <div class="chat-sidebar">
                 <div class="chat-header">
-                    <span>COMMS CENTER</span>
+                    <span>MESSAGES</span>
                     <i class="fas fa-satellite-dish"></i>
                 </div>
                 <div class="friend-list">
-                    <div class="friend-item active" onclick="switchChat('bot1')">
-                        <img src="https://i.pravatar.cc/150?img=11" class="friend-avatar">
+                    <div class="friend-item active">
+                        <img src="https://i.pinimg.com/736x/d6/38/20/d63820253521256e297127e997645f07.jpg" class="friend-avatar lume-avatar-glow">
                         <div class="friend-info">
-                            <h4>Alice (Analyst)</h4>
-                            <p>Market looking bullish!</p>
-                        </div>
-                        <div class="status-online"></div>
-                    </div>
-                    <div class="friend-item" onclick="switchChat('bot2')">
-                        <img src="https://i.pravatar.cc/150?img=33" class="friend-avatar">
-                        <div class="friend-info">
-                            <h4>Bob (Miner)</h4>
-                            <p>Hashrate is dropping...</p>
-                        </div>
-                        <div class="status-online" style="background: #f0b90b;"></div>
-                    </div>
-                     <div class="friend-item" onclick="switchChat('bot3')">
-                        <img src="https://i.pravatar.cc/150?img=53" class="friend-avatar">
-                        <div class="friend-info">
-                            <h4>Elon M. (Whale)</h4>
-                            <p>To the moon? 🚀</p>
+                            <h4>Lume (AI Assistant)</h4>
+                            <p>StableCast Analysis Core</p>
                         </div>
                         <div class="status-online"></div>
                     </div>
@@ -302,17 +299,21 @@
             </div>
             <div class="chat-main">
                 <div class="chat-title-bar">
-                    <span id="currentChatUser">Alice (Analyst)</span>
+                    <span id="currentChatUser" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-robot" style="color: #3b82f6;"></i> Lume (AI Assistant)
+                    </span>
                     <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
                 </div>
                 <div class="chat-messages" id="chatContainer">
                     <div class="message msg-in">
-                        Hello Operator! Have you checked the latest BTC signals?
-                        <div class="msg-time">10:45 AM</div>
+                        Hello Operator! I am <b>Lume</b>, your StableCast AI Assistant. 
+                        <br><br>
+                        I am connected to the real-time data feed. You can ask me about the current price, trend analysis, or risk management advice. How can I help you today?
+                        <div class="msg-time">System</div>
                     </div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Type a secure message...">
+                    <input type="text" class="chat-input" id="msgInput" placeholder="Ask Lume about the market...">
                     <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
