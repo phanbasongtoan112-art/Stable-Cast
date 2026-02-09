@@ -10,10 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* === RESET & BASE === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
         body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
-        /* (Các style CSS còn lại của bạn giữ nguyên bên dưới...) */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
@@ -100,7 +98,6 @@
         .send-btn { background: #3b82f6; color: #fff; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 6px; }
         .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
         .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
-        .lume-avatar-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body>
@@ -119,7 +116,6 @@
             <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
                 <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
             </div>
-            <p id="loginMsg"></p>
         </div>
         <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
     </div>
@@ -190,7 +186,6 @@
                 <div class="info-card">
                     <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> Description</h3>
                     <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="profile-desc-txt">StableCast is an advanced AI-powered cryptocurrency price prediction terminal...</p>
-                    <h3><i class="fas fa-users" style="margin-right: 10px;"></i> Social Stats</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                         <div class="stat-box"><div class="stat-num" id="stat-friends">0</div><div class="stat-label">Friends</div></div>
                         <div class="stat-box"><div class="stat-num" id="stat-hours">0m</div><div class="stat-label">Online Time</div></div>
@@ -208,23 +203,15 @@
             <div class="modal-header"><span>EDIT PROFILE</span><i class="fas fa-times close-modal" id="closeEditModal"></i></div>
             <div class="modal-body">
                 <div class="modal-section-title">Visual Identity</div>
-                <label class="file-upload-label" for="editAvatarInput"><i class="fas fa-cloud-upload-alt"></i> Upload New Avatar</label>
-                <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
-
+                <input type="file" id="editAvatarInput" accept="image/*" style="margin-bottom: 10px;">
                 <div class="modal-section-title">Personal Information</div>
-                <label style="color:#888; font-size:0.8rem;">DISPLAY NAME</label><input type="text" id="editNameInput" class="form-input" placeholder="Name">
-                <label style="color:#888; font-size:0.8rem;">JOB TITLE</label><input type="text" id="editRoleInput" class="form-input" placeholder="Title">
-
+                <input type="text" id="editNameInput" class="form-input" placeholder="Name">
+                <input type="text" id="editRoleInput" class="form-input" placeholder="Title">
                 <div class="modal-section-title">Contact Details</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="color:#888; font-size:0.8rem;">OPERATOR ID</label><input type="text" id="editIDInput" class="form-input"></div>
-                    <div><label style="color:#888; font-size:0.8rem;">EMAIL</label><input type="text" id="editEmailInput" class="form-input"></div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="color:#888; font-size:0.8rem;">ORGANIZATION</label><input type="text" id="editOrgInput" class="form-input"></div>
-                    <div><label style="color:#888; font-size:0.8rem;">LOCATION</label><input type="text" id="editLocInput" class="form-input"></div>
-                </div>
-
+                <input type="text" id="editIDInput" class="form-input">
+                <input type="text" id="editEmailInput" class="form-input">
+                <input type="text" id="editOrgInput" class="form-input">
+                <input type="text" id="editLocInput" class="form-input">
                 <div class="modal-section-title">Description</div>
                 <textarea id="editDescInput" class="form-textarea"></textarea>
             </div>
@@ -235,25 +222,22 @@
     <div id="chatSystemOverlay" class="chat-overlay">
         <div class="chat-window">
             <div class="chat-sidebar">
-                <div class="chat-header"><span>MESSAGES</span><i class="fas fa-satellite-dish"></i></div>
+                <div class="chat-header"><span>MESSAGES</span></div>
                 <div class="friend-list">
                     <div class="friend-item active">
-                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop" class="friend-avatar lume-avatar-glow">
+                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop" class="friend-avatar">
                         <div class="friend-info"><h4>Lume (AI Assistant)</h4><p>Online</p></div><div class="status-online"></div>
                     </div>
                 </div>
             </div>
             <div class="chat-main">
-                <div class="chat-title-bar">
-                    <span id="currentChatUser" style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-robot" style="color: #3b82f6;"></i> Lume (AI Assistant)</span>
-                    <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
-                </div>
+                <div class="chat-header"><span><i class="fas fa-robot"></i> Lume (AI)</span><i class="fas fa-times" id="closeChatBtn" style="cursor:pointer;"></i></div>
                 <div class="chat-messages" id="chatContainer">
-                    <div class="message msg-in">Hello! I am <b>Lume</b>. I can analyze the market for you. How was your day?<div class="msg-time">System</div></div>
+                    <div class="message msg-in">Hello! I am Lume. How can I help you analyze the market today?</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Chat with Lume...">
-                    <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" class="chat-input" id="msgInput" placeholder="Ask Lume...">
+                    <button class="send-btn" id="sendMsgBtn">SEND</button>
                 </div>
             </div>
         </div>
