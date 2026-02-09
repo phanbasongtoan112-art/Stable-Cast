@@ -15,36 +15,28 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// System Vars
+// === STATE & VARS ===
 let currentPrice = 0;
 let predictedPriceGlobal = 0; 
 let priceHistory = [];
 let forecastHistory = [];
 let timeLabels = [];
-let chart; 
+let chart; // Biến Chart toàn cục
 let ws; 
-let aiInterval; 
+let activeChatId = 'lume';
 
-// DATA: DANH SÁCH BÀI VIẾT (Mặc định nếu chưa có)
-const defaultPosts = [
-    { id: 101, name: "Alice Crypto", handle: "@alice_btc", avatar: "https://i.pravatar.cc/150?img=5", time: "2h ago", text: "BTC holding support at $68k. Good time to accumulate? #Bitcoin", connected: false },
-    { id: 102, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate spiking. Difficulty adjustment incoming.", connected: false },
-    { id: 103, name: "Elon M.", handle: "@technoking", avatar: "https://i.pravatar.cc/150?img=12", time: "5h ago", text: "To the moon! 🚀", connected: false }
+// Mặc định Friend List
+let friendList = JSON.parse(localStorage.getItem('stableCastFriendList')) || [
+    { id: 'lume', name: 'Lume (AI)', avatar: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop', status: 'Online' }
 ];
 
-// DATA: DANH SÁCH BẠN BÈ (Mặc định có Lume)
-const defaultFriends = [
-    { id: 'lume', name: 'Lume (AI)', avatar: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop', status: 'Online', messages: [] }
+// Mặc định Feed Posts
+let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
+    { id: 101, name: "Alice Crypto", avatar: "https://i.pravatar.cc/150?img=5", time: "2h ago", text: "BTC holding $68k support. Long here? 🚀", image: null, likes: 12, comments: [] },
+    { id: 102, name: "Bob Miner", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Difficulty adjustment is brutal this week.", image: null, likes: 5, comments: [] }
 ];
 
-// Load from LocalStorage
-let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || defaultPosts;
-let friendList = JSON.parse(localStorage.getItem('stableCastFriendList')) || defaultFriends;
-let activeChatId = null;
-
-// ============================================================
-// 0. INIT & AUTO-LOGIN
-// ============================================================
+// === 0. AUTO-LOGIN ===
 window.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('stableCastUser');
     if (savedUser) {
@@ -53,13 +45,16 @@ window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { document.querySelector('.main-app-container').style.opacity = '1'; }, 50);
         
         loadProfileData();
-        startTimeTracking();
         renderFeed();
-        renderFriendList(); // Render Chat Sidebar
-        setTimeout(() => { initSystem(); }, 500);
+        renderFriendList();
+        startTimeTracking();
+        
+        // QUAN TRỌNG: Khởi tạo Chart
+        setTimeout(initSystem, 500); 
     }
 });
 
+// Helper
 function checkEmpty(val) { return (!val || val.trim() === "") ? "None" : val; }
 
 function loadProfileData() {
@@ -70,319 +65,321 @@ function loadProfileData() {
         role: localStorage.getItem('stableCastRole'),
         id: localStorage.getItem('stableCastID') || "DE200247",
         org: localStorage.getItem('stableCastOrg') || "FPT University",
-        loc: localStorage.getItem('stableCastLoc') || "Da Nang, Vietnam",
-        desc: localStorage.getItem('stableCastDesc') || "StableCast Trader...",
-        friends: friendList.length // Số bạn bè thật
+        friends: friendList.length
     };
     updateProfileInfo(data);
 }
 
-// ============================================================
-// 1. NAV & VIEWS
-// ============================================================
+// === 1. NAV & VIEW SWITCHING (Có Fix Chart) ===
+const btnTerminal = document.getElementById('btn-terminal');
+const btnCommunity = document.getElementById('btn-community');
+const btnProfile = document.getElementById('btn-profile');
 const views = {
     dashboard: document.getElementById('dashboard-view'),
     community: document.getElementById('community-view'),
     profile: document.getElementById('profile-view')
 };
-const btns = {
-    dashboard: document.getElementById('btn-terminal'),
-    community: document.getElementById('btn-community'),
-    profile: document.getElementById('btn-profile')
-};
 
 function switchView(viewName) {
-    Object.values(btns).forEach(b => b.classList.remove('active'));
+    // Reset Buttons
+    btnTerminal.classList.remove('active');
+    btnCommunity.classList.remove('active');
+    btnProfile.classList.remove('active');
+    
+    // Hide Views
     Object.values(views).forEach(v => v.style.display = 'none');
     
-    btns[viewName].classList.add('active');
-    views[viewName].style.display = 'block';
+    // Show View
+    if(viewName === 'dashboard') {
+        btnTerminal.classList.add('active');
+        views.dashboard.style.display = 'block';
+        // Resize chart khi hiện lại
+        if(chart) chart.resize(); 
+    } else if(viewName === 'community') {
+        btnCommunity.classList.add('active');
+        views.community.style.display = 'block';
+    } else {
+        btnProfile.classList.add('active');
+        views.profile.style.display = 'block';
+    }
 }
 
-btns.dashboard.addEventListener('click', () => switchView('dashboard'));
-btns.community.addEventListener('click', () => switchView('community'));
-btns.profile.addEventListener('click', () => switchView('profile'));
+btnTerminal.addEventListener('click', () => switchView('dashboard'));
+btnCommunity.addEventListener('click', () => switchView('community'));
+btnProfile.addEventListener('click', () => switchView('profile'));
 
-// ============================================================
-// 2. COMMUNITY FEED & CONNECT LOGIC
-// ============================================================
+// === 2. COMMUNITY FEED (Like, Comment, Connect) ===
 function renderFeed() {
     const feedStream = document.getElementById('feedStream');
     feedStream.innerHTML = "";
     
     communityPosts.forEach(post => {
-        const postEl = document.createElement('div');
-        postEl.className = "feed-post";
+        const div = document.createElement('div');
+        div.className = "feed-post";
         
-        // Kiểm tra xem đã là bạn bè chưa
+        // Check connection
         const isFriend = friendList.some(f => f.id == post.id);
-        const connectBtnHtml = isFriend 
-            ? `<span class="friend-badge"><i class="fas fa-check"></i> Friend</span>` 
-            : `<button class="connect-btn" onclick="window.connectUser(${post.id})"><i class="fas fa-user-plus"></i> Connect</button>`;
+        const connectHtml = isFriend 
+            ? `<span style="color:#0ecb81; font-size:0.8rem; margin-left:10px;"><i class="fas fa-check"></i> Friend</span>`
+            : `<button class="connect-btn" onclick="window.connectUser(${post.id})">Connect</button>`;
 
-        postEl.innerHTML = `
+        // Image in post
+        const imgHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
+
+        // Comments HTML
+        let commentsHtml = '';
+        if(post.comments && post.comments.length > 0) {
+            commentsHtml = `<div style="margin-top:10px; padding-top:10px; border-top:1px dashed #333;">
+                ${post.comments.map(c => `<div style="font-size:0.8rem; color:#888; margin-bottom:5px;"><b>${c.user}:</b> ${c.text}</div>`).join('')}
+            </div>`;
+        }
+
+        div.innerHTML = `
             <img src="${post.avatar}" class="post-avatar">
             <div class="post-content">
                 <div class="post-header">
-                    <div class="post-info"><span class="post-name">${post.name}</span><span class="post-handle">${post.handle}</span>${connectBtnHtml}</div>
-                    <span class="post-time">${post.time}</span>
+                    <div><span class="post-user">${post.name}</span> ${connectHtml}</div>
+                    <span class="post-handle" style="font-size:0.8rem; color:#666;">${post.time}</span>
                 </div>
                 <div class="post-text">${post.text}</div>
+                ${imgHtml}
                 <div class="post-actions">
-                    <span class="action-item"><i class="far fa-heart"></i> Like</span>
-                    <span class="action-item"><i class="far fa-comment"></i> Reply</span>
-                    <span class="action-item"><i class="fas fa-share"></i> Share</span>
+                    <span class="action-item" onclick="window.likePost(${post.id})"><i class="far fa-heart"></i> ${post.likes}</span>
+                    <span class="action-item" onclick="window.toggleComment(${post.id})"><i class="far fa-comment"></i> Comment</span>
                 </div>
+                
+                <div id="comment-box-${post.id}" style="display:none; margin-top:10px;">
+                    <input type="text" id="input-comment-${post.id}" placeholder="Write a comment..." style="background:#000; border:1px solid #333; color:#fff; padding:5px; width:70%;">
+                    <button onclick="window.submitComment(${post.id})" style="background:#3b82f6; color:#fff; border:none; padding:5px 10px; cursor:pointer;">Send</button>
+                </div>
+                ${commentsHtml}
             </div>`;
-        feedStream.prepend(postEl);
+        feedStream.prepend(div);
     });
 }
 
-// Logic Kết Bạn
-window.connectUser = function(postId) {
-    const post = communityPosts.find(p => p.id === postId);
-    if (post) {
-        // Thêm vào danh sách bạn bè
-        const newFriend = {
-            id: post.id,
-            name: post.name,
-            avatar: post.avatar,
-            status: 'Offline',
-            messages: []
-        };
-        
-        friendList.push(newFriend);
-        localStorage.setItem('stableCastFriendList', JSON.stringify(friendList));
-        
-        // Cập nhật giao diện
+// Window functions for HTML onClick
+window.likePost = (id) => {
+    const p = communityPosts.find(x => x.id === id);
+    if(p) { p.likes++; savePosts(); renderFeed(); }
+}
+
+window.toggleComment = (id) => {
+    const box = document.getElementById(`comment-box-${id}`);
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+window.submitComment = (id) => {
+    const input = document.getElementById(`input-comment-${id}`);
+    const text = input.value.trim();
+    if(text) {
+        const p = communityPosts.find(x => x.id === id);
+        if(!p.comments) p.comments = [];
+        p.comments.push({ user: document.getElementById('profile-name-txt').innerText, text: text });
+        savePosts();
         renderFeed();
-        renderFriendList(); // Cập nhật bên Chat Sidebar
-        document.getElementById('stat-friends').innerText = friendList.length;
-        
-        alert(`You are now connected with ${post.name}!`);
     }
 }
 
-// Đăng bài mới
-const submitPostBtn = document.getElementById('submitPostBtn');
-if(submitPostBtn) {
-    submitPostBtn.addEventListener('click', () => {
-        const input = document.getElementById('postInput');
-        const text = input.value.trim();
-        if(text) {
-            const name = document.getElementById('profile-name-txt').innerText;
-            const newPost = {
-                id: Date.now(),
-                name: name,
-                handle: "@" + name.replace(/\s+/g, '').toLowerCase(),
-                avatar: document.getElementById('profile-avatar-img').src,
-                time: "Just now",
-                text: text,
-                connected: true // Bạn là bạn của chính mình
-            };
-            communityPosts.push(newPost);
-            localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
-            input.value = "";
-            renderFeed();
-        }
-    });
+window.connectUser = (id) => {
+    const p = communityPosts.find(x => x.id === id);
+    if(p) {
+        friendList.push({ id: p.id, name: p.name, avatar: p.avatar, status: 'Online' });
+        localStorage.setItem('stableCastFriendList', JSON.stringify(friendList));
+        renderFeed();
+        renderFriendList();
+        updateProfileInfo({friends: friendList.length}); // Update count
+        alert(`You are now friends with ${p.name}`);
+    }
 }
 
-// ============================================================
-// 3. CHAT SYSTEM (2 COLUMNS)
-// ============================================================
-const openChatBtn = document.getElementById('openChatBtn');
+function savePosts() { localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts)); }
+
+// Post Logic (Image + Sticker)
+window.handleMediaSelect = (input) => {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('mediaPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+window.clearMedia = () => {
+    document.getElementById('mediaInput').value = "";
+    document.getElementById('mediaPreview').style.display = 'none';
+    document.getElementById('previewImg').src = "";
+}
+window.addSticker = (s) => { document.getElementById('postInput').value += s; }
+
+document.getElementById('submitPostBtn').addEventListener('click', () => {
+    const text = document.getElementById('postInput').value.trim();
+    const imgSrc = document.getElementById('previewImg').src;
+    const hasImg = document.getElementById('mediaPreview').style.display === 'block';
+    
+    if(text || hasImg) {
+        const name = document.getElementById('profile-name-txt').innerText;
+        const newPost = {
+            id: Date.now(),
+            name: name,
+            avatar: document.getElementById('profile-avatar-img').src,
+            time: "Just now",
+            text: text,
+            image: hasImg ? imgSrc : null,
+            likes: 0,
+            comments: []
+        };
+        communityPosts.push(newPost);
+        savePosts();
+        document.getElementById('postInput').value = "";
+        clearMedia();
+        renderFeed();
+    }
+});
+
+// === 3. CHAT SYSTEM (Zalo Style) ===
 const chatOverlay = document.getElementById('chatSystemOverlay');
-const closeChatBtn = document.getElementById('closeChatBtn');
-const friendListContainer = document.getElementById('friendListContainer');
-const chatContainer = document.getElementById('chatContainer');
-const sendMsgBtn = document.getElementById('sendMsgBtn');
-const msgInput = document.getElementById('msgInput');
+document.getElementById('openChatBtn').addEventListener('click', () => chatOverlay.style.display = 'flex');
+document.getElementById('closeChatBtn').addEventListener('click', () => chatOverlay.style.display = 'none');
 
-if(openChatBtn) openChatBtn.addEventListener('click', () => chatOverlay.style.display = 'flex');
-if(closeChatBtn) closeChatBtn.addEventListener('click', () => chatOverlay.style.display = 'none');
-
-// Render Sidebar List
 function renderFriendList() {
-    friendListContainer.innerHTML = "";
-    friendList.forEach(friend => {
+    const list = document.getElementById('friendListContainer');
+    list.innerHTML = "";
+    friendList.forEach(f => {
         const div = document.createElement('div');
-        div.className = `friend-item ${activeChatId == friend.id ? 'active' : ''}`;
-        div.onclick = () => openChatWith(friend.id);
-        
+        div.className = `friend-item ${activeChatId == f.id ? 'active' : ''}`;
+        div.onclick = () => openChat(f.id);
         div.innerHTML = `
-            <img src="${friend.avatar}" class="friend-avatar">
-            <div class="friend-info">
-                <h4>${friend.name}</h4>
-                <p>${friend.id === 'lume' ? 'AI Assistant' : 'Trader'}</p>
-            </div>
-            ${friend.id === 'lume' ? '<div class="status-online"></div>' : ''}
+            <img src="${f.avatar}" class="friend-avatar">
+            <div class="friend-info"><h4>${f.name}</h4><p>${f.status}</p></div>
         `;
-        friendListContainer.appendChild(div);
+        list.appendChild(div);
     });
 }
 
-function openChatWith(id) {
+function openChat(id) {
     activeChatId = id;
-    renderFriendList(); // Refresh active class
+    renderFriendList();
+    const f = friendList.find(x => x.id == id);
+    document.getElementById('currentChatUser').innerHTML = `<i class="fas fa-user"></i> ${f.name}`;
+    document.getElementById('chatContainer').innerHTML = ""; // Clear old
     
-    const friend = friendList.find(f => f.id == id);
-    const chatTitle = document.getElementById('currentChatUser');
-    chatTitle.innerHTML = `<img src="${friend.avatar}" style="width:30px; height:30px; border-radius:50%;"> ${friend.name}`;
-    
-    // Clear & Load Messages (Mock)
-    chatContainer.innerHTML = "";
-    
-    if(friend.id === 'lume') {
-        addMessage("Hello! I am Lume. I can analyze the market for you.", 'msg-in');
-    } else {
-        addMessage(`You are now connected with ${friend.name}. Say hi!`, 'msg-in');
-    }
+    if(id === 'lume') addMessage("Hello! Ask me about the market.", 'msg-in');
+    else addMessage(`This is the start of your conversation with ${f.name}.`, 'msg-in');
 }
 
 function addMessage(text, type) {
+    const box = document.getElementById('chatContainer');
     const div = document.createElement('div');
-    div.className = `message ${type}`;
-    div.innerHTML = `${text}<div class="msg-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
-    chatContainer.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    div.className = `msg msg-${type}`;
+    div.innerText = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
 }
 
-// Logic Gửi Tin & Lume Rep
-if(sendMsgBtn) {
-    const handleSend = () => {
-        if(!activeChatId) { alert("Select a friend first!"); return; }
-        const text = msgInput.value.trim();
-        if(text) {
-            addMessage(text, 'msg-out');
-            msgInput.value = '';
-            
-            // Nếu chat với Lume -> AI trả lời
-            if(activeChatId === 'lume') {
-                setTimeout(() => {
-                    const reply = generateLumeResponse(text);
-                    addMessage(reply, 'msg-in');
-                }, 1000);
-            } 
-            // Nếu chat với người khác -> Giả lập "Đã xem" (Hoặc trả lời random nếu thích)
+document.getElementById('sendMsgBtn').addEventListener('click', () => {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if(text) {
+        addMessage(text, 'out');
+        input.value = "";
+        
+        if(activeChatId === 'lume') {
+            setTimeout(() => {
+                const reply = `BTC Price: $${currentPrice.toFixed(2)}. Trend is looking volatile.`;
+                addMessage(reply, 'msg-in');
+            }, 1000);
         }
-    };
-    sendMsgBtn.addEventListener('click', handleSend);
-    msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
-}
-
-// Lume Logic (Giữ nguyên trí thông minh)
-function generateLumeResponse(input) {
-    const text = input.toLowerCase();
-    if (text.match(/price/)) return `BTC is currently at <b>$${currentPrice.toFixed(2)}</b>.`;
-    if (text.match(/hello/)) return "Hello Operator! Ready to trade?";
-    return "I'm analyzing the market. Ask me about the price or trends.";
-}
-
-// ============================================================
-// 4. REAL-TIME TIME TRACKING & EDIT PROFILE
-// ============================================================
-function startTimeTracking() {
-    let totalMinutes = parseInt(localStorage.getItem('stableCastTotalMinutes')) || 0;
-    updateTimeDisplay(totalMinutes);
-    setInterval(() => {
-        totalMinutes++;
-        localStorage.setItem('stableCastTotalMinutes', totalMinutes);
-        updateTimeDisplay(totalMinutes);
-    }, 60000);
-}
-
-function updateTimeDisplay(minutes) {
-    const el = document.getElementById('stat-hours');
-    if(el) el.innerText = minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
-}
-
-// Edit Profile & Save Logic (Tương tự cũ nhưng thêm checkEmpty)
-const editProfileBtn = document.getElementById('editProfileBtn');
-const editProfileModal = document.getElementById('editProfileModal');
-const closeEditModal = document.getElementById('closeEditModal');
-const saveProfileBtn = document.getElementById('saveProfileBtn');
-const editAvatarInput = document.getElementById('editAvatarInput');
-
-if(editProfileBtn) editProfileBtn.addEventListener('click', () => {
-    editProfileModal.style.display = 'flex';
-    // Load current values...
-    document.getElementById('editNameInput').value = document.getElementById('profile-name-txt').innerText;
-});
-if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileModal.style.display = 'none');
-
-if(saveProfileBtn) saveProfileBtn.addEventListener('click', () => {
-    const data = {
-        name: checkEmpty(document.getElementById('editNameInput').value),
-        role: checkEmpty(document.getElementById('editRoleInput').value),
-        id: checkEmpty(document.getElementById('editIDInput').value),
-        email: checkEmpty(document.getElementById('editEmailInput').value),
-        org: checkEmpty(document.getElementById('editOrgInput').value),
-        loc: checkEmpty(document.getElementById('editLocInput').value),
-        desc: checkEmpty(document.getElementById('editDescInput').value),
-        avatar: null
-    };
-    
-    if (editAvatarInput.files && editAvatarInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            data.avatar = e.target.result;
-            saveAndUpdate(data);
-        }
-        reader.readAsDataURL(editAvatarInput.files[0]);
-    } else {
-        data.avatar = document.getElementById('profile-avatar-img').src;
-        saveAndUpdate(data);
     }
 });
 
-function saveAndUpdate(data) {
-    updateProfileInfo(data);
-    localStorage.setItem('stableCastUser', data.name);
-    // ... Save other fields ...
-    if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
-    editProfileModal.style.display = 'none';
-}
-
-function updateProfileInfo(data) {
-    if(data.name) document.getElementById('profile-name-txt').innerText = data.name;
-    // ... Update others ...
-    if(data.avatar) document.getElementById('profile-avatar-img').src = data.avatar;
-    document.getElementById('stat-friends').innerText = friendList.length; // Real count
-}
-
-// ============================================================
-// 5. LOGIN & CHART (Giữ nguyên)
-// ============================================================
-// (Login logic & Chart logic giữ nguyên như bài trước)
-const mainBtn = document.getElementById('mainAuthBtn');
-if(mainBtn) {
-    mainBtn.addEventListener('click', () => {
-        // ... Login Code ...
-        const user = document.getElementById('email').value || "Guest";
-        localStorage.setItem('stableCastUser', user);
-        location.reload();
-    });
-}
+// === 4. AUTH & CHART & PROFILE EDIT (Giữ nguyên logic cũ) ===
+// (Logic login, edit profile, chart initSystem tương tự bài trước)
+// Chỉ cần đảm bảo initSystem được gọi.
 
 function initSystem() {
-    // ... Chart Code ...
     const ctx = document.getElementById('mainChart').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: timeLabels,
             datasets: [{
-                label: 'Price', data: priceHistory, borderColor: '#0ecb81'
+                label: 'Price', data: priceHistory, borderColor: '#0ecb81', borderWidth: 2, tension: 0.2, pointRadius: 0
+            }, {
+                label: 'AI Forecast', data: forecastHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [5,5], tension: 0.4, pointRadius: 0
             }]
-        }
+        },
+        options: { responsive: true, maintainAspectRatio: false, animation: false }
     });
-    
-    // Simulating WebSocket for Demo
-    aiInterval = setInterval(() => {
-        const price = 68000 + Math.random() * 100;
+
+    ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+    ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        const price = parseFloat(data.p);
         currentPrice = price;
         document.getElementById('btcPrice').innerText = `$${price.toFixed(2)}`;
-        // Update Chart...
-    }, 2000);
+        
+        // Push Data
+        const t = new Date().toLocaleTimeString();
+        if(timeLabels.length > 50) { timeLabels.shift(); priceHistory.shift(); forecastHistory.shift(); }
+        timeLabels.push(t);
+        priceHistory.push(price);
+        
+        // Mock Forecast
+        predictedPriceGlobal = price + (Math.random()*20 - 5);
+        forecastHistory.push(predictedPriceGlobal);
+        document.getElementById('predPrice').innerText = `$${predictedPriceGlobal.toFixed(2)}`;
+        
+        if(chart) chart.update();
+    };
+}
+
+// Logic Edit Profile + Save (Giống cũ)
+const editBtn = document.getElementById('editProfileBtn');
+if(editBtn) editBtn.addEventListener('click', () => document.getElementById('editProfileModal').style.display = 'flex');
+document.getElementById('closeEditModal').addEventListener('click', () => document.getElementById('editProfileModal').style.display = 'none');
+
+document.getElementById('saveProfileBtn').addEventListener('click', () => {
+    // Logic save...
+    const name = document.getElementById('editNameInput').value;
+    if(name) {
+        localStorage.setItem('stableCastUser', name);
+        document.getElementById('profile-name-txt').innerText = name;
+    }
+    // Handle Avatar File
+    const fileInp = document.getElementById('editAvatarInput');
+    if(fileInp.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            localStorage.setItem('stableCastAvatar', e.target.result);
+            document.getElementById('profile-avatar-img').src = e.target.result;
+        };
+        reader.readAsDataURL(fileInp.files[0]);
+    }
+    document.getElementById('editProfileModal').style.display = 'none';
+});
+
+// Login Button
+document.getElementById('mainAuthBtn').addEventListener('click', () => {
+    const u = document.getElementById('email').value || "Operator";
+    localStorage.setItem('stableCastUser', u);
+    location.reload();
+});
+
+function updateProfileInfo(data) {
+    if(data.name) document.getElementById('profile-name-txt').innerText = data.name;
+    if(data.avatar) document.getElementById('profile-avatar-img').src = data.avatar;
+    if(data.friends) document.getElementById('stat-friends').innerText = data.friends;
+}
+
+// Time Tracking
+let totalMinutes = parseInt(localStorage.getItem('stableCastTotalMinutes')) || 0;
+function startTimeTracking() {
+    document.getElementById('stat-hours').innerText = `${Math.floor(totalMinutes/60)}h ${totalMinutes%60}m`;
+    setInterval(() => {
+        totalMinutes++;
+        localStorage.setItem('stableCastTotalMinutes', totalMinutes);
+        document.getElementById('stat-hours').innerText = `${Math.floor(totalMinutes/60)}h ${totalMinutes%60}m`;
+    }, 60000);
 }
