@@ -23,26 +23,20 @@
             padding-bottom: 40px; 
         }
 
-        /* === SCROLLBAR === */
+        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
         
-        /* === LOGIN SCREEN (Giữ nguyên) === */
-        #loginOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050505; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column;
-        }
+        /* === LOGIN SCREEN === */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
         .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: border 0.3s; }
         .input-group input:focus { border-color: #0ecb81; }
-        
         button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
         button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
         button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -54,23 +48,16 @@
         /* === MAIN APP CONTAINER === */
         .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
         
-        /* HEADER (Thêm Menu Nav) */
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
         
-        /* MENU NAV BUTTONS */
         .nav-tabs { display: flex; gap: 20px; background: #111; padding: 5px; border-radius: 30px; border: 1px solid #333; }
-        .nav-btn {
-            background: none; border: none; color: #848e9c; padding: 8px 20px; 
-            cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .nav-btn:hover { color: #fff; }
         .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
 
-        /* === DASHBOARD VIEW (Giao diện cũ) === */
-        #dashboard-view { display: block; } /* Mặc định hiện */
-        
+        /* === DASHBOARD === */
+        #dashboard-view { display: block; }
         .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
         .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
@@ -87,61 +74,72 @@
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-time { color: #555; margin-right: 10px; }
 
-        /* === PROFILE VIEW (Giao diện Mới) === */
-        #profile-view { display: none; } /* Mặc định ẩn */
-
-        /* 1. Cover Photo */
-        .profile-cover {
-            height: 200px; width: 100%;
-            background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center;
-            background-size: cover;
-            border-radius: 8px 8px 0 0;
-            position: relative;
-            border-bottom: 2px solid #0ecb81;
-        }
-
-        /* 2. Header Profile (Avatar + Name) */
-        .profile-header-card {
-            background: #0b0e11; border: 1px solid #2b3139; border-top: none;
-            border-radius: 0 0 8px 8px; padding: 20px;
-            position: relative; margin-bottom: 20px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        
-        .profile-avatar {
-            width: 140px; height: 140px;
-            border-radius: 50%;
-            border: 4px solid #0b0e11;
-            margin-top: -90px; /* Đẩy lên đè ảnh bìa */
-            background: #222;
-            object-fit: cover;
-            box-shadow: 0 0 20px rgba(14, 203, 129, 0.3);
-        }
-        
+        /* === PROFILE === */
+        #profile-view { display: none; }
+        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
+        .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; position: relative; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
+        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); }
         .profile-name { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 15px; }
         .profile-role { color: #3b82f6; font-size: 0.9rem; margin-bottom: 15px; letter-spacing: 1px; }
-        
         .profile-actions { display: flex; gap: 10px; }
-        .action-btn { padding: 8px 16px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; background: #1a1a1a; color: #ccc; }
-        .action-btn:hover { border-color: #0ecb81; color: #0ecb81; }
-
-        /* 3. Grid Content Profile */
+        .action-btn { padding: 8px 16px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; background: #1a1a1a; color: #ccc; transition: 0.3s; }
+        .action-btn:hover { border-color: #0ecb81; color: #0ecb81; background: #111; }
         .profile-content { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
-        
         .info-card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
         .info-card h3 { color: #848e9c; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; }
-        
         .detail-row { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
         .detail-icon { width: 30px; color: #0ecb81; text-align: center; margin-right: 10px; }
         .detail-text { color: #fff; }
         .detail-sub { display: block; font-size: 0.75rem; color: #555; }
-
         .stat-box { background: #131722; padding: 15px; border-radius: 4px; text-align: center; margin-bottom: 10px; border: 1px solid #333; }
         .stat-num { font-size: 1.5rem; color: #0ecb81; font-weight: bold; }
         .stat-label { font-size: 0.8rem; color: #848e9c; }
-
         .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
         .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
+
+        /* === NEW: MODAL EDIT PROFILE === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #111; border: 1px solid #333; padding: 30px; width: 400px; border-radius: 8px; position: relative; }
+        .modal-header { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; }
+        .close-modal { cursor: pointer; color: #555; }
+        .close-modal:hover { color: #f6465d; }
+        .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; }
+        .form-input:focus { border-color: #3b82f6; }
+        .save-btn { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+        .save-btn:hover { background: #2563eb; }
+
+        /* === NEW: CHAT SYSTEM (COMMS CENTER) === */
+        .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
+        .chat-window { width: 900px; height: 600px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
+        /* Cột trái: Friend List */
+        .chat-sidebar { width: 300px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .chat-header { padding: 20px; border-bottom: 1px solid #333; font-weight: bold; color: #0ecb81; display: flex; justify-content: space-between; align-items: center; }
+        .friend-list { flex: 1; overflow-y: auto; }
+        .friend-item { padding: 15px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1a1a; transition: 0.2s; }
+        .friend-item:hover { background: #1a1a1a; }
+        .friend-item.active { background: #1a1a1a; border-left: 3px solid #0ecb81; }
+        .friend-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .friend-info h4 { font-size: 0.9rem; color: #fff; margin-bottom: 3px; }
+        .friend-info p { font-size: 0.75rem; color: #888; }
+        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; }
+
+        /* Cột phải: Chat Content */
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
+        .chat-title-bar { padding: 15px 20px; border-bottom: 1px solid #333; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .message { max-width: 70%; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; position: relative; }
+        .msg-in { align-self: flex-start; background: #1a1a1a; color: #ccc; border-bottom-left-radius: 0; }
+        .msg-out { align-self: flex-end; background: #004d40; color: #fff; border-bottom-right-radius: 0; border: 1px solid #00695c; }
+        .msg-time { font-size: 0.7rem; color: #555; margin-top: 5px; text-align: right; }
+
+        .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
+        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 10px; color: #fff; outline: none; border-radius: 4px; }
+        .send-btn { background: #0ecb81; color: #000; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .send-btn:hover { opacity: 0.9; }
+        .close-chat-btn { color: #888; cursor: pointer; font-size: 1.2rem; }
+        .close-chat-btn:hover { color: #f6465d; }
 
     </style>
 </head>
@@ -150,14 +148,8 @@
     <div id="loginOverlay">
         <div class="login-box">
             <h2 id="authTitle">SYSTEM LOGIN</h2>
-            <div class="input-group">
-                <label>EMAIL / OPERATOR ID</label>
-                <input type="text" id="email" placeholder="ENTER ID">
-            </div>
-            <div class="input-group">
-                <label>PASSCODE</label>
-                <input type="password" id="password" placeholder="••••••">
-            </div>
+            <div class="input-group"><label>EMAIL / OPERATOR ID</label><input type="text" id="email" placeholder="ENTER ID"></div>
+            <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
             <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
                 <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Session</label>
@@ -174,11 +166,7 @@
 
     <div class="main-app-container">
         <header>
-            <div class="brand">
-                <span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span>
-                <span style="font-size: 0.9rem; color:#555; font-weight:normal; margin-left: 10px;">| TEAM 1 - ADY201m</span>
-            </div>
-            
+            <div class="brand"><span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span><span style="font-size: 0.9rem; color:#555; font-weight:normal; margin-left: 10px;">| TEAM 1 - ADY201m</span></div>
             <div class="nav-tabs">
                 <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
                 <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
@@ -197,7 +185,6 @@
                     </div>
                     <div class="chart-container"><canvas id="mainChart"></canvas></div>
                 </div>
-
                 <div>
                     <div class="card prediction-box">
                         <div class="pred-label"><i class="fas fa-robot"></i> ENSEMBLE AI PREDICTION</div>
@@ -224,81 +211,111 @@
 
         <div id="profile-view">
             <div class="profile-cover"></div>
-            
             <div class="profile-header-card">
                 <img id="profile-avatar-img" src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" class="profile-avatar">
                 <div class="profile-name" id="profile-name-txt">OPERATOR NAME</div>
-                <div class="profile-role">Lead Developer | FPT University</div>
+                <div class="profile-role" id="profile-role-txt">Lead Developer | FPT University</div>
                 <div class="profile-actions">
-                    <button class="action-btn"><i class="fas fa-envelope"></i> Message</button>
-                    <button class="action-btn"><i class="fas fa-cog"></i> Edit Profile</button>
+                    <button class="action-btn" id="openChatBtn"><i class="fas fa-comment-alt"></i> Comms Center</button>
+                    <button class="action-btn" id="editProfileBtn"><i class="fas fa-cog"></i> Edit Profile</button>
                 </div>
             </div>
-
             <div class="profile-content">
                 <div class="info-card">
                     <h3><i class="fas fa-id-card" style="margin-right: 10px;"></i> Contact Info</h3>
-                    <div class="detail-row">
-                        <div class="detail-icon"><i class="fas fa-user-circle"></i></div>
-                        <div>
-                            <div class="detail-text" id="profile-id-txt">DE200247</div>
-                            <span class="detail-sub">Operator ID</span>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon"><i class="fas fa-envelope"></i></div>
-                        <div>
-                            <div class="detail-text" id="profile-email-txt">toanpbs@fpt.edu.vn</div>
-                            <span class="detail-sub">Email Address</span>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon"><i class="fas fa-university"></i></div>
-                        <div>
-                            <div class="detail-text">FPT University</div>
-                            <span class="detail-sub">Organization</span>
-                        </div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div>
-                        <div>
-                            <div class="detail-text">Da Nang, Vietnam</div>
-                            <span class="detail-sub">Location</span>
-                        </div>
-                    </div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-user-circle"></i></div><div><div class="detail-text" id="profile-id-txt">DE200247</div><span class="detail-sub">Operator ID</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-envelope"></i></div><div><div class="detail-text" id="profile-email-txt">toanpbs@fpt.edu.vn</div><span class="detail-sub">Email Address</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-university"></i></div><div><div class="detail-text">FPT University</div><span class="detail-sub">Organization</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div><div><div class="detail-text">Da Nang, Vietnam</div><span class="detail-sub">Location</span></div></div>
                 </div>
-
                 <div class="info-card">
                     <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> About Project</h3>
                     <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
                         StableCast is an advanced AI-powered cryptocurrency price prediction terminal. 
-                        Developed as part of the ADY201m Laboratory course, it utilizes a Hybrid Ensemble model combining LSTM (Long Short-Term Memory) and XGBoost to analyze real-time market data from Binance.
-                        <br><br>
-                        This project aims to provide traders with high-confidence price forecasts and automated risk management signals (Stop Loss / Take Profit).
+                        Developed as part of the ADY201m Laboratory course, it utilizes a Hybrid Ensemble model combining LSTM and XGBoost.
                     </p>
-
-                    <h3><i class="fas fa-chart-pie" style="margin-right: 10px;"></i> Trading Statistics (Simulated)</h3>
+                    <h3><i class="fas fa-chart-pie" style="margin-right: 10px;"></i> Trading Statistics</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div class="stat-box">
-                            <div class="stat-num">98.2%</div>
-                            <div class="stat-label">Model Accuracy</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-num">$12,450</div>
-                            <div class="stat-label">Total Volume</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-num" style="color: #3b82f6;">45</div>
-                            <div class="stat-label">Signals Generated</div>
-                        </div>
+                        <div class="stat-box"><div class="stat-num">98.2%</div><div class="stat-label">Accuracy</div></div>
+                        <div class="stat-box"><div class="stat-num">$12K</div><div class="stat-label">Volume</div></div>
+                        <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">45</div><div class="stat-label">Signals</div></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="footer-info">
-            © 2026 StableCast Project. FPT University.<br>
-            Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span>
+        <div class="footer-info">© 2026 StableCast Project. FPT University.<br>Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span></div>
+    </div>
+
+    <div id="editProfileModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>EDIT OPERATOR PROFILE</span>
+                <i class="fas fa-times close-modal" id="closeEditModal"></i>
+            </div>
+            <label style="color: #888; font-size: 0.8rem;">DISPLAY NAME</label>
+            <input type="text" id="editNameInput" class="form-input" placeholder="Enter new name">
+            
+            <label style="color: #888; font-size: 0.8rem;">JOB TITLE</label>
+            <input type="text" id="editRoleInput" class="form-input" placeholder="e.g. Senior Trader">
+            
+            <label style="color: #888; font-size: 0.8rem;">AVATAR IMAGE URL</label>
+            <input type="text" id="editAvatarInput" class="form-input" placeholder="https://example.com/image.jpg">
+            
+            <button class="save-btn" id="saveProfileBtn">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <div id="chatSystemOverlay" class="chat-overlay">
+        <div class="chat-window">
+            <div class="chat-sidebar">
+                <div class="chat-header">
+                    <span>COMMS CENTER</span>
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <div class="friend-list">
+                    <div class="friend-item active" onclick="switchChat('bot1')">
+                        <img src="https://i.pravatar.cc/150?img=11" class="friend-avatar">
+                        <div class="friend-info">
+                            <h4>Alice (Analyst)</h4>
+                            <p>Market looking bullish!</p>
+                        </div>
+                        <div class="status-online"></div>
+                    </div>
+                    <div class="friend-item" onclick="switchChat('bot2')">
+                        <img src="https://i.pravatar.cc/150?img=33" class="friend-avatar">
+                        <div class="friend-info">
+                            <h4>Bob (Miner)</h4>
+                            <p>Hashrate is dropping...</p>
+                        </div>
+                        <div class="status-online" style="background: #f0b90b;"></div>
+                    </div>
+                     <div class="friend-item" onclick="switchChat('bot3')">
+                        <img src="https://i.pravatar.cc/150?img=53" class="friend-avatar">
+                        <div class="friend-info">
+                            <h4>Elon M. (Whale)</h4>
+                            <p>To the moon? 🚀</p>
+                        </div>
+                        <div class="status-online"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-main">
+                <div class="chat-title-bar">
+                    <span id="currentChatUser">Alice (Analyst)</span>
+                    <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
+                </div>
+                <div class="chat-messages" id="chatContainer">
+                    <div class="message msg-in">
+                        Hello Operator! Have you checked the latest BTC signals?
+                        <div class="msg-time">10:45 AM</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="msgInput" placeholder="Type a secure message...">
+                    <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
         </div>
     </div>
 
