@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// === CẤU HÌNH FIREBASE ===
 const firebaseConfig = {
   apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
   authDomain: "stablecast-login.firebaseapp.com",
@@ -29,6 +28,12 @@ const authTitle = document.getElementById('authTitle');
 const msg = document.getElementById('loginMsg');
 let isRegisterMode = false;
 
+// PROFILE & NAV ELEMENTS
+const btnTerminal = document.getElementById('btn-terminal');
+const btnProfile = document.getElementById('btn-profile');
+const viewDashboard = document.getElementById('dashboard-view');
+const viewProfile = document.getElementById('profile-view');
+
 // Biến hệ thống
 let currentPrice = 0;
 let priceHistory = [];
@@ -39,29 +44,55 @@ let ws;
 let aiInterval; 
 
 // ============================================================
-// 0. TỰ ĐỘNG ĐĂNG NHẬP (AUTO-LOGIN CHECK)
+// 0. AUTO-LOGIN CHECK
 // ============================================================
-// Kiểm tra xem đã lưu phiên đăng nhập chưa
 const savedUser = localStorage.getItem('stableCastUser');
+const savedEmail = localStorage.getItem('stableCastEmail');
+const savedAvatar = localStorage.getItem('stableCastAvatar');
+
 if (savedUser) {
-    console.log("Found saved session:", savedUser);
-    // Ẩn ngay màn hình login, không cần animation
-    const overlay = document.getElementById('loginOverlay');
-    overlay.style.display = 'none';
-    document.body.classList.add('logged-in');
+    // Ẩn Login
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.querySelector('.main-app-container').style.display = 'block';
+    setTimeout(() => { document.querySelector('.main-app-container').style.opacity = '1'; }, 50);
     
-    // Hiện app chính
-    const mainApp = document.querySelector('.main-app-container');
-    mainApp.style.display = 'block';
-    mainApp.style.opacity = '1';
-    
-    // Khởi chạy hệ thống ngay lập tức
-    // Dùng setTimeout nhỏ để đảm bảo DOM đã load
+    // Load dữ liệu vào Profile
+    updateProfileInfo(savedUser, savedEmail, savedAvatar);
+
+    // Chạy app
     setTimeout(() => { initSystem(); }, 100);
 }
 
 // ============================================================
-// 1. LOGIC CHUYỂN ĐỔI GIAO DIỆN
+// 1. NAV TABS LOGIC (Chuyển đổi Terminal / Profile)
+// ============================================================
+btnTerminal.addEventListener('click', () => {
+    btnTerminal.classList.add('active');
+    btnProfile.classList.remove('active');
+    viewDashboard.style.display = 'block';
+    viewProfile.style.display = 'none';
+});
+
+btnProfile.addEventListener('click', () => {
+    btnProfile.classList.add('active');
+    btnTerminal.classList.remove('active');
+    viewDashboard.style.display = 'none';
+    viewProfile.style.display = 'block'; // Hiện Profile dạng Grid hoặc Block
+});
+
+// Hàm cập nhật thông tin Profile
+function updateProfileInfo(name, email, avatarUrl) {
+    document.getElementById('profile-name-txt').innerText = name || "OPERATOR";
+    document.getElementById('profile-email-txt').innerText = email || "Unknown";
+    document.getElementById('profile-id-txt').innerText = "DE200247"; // Mặc định hoặc lấy từ DB
+    
+    if(avatarUrl) {
+        document.getElementById('profile-avatar-img').src = avatarUrl;
+    }
+}
+
+// ============================================================
+// 2. LOGIN LOGIC
 // ============================================================
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -80,17 +111,23 @@ if (toggleBtn) {
     });
 }
 
-// ============================================================
-// 2. HÀM MỞ KHÓA & LƯU PHIÊN (Updated)
-// ============================================================
-function unlockInterface(userName) {
-    // 1. Lưu phiên đăng nhập nếu checkbox được chọn
+function unlockInterface(user) {
+    const userName = user.displayName || user.email.split('@')[0];
+    const userEmail = user.email;
+    const userAvatar = user.photoURL || "https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg";
+
+    // 1. Lưu session
     const rememberMe = document.getElementById('rememberMe');
     if (rememberMe && rememberMe.checked) {
         localStorage.setItem('stableCastUser', userName);
+        localStorage.setItem('stableCastEmail', userEmail);
+        localStorage.setItem('stableCastAvatar', userAvatar);
     }
 
-    // 2. Hiệu ứng giao diện
+    // 2. Cập nhật Profile UI
+    updateProfileInfo(userName, userEmail, userAvatar);
+
+    // 3. Hiệu ứng vào App
     const overlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
     
@@ -113,9 +150,7 @@ function unlockInterface(userName) {
     }, 1000);
 }
 
-// ============================================================
-// 3. XỬ LÝ SỰ KIỆN NÚT BẤM
-// ============================================================
+// Login Events
 if(mainBtn) {
     mainBtn.addEventListener('click', () => {
         const emailInput = document.getElementById('email');
@@ -127,36 +162,34 @@ if(mainBtn) {
 
         if (isRegisterMode) {
             createUserWithEmailAndPassword(auth, emailOrId, pass)
-                .then((userCredential) => { unlockInterface(userCredential.user.email); })
+                .then((userCredential) => { unlockInterface(userCredential.user); })
                 .catch((error) => {
                     mainBtn.innerHTML = "REGISTER ACCESS"; mainBtn.style.opacity = "1";
                     msg.style.color = '#f6465d';
-                    if(error.code === 'auth/email-already-in-use') msg.innerText = "EMAIL ALREADY EXISTS";
-                    else if(error.code === 'auth/weak-password') msg.innerText = "PASSWORD TOO WEAK (MIN 6 CHARS)";
-                    else msg.innerText = "ERROR: " + error.message;
+                    msg.innerText = "ERROR: " + error.message;
                 });
         } else {
+            // Hardcode Admin check
             if ((emailOrId === 'DE200247' || emailOrId === 'admin') && pass === '123456') {
-                unlockInterface(emailOrId);
+                // Tạo user giả cho Admin
+                unlockInterface({ displayName: "Phan Ba Song Toan", email: "DE200247@fpt.edu.vn" });
                 return;
             }
             signInWithEmailAndPassword(auth, emailOrId, pass)
-                .then((userCredential) => { unlockInterface(userCredential.user.email); })
+                .then((userCredential) => { unlockInterface(userCredential.user); })
                 .catch((error) => {
                     mainBtn.innerHTML = "AUTHENTICATE"; mainBtn.style.opacity = "1";
                     msg.style.color = '#f6465d';
-                    msg.innerText = "ACCESS DENIED: INVALID CREDENTIALS";
+                    msg.innerText = "ACCESS DENIED";
                 });
         }
     });
 }
 
-// Google Login
-const googleBtn = document.getElementById('googleLoginBtn');
-if(googleBtn) {
-    googleBtn.addEventListener('click', () => {
+if(document.getElementById('googleLoginBtn')) {
+    document.getElementById('googleLoginBtn').addEventListener('click', () => {
         signInWithPopup(auth, provider)
-            .then((result) => unlockInterface(result.user.displayName || "GOOGLE USER"))
+            .then((result) => unlockInterface(result.user))
             .catch((error) => {
                 msg.innerText = "GOOGLE ERROR: " + error.message;
                 msg.style.color = '#f6465d';
@@ -165,9 +198,8 @@ if(googleBtn) {
 }
 
 // ============================================================
-// 4. HỆ THỐNG CHART & AI
+// 3. CHART & AI SYSTEM
 // ============================================================
-
 function log(msg) {
     const time = new Date().toLocaleTimeString('en-US', {hour12: false});
     const div = document.createElement('div');
@@ -180,28 +212,20 @@ function log(msg) {
 }
 
 function initSystem() {
-    log("Authentication verified. Initializing Core Services...");
+    log("System initialized. Welcome back, Operator.");
     setupChartAndSocket();
 }
 
 function setupChartAndSocket() {
-    // Chart.js
     const ctx = document.getElementById('mainChart').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: timeLabels,
             datasets: [{
-                label: 'Real-time Price', 
-                data: priceHistory, 
-                borderColor: '#0ecb81', 
-                backgroundColor: 'rgba(14, 203, 129, 0.05)', 
-                borderWidth: 2, tension: 0.2, fill: true, pointRadius: 0
+                label: 'Real-time Price', data: priceHistory, borderColor: '#0ecb81', backgroundColor: 'rgba(14, 203, 129, 0.05)', borderWidth: 2, tension: 0.2, fill: true, pointRadius: 0
             }, {
-                label: 'AI Ensemble Forecast', 
-                data: forecastHistory, 
-                borderColor: '#3b82f6', 
-                borderWidth: 2, borderDash: [5, 5], tension: 0.4, pointRadius: 0, fill: false
+                label: 'AI Ensemble Forecast', data: forecastHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], tension: 0.4, pointRadius: 0, fill: false
             }]
         },
         options: {
@@ -212,10 +236,8 @@ function setupChartAndSocket() {
         }
     });
 
-    // Binance WebSocket
     log("Connecting to Binance WebSocket Feed...");
     ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-    
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         const price = parseFloat(data.p);
@@ -231,43 +253,27 @@ function setupChartAndSocket() {
         chart.update();
     };
 
-    // AI Connection
-    log("Connecting to AI Inference Engine (Ensemble Model)...");
+    log("Connecting to AI Inference Engine...");
     aiInterval = setInterval(() => {
         if(currentPrice === 0) return;
-
         fetch('http://127.0.0.1:5000/predict')
-            .then(response => {
-                if (!response.ok) throw new Error("Server Error");
-                return response.json();
-            })
-            .then(data => {
-                const aiPrice = data.predicted_price;
-                const direction = data.direction;
-                updateDashboard(aiPrice, direction, "Ensemble AI");
-            })
+            .then(res => res.json())
+            .then(data => updateDashboard(data.predicted_price, data.direction, "Ensemble AI"))
             .catch(err => {
                 const fakePrice = currentPrice + (Math.random() * 40 - 15);
-                const direction = fakePrice > currentPrice ? 'UP' : 'DOWN';
-                updateDashboard(fakePrice, direction, "Simulation Mode");
+                updateDashboard(fakePrice, fakePrice > currentPrice ? 'UP' : 'DOWN', "Simulation Mode");
             });
-
     }, 2000);
 }
 
 function updateDashboard(predictedVal, direction, source) {
     predEl.innerText = `$${predictedVal.toFixed(2)}`;
     predEl.style.color = direction === 'UP' ? '#0ecb81' : '#f6465d'; 
-
     const volatility = Math.abs(predictedVal - currentPrice) * 1.5 + 25; 
     slEl.innerText = `$${(currentPrice - volatility).toFixed(2)}`;
     tpEl.innerText = `$${(currentPrice + volatility * 2.5).toFixed(2)}`;
-
     forecastHistory.push(predictedVal);
     if(forecastHistory.length > 50) forecastHistory.shift();
     chart.update();
-
-    if(Math.random() > 0.7) {
-        log(`Inference [${source}]: Predict ${direction} -> Conf: ${(89 + Math.random()*10).toFixed(1)}%`);
-    }
+    if(Math.random() > 0.7) log(`Inference [${source}]: Predict ${direction} -> Conf: ${(89 + Math.random()*10).toFixed(1)}%`);
 }
