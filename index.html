@@ -3,126 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast | TERMINAL</title>
+    <title>StableCast | ULTIMATE TERMINAL</title>
+    
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* === GIỮ NGUYÊN STYLE CYBERPUNK CŨ === */
+        /* === CORE STYLES === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
-        body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
-        ::-webkit-scrollbar { width: 8px; }
+        body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 20px; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
 
-        /* Login */
+        /* === LOGIN SCREEN === */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
+        .login-box { width: 450px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 30px rgba(0, 255, 136, 0.1); text-align: center; position: relative; }
+        .login-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, #0ecb81, #3b82f6); }
         .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
-        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; }
-        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; }
-        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 8px; letter-spacing: 1px; }
+        .input-group input { width: 100%; padding: 12px; background: #080808; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: 0.3s; }
+        .input-group input:focus { border-color: #0ecb81; box-shadow: 0 0 10px rgba(14, 203, 129, 0.2); }
+        button#mainAuthBtn { width: 100%; padding: 14px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; letter-spacing: 1px; transition: 0.3s; }
+        button#mainAuthBtn:hover { box-shadow: 0 0 15px rgba(14, 203, 129, 0.6); }
+        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        button#googleLoginBtn:hover { border-color: #fff; background: #222; }
 
-        /* Main Layout */
-        .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
+        /* === MAIN DASHBOARD === */
+        .main-app-container { display: none; opacity: 0; transition: opacity 0.8s ease; padding: 20px; max-width: 1600px; margin: 0 auto; }
+        
+        /* Header */
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
+        .brand { font-size: 2rem; font-weight: bold; letter-spacing: -2px; }
+        .user-panel { display: flex; align-items: center; gap: 20px; }
+        .user-info { text-align: right; }
+        .user-name { color: #fff; font-weight: bold; display: block; }
+        .user-role { color: #3b82f6; font-size: 0.8rem; }
+        .avatar-small { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #0ecb81; cursor: pointer; object-fit: cover; }
+
+        /* Grid Layout (Layout Cũ - Hầm hố) */
+        .dashboard-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 25px; height: 75vh; }
         
-        .nav-tabs { display: flex; gap: 15px; background: #111; padding: 5px; border-radius: 4px; border: 1px solid #333; }
-        .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .nav-btn:hover { color: #fff; }
-        .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
+        /* Card Style */
+        .card { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        
+        /* Chart Area */
+        .price-display { font-size: 4rem; font-weight: bold; color: #0ecb81; margin: 10px 0; letter-spacing: -2px; text-shadow: 0 0 10px rgba(14, 203, 129, 0.3); }
+        .chart-container { flex: 1; position: relative; width: 100%; min-height: 0; }
 
-        /* Views Control */
-        .view-section { display: none; }
-        .view-section.active-view { display: block; }
+        /* Right Panel (Utilities) */
+        .prediction-box { text-align: center; padding: 25px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 20px; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        .pred-label { color: #848e9c; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .pred-price { font-size: 3rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
+        
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.95rem; }
+        .info-label { color: #848e9c; }
+        .info-val { color: #fff; font-weight: bold; }
 
-        /* === DASHBOARD (GIỮ NGUYÊN 100%) === */
-        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; margin-bottom: 30px; }
-        .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
-        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
-        .chart-container { position: relative; height: 400px; width: 100%; }
-        .prediction-box { text-align: center; padding: 25px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 20px; }
-        .pred-price { font-size: 2.8rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
-        .logs-container { margin-top: 30px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #3b82f6; }
+        /* System Specs (Đã quay lại) */
+        .specs-title { color: #0ecb81; margin-bottom: 15px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; text-transform: uppercase; border-bottom: 2px solid #0ecb81; padding-bottom: 5px; display: inline-block; }
+        .spec-val-highlight { color: #3b82f6; font-family: monospace; }
+
+        /* Terminal Logs (To & Rõ) */
+        .logs-container { margin-top: 25px; background: #050505; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #0ecb81; font-family: 'Courier New', monospace; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-time { color: #555; margin-right: 10px; }
 
-        /* === COMMUNITY FEED (STYLE DARK CYBERPUNK) === */
-        #community-view { max-width: 900px; margin: 0 auto; }
-        .feed-input-box { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
-        .feed-textarea { width: 100%; background: #000; border: 1px solid #333; color: #0ecb81; padding: 15px; outline: none; min-height: 80px; font-family: inherit; }
-        .feed-tools { display: flex; justify-content: space-between; margin-top: 10px; align-items: center; }
-        .tool-icons { display: flex; gap: 15px; color: #3b82f6; cursor: pointer; font-size: 1.2rem; }
-        .post-btn { background: #0ecb81; color: #000; padding: 8px 25px; border: none; font-weight: bold; cursor: pointer; }
+        /* Buttons Panel */
+        .tools-panel { display: flex; gap: 15px; margin-top: 20px; justify-content: flex-end; }
+        .tool-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .tool-btn:hover { border-color: #0ecb81; color: #0ecb81; }
+
+        /* === MODALS (Overlays) === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #111; border: 1px solid #333; width: 500px; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; }
+        .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; overflow-y: auto; }
         
-        .feed-post { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 4px; margin-bottom: 15px; display: flex; gap: 15px; }
-        .post-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #333; }
-        .post-content { flex: 1; }
-        .post-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .post-user { color: #fff; font-weight: bold; margin-right: 10px; }
-        .post-handle { color: #888; font-size: 0.9rem; }
-        .post-text { color: #ccc; line-height: 1.5; margin-bottom: 10px; }
-        .post-image { width: 100%; border-radius: 4px; margin-top: 10px; border: 1px solid #333; max-height: 400px; object-fit: cover; }
-        .post-actions { display: flex; gap: 20px; color: #888; font-size: 0.9rem; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
-        .action-item { cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .action-item:hover { color: #0ecb81; }
-        .connect-btn { border: 1px solid #3b82f6; color: #3b82f6; background: none; padding: 2px 10px; font-size: 0.75rem; cursor: pointer; margin-left: 10px; }
-        .connect-btn:hover { background: #3b82f6; color: #000; }
+        .form-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; }
+        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; font-weight: bold; cursor: pointer; }
 
-        /* === CHAT SYSTEM (ZALO STYLE - DARK) === */
-        .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; align-items: center; justify-content: center; }
-        .chat-window { width: 1000px; height: 700px; background: #0b0e11; border: 1px solid #333; display: flex; box-shadow: 0 0 50px rgba(14, 203, 129, 0.2); }
+        /* CHAT WINDOW (Zalo Style - Embedded in Modal) */
+        .chat-container-flex { display: flex; height: 500px; }
+        .chat-sidebar { width: 30%; border-right: 1px solid #333; background: #080808; overflow-y: auto; }
+        .chat-main { width: 70%; display: flex; flex-direction: column; background: #0b0e11; }
+        .friend-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; display: flex; gap: 10px; align-items: center; }
+        .friend-item:hover, .friend-item.active { background: #1a1a1a; }
+        .friend-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; }
+        .chat-msgs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
+        .msg-in { align-self: flex-start; background: #222; color: #ddd; }
+        .msg-out { align-self: flex-end; background: #004d40; color: #fff; }
+        .chat-input-box { padding: 15px; border-top: 1px solid #333; display: flex; gap: 10px; }
         
-        .chat-sidebar { width: 300px; background: #050505; border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .chat-search { padding: 15px; border-bottom: 1px solid #333; }
-        .chat-search input { width: 100%; background: #111; border: 1px solid #333; padding: 8px; color: #fff; outline: none; }
-        .friend-list { flex: 1; overflow-y: auto; }
-        .friend-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #111; transition: 0.2s; }
-        .friend-item:hover, .friend-item.active { background: #111; border-left: 3px solid #0ecb81; }
-        .friend-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .friend-info h4 { font-size: 0.9rem; color: #fff; margin-bottom: 3px; }
-        .friend-info p { font-size: 0.75rem; color: #888; }
-
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
-        .chat-header { padding: 15px; border-bottom: 1px solid #333; color: #fff; display: flex; justify-content: space-between; align-items: center; background: #111; font-weight: bold; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 70%; padding: 10px 15px; font-size: 0.9rem; line-height: 1.5; position: relative; }
-        .msg-in { align-self: flex-start; background: #111; color: #ccc; border: 1px solid #333; }
-        .msg-out { align-self: flex-end; background: #004d40; color: #fff; border: 1px solid #00695c; }
-        .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #050505; }
-        .chat-input { flex: 1; background: #111; border: 1px solid #333; padding: 12px; color: #fff; outline: none; }
-        .send-btn { background: #0ecb81; color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; }
-
-        /* Media Upload */
-        #mediaPreview { display: none; margin-top: 10px; position: relative; }
-        #previewImg { max-width: 100%; border: 1px solid #333; max-height: 200px; object-fit: cover; }
-        .close-btn { color: #555; cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
-        .close-btn:hover { color: #f6465d; }
-
-        /* Profile & Edit Modal giữ nguyên style cũ... */
-        .profile-cover { height: 200px; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center; background-size: cover; border-bottom: 2px solid #0ecb81; }
-        .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; padding: 20px; position: relative; margin-bottom: 20px; text-align: center; }
-        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; }
-        .profile-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .action-btn { padding: 8px 16px; border: 1px solid #333; background: #1a1a1a; color: #ccc; cursor: pointer; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; }
-        .modal-box { background: #111; border: 1px solid #333; width: 500px; padding: 20px; }
+        /* Footer */
+        .footer { text-align: center; margin-top: 30px; color: #444; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h2 style="color:#fff; margin-bottom:30px;">SYSTEM LOGIN</h2>
-            <div class="input-group"><label>OPERATOR ID</label><input type="text" id="email" placeholder="ENTER ID"></div>
-            <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
-            <div style="text-align:left; margin-bottom:20px;"><input type="checkbox" id="rememberMe" checked> <span style="color:#888; font-size:0.8rem;">Remember Me</span></div>
-            <button id="mainAuthBtn">LOGIN</button>
+            <h1 style="color:#fff; margin-bottom:10px; font-size:2.5rem;">STABLE<span style="color:#0ecb81">CAST</span></h1>
+            <p style="color:#888; margin-bottom:30px;">SECURE TRADING TERMINAL ACCESS</p>
+            
+            <div class="input-group">
+                <label>OPERATOR ID</label>
+                <input type="text" id="email" placeholder="ENTER ID">
+            </div>
+            <div class="input-group">
+                <label>PASSCODE</label>
+                <input type="password" id="password" placeholder="••••••">
+            </div>
+            
+            <div style="text-align:left; margin-bottom:20px;">
+                <input type="checkbox" id="rememberMe" checked> <span style="color:#888; font-size:0.8rem;">Remember Session</span>
+            </div>
+
+            <button id="mainAuthBtn">AUTHENTICATE</button>
             <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
                 <button id="googleLoginBtn"><i class="fab fa-google"></i> ACCESS WITH GOOGLE</button>
             </div>
@@ -132,116 +136,105 @@
 
     <div class="main-app-container">
         <header>
-            <div class="brand"><span style="color:#3b82f6;">Stable</span><span style="color:#0ecb81;">Cast</span></div>
-            <div class="nav-tabs">
-                <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
-                <button class="nav-btn" id="btn-community"><i class="fas fa-users"></i> COMMUNITY</button>
-                <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
-            </div>
-            <div style="display:flex; gap:15px; align-items:center;">
-                <button class="nav-btn" id="openChatBtn"><i class="fas fa-comment-dots"></i> MESSAGES</button>
+            <div class="brand"><span style="color:#3b82f6;">Stable</span><span style="color:#0ecb81;">Cast</span> <span style="font-size:0.8rem; color:#555; font-weight:normal;">| SYSTEM ONLINE</span></div>
+            
+            <div class="user-panel">
+                <div class="user-info">
+                    <span class="user-name" id="display-name">OPERATOR</span>
+                    <span class="user-role" id="display-role">Lead Developer</span>
+                </div>
+                <img id="display-avatar" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" class="avatar-small" onclick="openEditProfile()">
             </div>
         </header>
 
-        <div id="dashboard-view" class="view-section active-view">
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; color:#848e9c; font-size:0.9rem; margin-bottom:10px;"><span>MARKET OVERVIEW</span><span style="color:#f0b90b;">BINANCE: BTC/USDT</span></div>
-                    <div class="price-display" id="btcPrice">LOADING...</div>
-                    <div class="chart-container"><canvas id="mainChart"></canvas></div>
+        <div class="dashboard-grid">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; color:#848e9c; font-size:0.9rem; margin-bottom:10px;">
+                    <span>MARKET OVERVIEW</span>
+                    <span style="color:#f0b90b; font-weight:bold;">BINANCE: BTC/USDT</span>
                 </div>
-                <div>
-                    <div class="card prediction-box"><div style="color:#848e9c; margin-bottom:10px;">AI PREDICTION</div><div class="pred-price" id="predPrice">---</div></div>
-                    <div class="card" style="margin-top:20px;">
-                        <div class="info-row"><span class="info-label">Stop Loss</span><span class="info-val" id="stopLoss" style="color:#f6465d;">---</span></div>
-                        <div class="info-row" style="border:none;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color:#0ecb81;">---</span></div>
-                    </div>
+                <div class="price-display" id="btcPrice">LOADING...</div>
+                <div style="font-size:0.8rem; margin-bottom:15px; display:flex; gap:20px;">
+                    <span style="color:#0ecb81;">▬ Real-time Price</span>
+                    <span style="color:#3b82f6; border-bottom:2px dashed #3b82f6;">--- AI Forecast</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
                 </div>
             </div>
-            <div class="logs-container" id="terminalLogs"><div class="log-entry">[SYSTEM] Ready to connect...</div></div>
+
+            <div>
+                <div class="card prediction-box">
+                    <div class="pred-label"><i class="fas fa-robot"></i> ENSEMBLE AI PREDICTION</div>
+                    <div class="pred-price" id="predPrice">---</div>
+                    <div style="color:#555; font-size:0.8rem; margin-top:5px;">Confidence Interval: 98.2%</div>
+                </div>
+
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="info-row"><span class="info-label">Stop Loss (ATR)</span><span class="info-val" id="stopLoss" style="color:#f6465d;">---</span></div>
+                    <div class="info-row" style="border:none;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color:#0ecb81;">---</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="specs-title"><i class="fas fa-microchip"></i> SYSTEM SPECIFICATIONS</div>
+                    <div class="info-row"><span class="info-label">Architecture</span><span class="spec-val-highlight">Hybrid (LSTM + XGB)</span></div>
+                    <div class="info-row"><span class="info-label">Input Shape</span><span class="spec-val-highlight">(Batch, 60, 13)</span></div>
+                    <div class="info-row"><span class="info-label">Optimization</span><span class="spec-val-highlight">Adam (Lr=0.001)</span></div>
+                    <div class="info-row" style="border:none;"><span class="info-label">Data Source</span><span class="spec-val-highlight">Binance WebSocket</span></div>
+                </div>
+
+                <div class="tools-panel">
+                    <button class="tool-btn" onclick="openChat()"><i class="fas fa-comment-dots"></i> MESSAGES</button>
+                    <button class="tool-btn" onclick="openEditProfile()"><i class="fas fa-cog"></i> PROFILE</button>
+                </div>
+            </div>
         </div>
 
-        <div id="community-view" class="view-section">
-            <div class="feed-input-box">
-                <textarea id="postInput" class="feed-textarea" placeholder="Share signals, news, analysis..."></textarea>
-                
-                <div id="mediaPreview">
-                    <img id="previewImg" src="">
-                    <div style="text-align:right; margin-top:5px; color:#f6465d; cursor:pointer;" onclick="clearMedia()">[Remove Image]</div>
-                </div>
-
-                <div class="feed-tools">
-                    <div class="tool-icons">
-                        <input type="file" id="mediaInput" accept="image/*" hidden onchange="handleMediaSelect(this)">
-                        <i class="far fa-image" onclick="document.getElementById('mediaInput').click()" title="Upload Image"></i>
-                        <i class="far fa-smile" onclick="addSticker('🚀')" title="Quick Sticker"></i>
-                    </div>
-                    <button class="post-btn" id="submitPostBtn">POST</button>
-                </div>
-            </div>
-            <div id="feedStream">
-                </div>
+        <div class="logs-container" id="terminalLogs">
+            <div class="log-entry"><span class="log-time">[SYSTEM]</span> Kernel loaded. Waiting for authentication...</div>
         </div>
 
-        <div id="profile-view" class="view-section">
-            <div class="profile-cover"></div>
-            <div class="profile-header-card">
-                <img id="profile-avatar-img" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" class="profile-avatar">
-                <div style="font-size:1.5rem; font-weight:bold; margin-top:15px; color:#fff;" id="profile-name-txt">OPERATOR</div>
-                <div style="color:#3b82f6; margin-bottom:15px;" id="profile-role-txt">Trader</div>
-                <div class="profile-actions">
-                    <button class="action-btn" id="editProfileBtn"><i class="fas fa-cog"></i> Edit Profile</button>
-                </div>
-            </div>
-            <div class="dashboard-grid">
-                <div class="card">
-                    <h3><i class="fas fa-id-card"></i> Contact Info</h3>
-                    <div class="info-row" style="margin-top:15px;"><span>ID</span><span id="profile-id-txt" style="color:#fff;">DE200247</span></div>
-                    <div class="info-row"><span>Email</span><span id="profile-email-txt" style="color:#fff;">Unknown</span></div>
-                    <div class="info-row"><span>Org</span><span id="profile-org-txt" style="color:#fff;">FPT University</span></div>
-                </div>
-                <div class="card">
-                    <h3><i class="fas fa-users"></i> Stats</h3>
-                    <div class="info-row" style="margin-top:15px;"><span>Friends</span><span id="stat-friends" style="color:#fff; font-weight:bold;">1</span></div>
-                    <div class="info-row"><span>Online</span><span id="stat-hours" style="color:#fff; font-weight:bold;">0m</span></div>
-                </div>
-            </div>
+        <div class="footer">
+            © 2026 StableCast Project. FPT University.<br>
+            Developer: <span style="color:#0ecb81; font-weight:bold;">Phan Bá Song Toàn - DE200247</span>
         </div>
     </div>
 
     <div id="editProfileModal" class="modal-overlay">
         <div class="modal-box">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; color:#fff; font-weight:bold;">
-                <span>EDIT PROFILE</span><i class="fas fa-times close-btn" id="closeEditModal"></i>
+            <div class="modal-header"><span>EDIT OPERATOR PROFILE</span><i class="fas fa-times" style="cursor:pointer;" onclick="closeModal('editProfileModal')"></i></div>
+            <div class="modal-body">
+                <label style="color:#888; font-size:0.8rem;">DISPLAY NAME</label>
+                <input type="text" id="editNameInput" class="form-input">
+                
+                <label style="color:#888; font-size:0.8rem;">JOB TITLE</label>
+                <input type="text" id="editRoleInput" class="form-input">
+                
+                <label style="color:#888; font-size:0.8rem;">AVATAR URL (Or Upload)</label>
+                <input type="file" id="editAvatarInput" style="margin-bottom:10px;">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label style="color:#888; font-size:0.8rem;">ID</label><input type="text" id="editIDInput" class="form-input" value="DE200247"></div>
+                    <div><label style="color:#888; font-size:0.8rem;">ORG</label><input type="text" id="editOrgInput" class="form-input" value="FPT University"></div>
+                </div>
             </div>
-            <div class="input-group"><label>DISPLAY NAME</label><input type="text" id="editNameInput" style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:10px;"></div>
-            <div class="input-group"><label>JOB TITLE</label><input type="text" id="editRoleInput" style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:10px;"></div>
-            <div style="margin-top:15px; text-align:center;">
-                <label style="color:#3b82f6; cursor:pointer;" for="editAvatarInput"><i class="fas fa-cloud-upload-alt"></i> Change Avatar</label>
-                <input type="file" id="editAvatarInput" hidden>
-            </div>
-            <button id="saveProfileBtn" style="width:100%; background:#0ecb81; padding:10px; border:none; font-weight:bold; margin-top:20px; cursor:pointer;">SAVE CHANGES</button>
+            <button class="save-btn" id="saveProfileBtn">SAVE CONFIGURATION</button>
         </div>
     </div>
 
-    <div id="chatSystemOverlay" class="chat-overlay">
-        <div class="chat-window">
-            <div class="chat-sidebar">
-                <div class="chat-search"><input type="text" placeholder="Search friends..."></div>
-                <div class="friend-list" id="friendListContainer">
+    <div id="chatModal" class="modal-overlay">
+        <div class="modal-box" style="width:800px; height:600px;">
+            <div class="modal-header"><span>COMMS CENTER</span><i class="fas fa-times" style="cursor:pointer;" onclick="closeModal('chatModal')"></i></div>
+            <div class="chat-container-flex">
+                <div class="chat-sidebar" id="friendListContainer">
                     </div>
-            </div>
-            <div class="chat-main">
-                <div class="chat-header">
-                    <span id="currentChatUser"><i class="fas fa-robot"></i> Lume (AI Assistant)</span>
-                    <i class="fas fa-times close-btn" id="closeChatBtn"></i>
-                </div>
-                <div class="chat-messages" id="chatContainer">
-                    <div class="msg msg-in">Hello! I am Lume. I am monitoring the market for you.</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Type a message...">
-                    <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+                <div class="chat-main">
+                    <div style="padding:10px; border-bottom:1px solid #333; color:#fff; font-weight:bold;" id="chatHeaderName">Lume (AI)</div>
+                    <div class="chat-msgs" id="chatContainer"></div>
+                    <div class="chat-input-box">
+                        <input type="text" id="chatInput" placeholder="Type command..." style="flex:1; background:#000; border:1px solid #333; color:#fff; padding:10px; outline:none;">
+                        <button onclick="sendChat()" style="background:#3b82f6; border:none; color:#fff; padding:0 20px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
