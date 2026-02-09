@@ -3,324 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast | AI TRADING TERMINAL</title>
+    <title>StableCast | SOCIAL TRADING</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* === GIỮ NGUYÊN CSS CYBERPUNK CŨ === */
+        /* === BASE STYLES === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
-        body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
+        body { background-color: #000; color: #e7e9ea; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
+        ::-webkit-scrollbar-thumb:hover { background: #1d9bf0; }
 
-        /* Login Screen */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
-        .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
-        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: border 0.3s; }
-        .input-group input:focus { border-color: #0ecb81; }
-        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
-        button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
-        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
-        #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
+        /* HEADER */
+        .main-app-container { display: none; max-width: 1200px; margin: 0 auto; min-height: 100vh; border-left: 1px solid #2f3336; border-right: 1px solid #2f3336; display: flex; flex-direction: column;}
+        header { padding: 15px 20px; border-bottom: 1px solid #2f3336; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 100; }
+        .brand { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: bold; color: #fff; }
+        .nav-tabs { display: flex; gap: 20px; }
+        .nav-btn { background: none; border: none; color: #71767b; font-weight: bold; font-size: 1rem; cursor: pointer; padding: 10px; transition: 0.2s; position: relative; }
+        .nav-btn:hover { color: #e7e9ea; }
+        .nav-btn.active { color: #fff; }
+        .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; height: 4px; background: #1d9bf0; border-radius: 2px; }
 
-        /* Main App */
-        .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
-        .nav-tabs { display: flex; gap: 20px; background: #111; padding: 5px; border-radius: 30px; border: 1px solid #333; }
-        .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .nav-btn:hover { color: #fff; }
-        .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
-
-        /* Views */
+        /* VIEWS */
         .view-section { display: none; }
         .view-section.active-view { display: block; }
 
-        /* Dashboard */
-        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
-        .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
-        .chart-container { position: relative; height: 400px; width: 100%; }
-        .prediction-box { text-align: center; padding: 25px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 20px; }
-        .pred-label { color: #848e9c; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .pred-price { font-size: 2.8rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
-        .info-label { color: #848e9c; }
-        .info-val { color: #fff; font-weight: bold; }
-        .specs-title { color: #848e9c; margin-bottom: 15px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .spec-val-highlight { color: #3b82f6; font-family: monospace; }
-        .logs-container { margin-top: 30px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #3b82f6; font-family: 'Courier New', monospace; }
-        .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .log-time { color: #555; margin-right: 10px; }
-
-        /* Profile */
-        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
-        .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; position: relative; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
-        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); }
-        .profile-name { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 15px; }
-        .profile-role { color: #3b82f6; font-size: 0.9rem; margin-bottom: 15px; letter-spacing: 1px; }
-        .profile-actions { display: flex; gap: 10px; }
-        .action-btn { padding: 8px 16px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; background: #1a1a1a; color: #ccc; transition: 0.3s; }
-        .action-btn:hover { border-color: #0ecb81; color: #0ecb81; background: #111; }
-        .profile-content { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
-        .info-card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
-        .info-card h3 { color: #848e9c; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; }
-        .detail-row { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
-        .detail-icon { width: 30px; color: #0ecb81; text-align: center; margin-right: 10px; }
-        .detail-text { color: #fff; }
-        .detail-sub { display: block; font-size: 0.75rem; color: #555; }
-        .stat-box { background: #131722; padding: 15px; border-radius: 4px; text-align: center; margin-bottom: 10px; border: 1px solid #333; }
-        .stat-num { font-size: 1.5rem; color: #0ecb81; font-weight: bold; }
-        .stat-label { font-size: 0.8rem; color: #848e9c; }
-        .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
-        .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
-
-        /* === COMMUNITY FEED (STYLE MỚI - GIỐNG X) === */
-        #community-view { max-width: 900px; margin: 0 auto; }
-        .feed-input-container { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 8px; margin-bottom: 20px; position: relative; }
-        .feed-textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 4px; resize: none; outline: none; min-height: 80px; font-size: 1rem; }
-        .feed-textarea:focus { border-color: #3b82f6; }
-        .post-btn { background: #0ecb81; color: #000; padding: 8px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; float: right; margin-top: 10px; }
-        .post-btn:hover { background: #0be08d; }
+        /* DASHBOARD */
+        #dashboard-view { padding: 20px; }
+        .dashboard-grid { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; font-family: 'JetBrains Mono', monospace; }
+        .card { background: #0b0e11; border: 1px solid #2f3336; padding: 20px; border-radius: 16px; }
+        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 10px 0; }
+        .chart-container { height: 400px; position: relative; }
         
-        .feed-post { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 15px; transition: 0.2s; }
-        .feed-post:hover { border-color: #3b82f6; }
-        .post-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #222; }
-        .post-content { flex: 1; }
-        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .post-info { display: flex; gap: 10px; align-items: center; }
+        /* COMMUNITY FEED */
+        #community-view { display: flex; min-height: 100vh; }
+        .feed-main { flex: 2; border-right: 1px solid #2f3336; padding-bottom: 50px; }
+        .feed-sidebar { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* Composer */
+        .x-composer { padding: 15px; border-bottom: 1px solid #2f3336; display: flex; gap: 15px; }
+        .user-avatar-small { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .composer-area { flex: 1; }
+        .x-input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1.2rem; outline: none; resize: none; min-height: 50px; margin-top: 10px; font-family: inherit; }
+        .composer-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #2f3336; padding-top: 10px; }
+        .x-icons { display: flex; gap: 15px; color: #1d9bf0; cursor: pointer; position: relative; }
+        .x-icon-btn:hover { color: #8ecdf8; }
+        .x-post-btn { background: #1d9bf0; color: #fff; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .x-post-btn:hover { background: #1a8cd8; }
+        
+        /* Image Preview in Composer */
+        #mediaPreview { display: none; margin-top: 10px; position: relative; }
+        #previewImg { max-width: 100%; border-radius: 12px; max-height: 300px; object-fit: cover; }
+        .remove-media { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* Sticker Popup */
+        #stickerPopup { position: absolute; top: 40px; left: 0; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; display: none; grid-template-columns: repeat(4, 1fr); gap: 5px; z-index: 10; width: 200px; box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
+        .sticker-item { font-size: 1.5rem; cursor: pointer; text-align: center; padding: 5px; border-radius: 4px; }
+        .sticker-item:hover { background: #222; }
+
+        /* Posts */
+        .x-post { padding: 15px; border-bottom: 1px solid #2f3336; display: flex; gap: 15px; transition: 0.2s; cursor: pointer; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .x-post:hover { background: rgba(255,255,255,0.03); }
+        .post-header { display: flex; gap: 5px; color: #71767b; font-size: 0.95rem; }
         .post-name { color: #fff; font-weight: bold; }
-        .post-handle { color: #888; font-size: 0.9rem; }
-        .post-time { color: #555; font-size: 0.8rem; }
-        .post-text { color: #ccc; line-height: 1.5; margin-bottom: 15px; font-size: 0.95rem; }
-        .post-actions { display: flex; justify-content: space-between; border-top: 1px solid #222; padding-top: 10px; color: #888; font-size: 0.9rem; max-width: 80%; }
-        .action-item { cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .action-item:hover { color: #0ecb81; }
+        .post-text { margin-top: 5px; line-height: 1.5; font-size: 1rem; color: #e7e9ea; white-space: pre-line; }
+        .post-image { margin-top: 10px; width: 100%; border-radius: 16px; border: 1px solid #2f3336; max-height: 400px; object-fit: cover; }
         
-        /* Nút Connect trong bài viết */
-        .connect-btn { border: 1px solid #3b82f6; color: #3b82f6; background: none; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .connect-btn:hover { background: #3b82f6; color: #fff; }
-        .friend-badge { color: #0ecb81; font-size: 0.75rem; border: 1px solid #0ecb81; padding: 3px 8px; border-radius: 12px; }
+        .post-actions { display: flex; justify-content: space-between; margin-top: 10px; color: #71767b; max-width: 80%; }
+        .action-item { cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; transition: 0.2s; }
+        .action-item:hover.blue { color: #1d9bf0; }
+        .action-item:hover.green { color: #00ba7c; }
+        .action-item:hover.red { color: #f91880; }
+        .action-item.liked { color: #f91880; } /* Liked state */
 
-        /* Modal Edit Profile */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #111; border: 1px solid #333; padding: 0; width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
-        .close-modal { cursor: pointer; color: #555; }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-        .modal-section-title { color: #0ecb81; font-size: 0.8rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; }
-        .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; height: 80px; resize: none; }
-        .file-upload-label { display: block; padding: 15px; background: #1a1a1a; border: 1px dashed #555; text-align: center; color: #888; cursor: pointer; margin-bottom: 15px; border-radius: 4px; transition: 0.3s; }
-        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        /* Comments Section */
+        .comments-section { display: none; margin-top: 15px; border-top: 1px solid #2f3336; padding-top: 10px; }
+        .comment-input-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .comment-input { flex: 1; background: #16181c; border: none; padding: 10px; border-radius: 20px; color: #fff; outline: none; }
+        .comment-item { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
+        .comment-content { background: #16181c; padding: 8px 12px; border-radius: 12px; flex: 1; }
 
-        /* === CHAT SYSTEM (ZALO STYLE - 2 CỘT) === */
-        .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
-        .chat-window { width: 1000px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 12px; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        
-        /* Cột trái (List Friend) */
-        .chat-sidebar { width: 300px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .chat-search-bar { padding: 15px; border-bottom: 1px solid #333; }
-        .search-input { width: 100%; background: #000; border: 1px solid #333; padding: 8px 12px; border-radius: 20px; color: #fff; outline: none; }
-        .friend-list { flex: 1; overflow-y: auto; }
-        .friend-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1a1a; transition: 0.2s; }
-        .friend-item:hover { background: #1a1a1a; }
-        .friend-item.active { background: #1f2937; border-left: 3px solid #3b82f6; }
-        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #222; }
-        .friend-info h4 { font-size: 0.9rem; color: #fff; margin-bottom: 3px; font-weight: bold; }
-        .friend-info p { font-size: 0.75rem; color: #888; }
-        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
+        /* Sidebar Widgets */
+        .sidebar-widget { background: #16181c; border-radius: 16px; padding: 15px; margin-bottom: 20px; }
+        .widget-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; }
+        .friend-item-mini { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 5px; border-radius: 8px; transition: 0.2s; }
+        .friend-item-mini:hover { background: rgba(255,255,255,0.05); }
+        .online-dot { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
+        .connect-btn { background: #eff3f4; color: #0f1419; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .connect-btn:hover { background: #d7dbdc; }
 
-        /* Cột phải (Chat Main) */
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
-        .chat-title-bar { padding: 15px 20px; border-bottom: 1px solid #333; color: #fff; display: flex; justify-content: space-between; align-items: center; background: #131722; font-weight: bold; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .message { max-width: 75%; padding: 12px 18px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; position: relative; }
-        .msg-in { align-self: flex-start; background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 0; }
-        .msg-out { align-self: flex-end; background: #059669; color: #fff; border-bottom-right-radius: 0; }
-        .msg-time { font-size: 0.7rem; color: #9ca3af; margin-top: 5px; text-align: right; opacity: 0.8; }
-        .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
-        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: #fff; outline: none; border-radius: 6px; }
-        .chat-input:focus { border-color: #3b82f6; }
-        .send-btn { background: #3b82f6; color: #fff; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        .close-chat-btn { color: #888; cursor: pointer; font-size: 1.2rem; }
-        .close-chat-btn:hover { color: #f6465d; }
+        /* Login Screen */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 20000; display: flex; align-items: center; justify-content: center; }
+        .login-card { width: 400px; padding: 40px; border: 1px solid #333; border-radius: 16px; text-align: center; }
+        .form-control { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px; outline: none; margin-bottom: 15px; }
+        .btn-primary { width: 100%; padding: 12px; background: #fff; color: #000; font-weight: bold; border-radius: 25px; border: none; cursor: pointer; }
+
+        /* PROFILE */
+        #profile-view { padding: 20px; }
+        .profile-container { max-width: 800px; margin: 0 auto; }
+        .profile-card-main { background: #0b0e11; border: 1px solid #2f3336; border-radius: 16px; overflow: hidden; position: relative; }
+        .cover-photo { height: 200px; background: linear-gradient(45deg, #1d9bf0, #00ba7c); }
+        .profile-details { padding: 20px; padding-top: 60px; position: relative; }
+        .avatar-large { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #0b0e11; position: absolute; top: -65px; left: 20px; object-fit: cover; background: #000; }
+        .edit-btn { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid #536471; color: #fff; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loginOverlay">
-        <div class="login-box">
-            <h2 id="authTitle">SYSTEM LOGIN</h2>
-            <div class="input-group"><label>EMAIL / OPERATOR ID</label><input type="text" id="email" placeholder="ENTER ID"></div>
-            <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
-            <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
-                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
-            </div>
-            <button id="mainAuthBtn">LOGIN</button>
-            <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
-            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
-                <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
-            </div>
-            <p id="loginMsg"></p>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <h1 style="margin-bottom: 30px; font-family:'JetBrains Mono'; color:#fff;">STABLE<span style="color:#1d9bf0">CAST</span></h1>
+            <input type="text" id="loginId" class="form-control" placeholder="Operator ID">
+            <input type="password" id="loginPass" class="form-control" placeholder="Passcode">
+            <button class="btn-primary" id="btnAuth">LOGIN</button>
+            <div style="margin-top:20px; font-size:0.8rem; color:#536471;">Secure Access v3.0</div>
         </div>
-        <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
     </div>
 
-    <div class="main-app-container">
+    <div class="main-app-container" id="mainApp">
         <header>
-            <div class="brand"><span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span><span style="font-size: 0.9rem; color:#555; font-weight:normal; margin-left: 10px;">| TEAM 1 - ADY201m</span></div>
+            <div class="brand">STABLE<span style="color:#1d9bf0">CAST</span></div>
             <div class="nav-tabs">
-                <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
-                <button class="nav-btn" id="btn-community"><i class="fas fa-users"></i> COMMUNITY</button>
-                <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
+                <button class="nav-btn" onclick="switchView('dashboard')"><i class="fas fa-chart-line"></i> Terminal</button>
+                <button class="nav-btn active" onclick="switchView('community')"><i class="fas fa-users"></i> Community</button>
+                <button class="nav-btn" onclick="switchView('profile')"><i class="fas fa-user"></i> Profile</button>
+            </div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <img id="headerAvatar" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
             </div>
         </header>
 
-        <div id="dashboard-view" class="view-section active-view">
+        <div id="dashboard-view" class="view-section">
             <div class="dashboard-grid">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; color: #848e9c; font-size: 0.9rem; margin-bottom: 10px;">
-                        <span>MARKET OVERVIEW</span><span style="color: #f0b90b; font-weight: bold;">BINANCE: BTC/USDT</span>
+                    <div style="display:flex; justify-content:space-between; color:#71767b; font-size:0.9rem;">
+                        <span>BTC/USDT PERPETUAL</span><span style="color:#0ecb81">LIVE</span>
                     </div>
-                    <div class="price-display" id="btcPrice">LOADING...</div>
-                    <div style="font-size: 0.8rem; margin-bottom: 15px; display: flex; gap: 20px;">
-                        <span style="color: #0ecb81;">▬ Real-time Price</span><span style="color: #3b82f6; border-bottom: 2px dashed #3b82f6;">--- AI Forecast</span>
-                    </div>
+                    <div class="price-display" id="btcPrice">CONNECTING...</div>
                     <div class="chart-container"><canvas id="mainChart"></canvas></div>
                 </div>
-                <div>
-                    <div class="card prediction-box">
-                        <div class="pred-label"><i class="fas fa-robot"></i> ENSEMBLE AI PREDICTION</div>
-                        <div class="pred-price" id="predPrice">---</div>
-                        <div style="color: #555; font-size: 0.8rem; margin-top: 5px;">Confidence Interval: 98.2%</div>
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div class="card" style="text-align:center;">
+                        <div style="color:#71767b; font-size:0.9rem; margin-bottom:10px;">AI PREDICTION (1H)</div>
+                        <div style="font-size:2.5rem; font-weight:bold; color:#1d9bf0;" id="predPrice">---</div>
                     </div>
-                    <div class="card" style="margin-bottom: 20px;">
-                        <div class="info-row"><span class="info-label">Stop Loss (ATR)</span><span class="info-val" id="stopLoss" style="color: #f6465d;">---</span></div>
-                        <div class="info-row" style="border: none; margin-bottom: 0;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color: #0ecb81;">---</span></div>
-                    </div>
-                    <div class="card">
-                        <div class="specs-title"><i class="fas fa-microchip"></i> SYSTEM SPECIFICATIONS</div>
-                        <div class="info-row"><span class="info-label">Architecture</span><span class="spec-val-highlight">Hybrid (LSTM + XGB)</span></div>
-                        <div class="info-row"><span class="info-label">Input Shape</span><span class="spec-val-highlight">(Batch, 60, 13)</span></div>
-                        <div class="info-row"><span class="info-label">Optimization</span><span class="spec-val-highlight">Adam (Lr=0.001)</span></div>
-                        <div class="info-row" style="border:none; margin-bottom: 0;"><span class="info-label">Data Source</span><span class="spec-val-highlight">Binance WebSocket</span></div>
+                    <div class="card" id="terminalLogs" style="flex:1; overflow-y:auto; font-size:0.8rem; color:#0ecb81; font-family:'Courier New';">
+                        <div>[SYSTEM] Initializing...</div>
                     </div>
                 </div>
-            </div>
-            <div class="logs-container" id="terminalLogs">
-                <div class="log-entry"><span class="log-time">[SYSTEM]</span> Ready to connect...</div>
             </div>
         </div>
 
-        <div id="community-view" class="view-section">
-            <div class="feed-input-container">
-                <textarea id="postInput" class="feed-textarea" placeholder="What is happening?! (Share signals, news...)"></textarea>
-                <div style="overflow:hidden;">
-                    <button class="post-btn" id="submitPostBtn">Post</button>
+        <div id="community-view" class="view-section active-view">
+            <div class="feed-main">
+                <div class="x-composer">
+                    <img id="feedAvatar" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" class="user-avatar-small">
+                    <div class="composer-area">
+                        <textarea id="postInput" class="x-input" placeholder="What is happening?!"></textarea>
+                        
+                        <div id="mediaPreview">
+                            <img id="previewImg" src="">
+                            <div class="remove-media" onclick="clearMedia()"><i class="fas fa-times"></i></div>
+                        </div>
+
+                        <div class="composer-tools">
+                            <div class="x-icons">
+                                <input type="file" id="mediaInput" accept="image/*" hidden onchange="handleMediaSelect(this)">
+                                
+                                <i class="far fa-image x-icon-btn" onclick="document.getElementById('mediaInput').click()" title="Image"></i>
+                                <i class="far fa-smile x-icon-btn" onclick="toggleStickers()" title="Sticker"></i>
+                                <i class="fas fa-poll-h x-icon-btn" title="Poll"></i>
+                                
+                                <div id="stickerPopup">
+                                    <div class="sticker-item" onclick="addSticker('🚀')">🚀</div>
+                                    <div class="sticker-item" onclick="addSticker('💎')">💎</div>
+                                    <div class="sticker-item" onclick="addSticker('📉')">📉</div>
+                                    <div class="sticker-item" onclick="addSticker('🔥')">🔥</div>
+                                    <div class="sticker-item" onclick="addSticker('😎')">😎</div>
+                                    <div class="sticker-item" onclick="addSticker('🤖')">🤖</div>
+                                    <div class="sticker-item" onclick="addSticker('🤡')">🤡</div>
+                                    <div class="sticker-item" onclick="addSticker('💀')">💀</div>
+                                </div>
+                            </div>
+                            <button id="btnPost" class="x-post-btn">Post</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="feedStream"></div>
+            </div>
+            
+            <div class="feed-sidebar">
+                <div class="sidebar-widget">
+                    <div class="widget-title">My Friends</div>
+                    <div id="myFriendsList">
+                        </div>
+                </div>
+
+                <div class="sidebar-widget">
+                    <div class="widget-title">Who to follow</div>
+                    <div id="suggestionList">
+                        </div>
                 </div>
             </div>
-            <div id="feedStream">
-                </div>
         </div>
 
         <div id="profile-view" class="view-section">
-            <div class="profile-cover"></div>
-            <div class="profile-header-card">
-                <img id="profile-avatar-img" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" class="profile-avatar">
-                <div class="profile-name" id="profile-name-txt">OPERATOR NAME</div>
-                <div class="profile-role" id="profile-role-txt">Lead Developer | FPT University</div>
-                <div class="profile-actions">
-                    <button class="action-btn" id="openChatBtn"><i class="fas fa-comment-alt"></i> Messages</button>
-                    <button class="action-btn" id="editProfileBtn"><i class="fas fa-cog"></i> Edit Profile</button>
-                </div>
-            </div>
-            <div class="profile-content">
-                <div class="info-card">
-                    <h3><i class="fas fa-id-card" style="margin-right: 10px;"></i> Contact Info</h3>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-user-circle"></i></div><div><div class="detail-text" id="profile-id-txt">DE200247</div><span class="detail-sub">Operator ID</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-envelope"></i></div><div><div class="detail-text" id="profile-email-txt">toanpbs@fpt.edu.vn</div><span class="detail-sub">Email Address</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-university"></i></div><div><div class="detail-text" id="profile-org-txt">FPT University</div><span class="detail-sub">Organization</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div><div><div class="detail-text" id="profile-loc-txt">Da Nang, Vietnam</div><span class="detail-sub">Location</span></div></div>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> Description</h3>
-                    <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="profile-desc-txt">StableCast is an advanced AI-powered cryptocurrency price prediction terminal...</p>
-                    <h3><i class="fas fa-users" style="margin-right: 10px;"></i> Social Stats</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div class="stat-box"><div class="stat-num" id="stat-friends">1</div><div class="stat-label">Friends</div></div>
-                        <div class="stat-box"><div class="stat-num" id="stat-hours">0m</div><div class="stat-label">Online Time</div></div>
-                        <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">98%</div><div class="stat-label">Reputation</div></div>
+            <div class="profile-container">
+                <div class="profile-card-main">
+                    <div class="cover-photo"></div>
+                    <div class="profile-details">
+                        <img id="profileAvatar" src="" class="avatar-large">
+                        <button class="edit-btn">Edit Profile</button>
+                        <h1 id="profileName" style="margin-top:10px;">Operator</h1>
+                        <div id="profileDesc" style="margin-top:10px; color:#ccc;"></div>
+                        
+                        <div style="display:flex; gap:30px; margin-top:20px;">
+                            <div><span id="statFriends" style="font-weight:bold; color:#fff;">0</span> <span style="color:#71767b">Friends</span></div>
+                            <div><span id="statOnline" style="font-weight:bold; color:#fff;">0m</span> <span style="color:#71767b">Online</span></div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-info">© 2026 StableCast Project. FPT University.<br>Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span></div>
-    </div>
-
-    <div id="editProfileModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header"><span>EDIT PROFILE</span><i class="fas fa-times close-modal" id="closeEditModal"></i></div>
-            <div class="modal-body">
-                <div class="modal-section-title">Visual Identity</div>
-                <label class="file-upload-label" for="editAvatarInput"><i class="fas fa-cloud-upload-alt"></i> Upload New Avatar</label>
-                <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
-
-                <div class="modal-section-title">Personal Information</div>
-                <label style="color:#888; font-size:0.8rem;">DISPLAY NAME</label><input type="text" id="editNameInput" class="form-input" placeholder="Name">
-                <label style="color:#888; font-size:0.8rem;">JOB TITLE</label><input type="text" id="editRoleInput" class="form-input" placeholder="Title">
-
-                <div class="modal-section-title">Contact Details</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="color:#888; font-size:0.8rem;">OPERATOR ID</label><input type="text" id="editIDInput" class="form-input"></div>
-                    <div><label style="color:#888; font-size:0.8rem;">EMAIL</label><input type="text" id="editEmailInput" class="form-input"></div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="color:#888; font-size:0.8rem;">ORGANIZATION</label><input type="text" id="editOrgInput" class="form-input"></div>
-                    <div><label style="color:#888; font-size:0.8rem;">LOCATION</label><input type="text" id="editLocInput" class="form-input"></div>
-                </div>
-
-                <div class="modal-section-title">Description</div>
-                <textarea id="editDescInput" class="form-textarea"></textarea>
-            </div>
-            <button class="save-btn" id="saveProfileBtn">SAVE CHANGES</button>
-        </div>
-    </div>
-
-    <div id="chatSystemOverlay" class="chat-overlay">
-        <div class="chat-window">
-            <div class="chat-sidebar">
-                <div class="chat-search-bar">
-                    <input type="text" class="search-input" placeholder="Search friends...">
-                </div>
-                <div class="friend-list" id="friendListContainer">
-                    </div>
-            </div>
-            
-            <div class="chat-main">
-                <div class="chat-title-bar">
-                    <span id="currentChatUser" style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-comment-dots" style="color: #3b82f6;"></i> Select a friend to chat
-                    </span>
-                    <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
-                </div>
-                <div class="chat-messages" id="chatContainer">
-                    <div class="message msg-in" style="font-style:italic; color:#777;">System: Welcome to StableCast Messenger.</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Type a message...">
-                    <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
