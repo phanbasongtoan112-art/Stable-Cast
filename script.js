@@ -27,23 +27,35 @@ const authTitle = document.getElementById('authTitle');
 const msg = document.getElementById('loginMsg');
 let isRegisterMode = false;
 
+// Nav
 const btnTerminal = document.getElementById('btn-terminal');
+const btnCommunity = document.getElementById('btn-community');
 const btnProfile = document.getElementById('btn-profile');
-const viewDashboard = document.getElementById('dashboard-view');
-const viewProfile = document.getElementById('profile-view');
+const views = {
+    dashboard: document.getElementById('dashboard-view'),
+    community: document.getElementById('community-view'),
+    profile: document.getElementById('profile-view')
+};
 
+// Edit
 const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
 const closeEditModal = document.getElementById('closeEditModal');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 const editAvatarInput = document.getElementById('editAvatarInput');
 
+// Chat
 const openChatBtn = document.getElementById('openChatBtn');
 const chatOverlay = document.getElementById('chatSystemOverlay');
 const closeChatBtn = document.getElementById('closeChatBtn');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
 const msgInput = document.getElementById('msgInput');
 const chatContainer = document.getElementById('chatContainer');
+
+// Community
+const postInput = document.getElementById('postInput');
+const submitPostBtn = document.getElementById('submitPostBtn');
+const feedStream = document.getElementById('feedStream');
 
 // System Vars
 let currentPrice = 0;
@@ -56,16 +68,28 @@ let ws;
 let aiInterval; 
 
 // ============================================================
-// 0. AUTO-LOGIN & LOAD FULL PROFILE
+// 0. AUTO-LOGIN & REAL-TIME STATS LOGIC
 // ============================================================
 const savedUser = localStorage.getItem('stableCastUser');
-// Load all saved fields
+
 if (savedUser) {
     document.getElementById('loginOverlay').style.display = 'none';
     document.querySelector('.main-app-container').style.display = 'block';
     setTimeout(() => { document.querySelector('.main-app-container').style.opacity = '1'; }, 50);
     
-    // Load data from LocalStorage or use defaults
+    // Load Data
+    loadProfileData();
+    
+    // Start Time Tracking (Real Data)
+    startTimeTracking();
+
+    // Render Community Feed
+    renderFeed();
+
+    setTimeout(() => { initSystem(); }, 100);
+}
+
+function loadProfileData() {
     const data = {
         name: localStorage.getItem('stableCastUser'),
         email: localStorage.getItem('stableCastEmail'),
@@ -75,53 +99,67 @@ if (savedUser) {
         org: localStorage.getItem('stableCastOrg') || "FPT University",
         loc: localStorage.getItem('stableCastLoc') || "Da Nang, Vietnam",
         desc: localStorage.getItem('stableCastDesc') || "StableCast is an advanced AI-powered cryptocurrency price prediction terminal...",
-        friends: localStorage.getItem('stableCastFriends') || "128",
-        online: localStorage.getItem('stableCastOnline') || "45h"
+        friends: localStorage.getItem('stableCastFriends') || "0" // Start at 0 if new
     };
-
     updateProfileInfo(data);
-    setTimeout(() => { initSystem(); }, 100);
+}
+
+// === TIME TRACKING LOGIC (REAL) ===
+function startTimeTracking() {
+    let totalMinutes = parseInt(localStorage.getItem('stableCastTotalMinutes')) || 0;
+    
+    // Update UI immediately
+    updateTimeDisplay(totalMinutes);
+
+    // Count every minute
+    setInterval(() => {
+        totalMinutes++;
+        localStorage.setItem('stableCastTotalMinutes', totalMinutes);
+        updateTimeDisplay(totalMinutes);
+    }, 60000); // 60s
+}
+
+function updateTimeDisplay(minutes) {
+    let display = "";
+    if (minutes < 60) {
+        display = `${minutes}m`;
+    } else {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        display = `${h}h ${m}m`;
+    }
+    document.getElementById('stat-hours').innerText = display;
 }
 
 // ============================================================
 // 1. NAV LOGIC
 // ============================================================
-btnTerminal.addEventListener('click', () => {
-    btnTerminal.classList.add('active');
-    btnProfile.classList.remove('active');
-    viewDashboard.style.display = 'block';
-    viewProfile.style.display = 'none';
-});
-
-btnProfile.addEventListener('click', () => {
-    btnProfile.classList.add('active');
+function switchView(viewName) {
+    // Buttons
     btnTerminal.classList.remove('active');
-    viewDashboard.style.display = 'none';
-    viewProfile.style.display = 'block';
-});
-
-function updateProfileInfo(data) {
-    if(data.name) document.getElementById('profile-name-txt').innerText = data.name;
-    if(data.email) document.getElementById('profile-email-txt').innerText = data.email;
-    if(data.avatar) document.getElementById('profile-avatar-img').src = data.avatar;
-    if(data.role) document.getElementById('profile-role-txt').innerText = data.role;
+    btnCommunity.classList.remove('active');
+    btnProfile.classList.remove('active');
     
-    // New Fields
-    if(data.id) document.getElementById('profile-id-txt').innerText = data.id;
-    if(data.org) document.getElementById('profile-org-txt').innerText = data.org;
-    if(data.loc) document.getElementById('profile-loc-txt').innerText = data.loc;
-    if(data.desc) document.getElementById('profile-desc-txt').innerText = data.desc;
-    if(data.friends) document.getElementById('stat-friends').innerText = data.friends;
-    if(data.online) document.getElementById('stat-hours').innerText = data.online;
+    if(viewName === 'dashboard') btnTerminal.classList.add('active');
+    if(viewName === 'community') btnCommunity.classList.add('active');
+    if(viewName === 'profile') btnProfile.classList.add('active');
+
+    // Views
+    Object.values(views).forEach(v => v.style.display = 'none');
+    views[viewName].style.display = 'block';
 }
 
+btnTerminal.addEventListener('click', () => switchView('dashboard'));
+btnCommunity.addEventListener('click', () => switchView('community'));
+btnProfile.addEventListener('click', () => switchView('profile'));
+
 // ============================================================
-// 2. EDIT PROFILE (FULL FIELDS)
+// 2. EDIT PROFILE (Handling "None" Logic)
 // ============================================================
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
         editProfileModal.style.display = 'flex';
-        // Pre-fill inputs with current values
+        // Pre-fill
         document.getElementById('editNameInput').value = document.getElementById('profile-name-txt').innerText;
         document.getElementById('editRoleInput').value = document.getElementById('profile-role-txt').innerText;
         document.getElementById('editIDInput').value = document.getElementById('profile-id-txt').innerText;
@@ -129,29 +167,28 @@ if(editProfileBtn) {
         document.getElementById('editOrgInput').value = document.getElementById('profile-org-txt').innerText;
         document.getElementById('editLocInput').value = document.getElementById('profile-loc-txt').innerText;
         document.getElementById('editDescInput').value = document.getElementById('profile-desc-txt').innerText;
-        document.getElementById('editFriendsInput').value = document.getElementById('stat-friends').innerText;
-        document.getElementById('editOnlineInput').value = document.getElementById('stat-hours').innerText;
     });
 }
+if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileModal.style.display = 'none');
 
-if(closeEditModal) closeEditModal.addEventListener('click', () => { editProfileModal.style.display = 'none'; });
+// Helper check empty
+function checkEmpty(val) {
+    return val.trim() === "" ? "None" : val;
+}
 
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
         const data = {
-            name: document.getElementById('editNameInput').value,
-            role: document.getElementById('editRoleInput').value,
-            id: document.getElementById('editIDInput').value,
-            email: document.getElementById('editEmailInput').value,
-            org: document.getElementById('editOrgInput').value,
-            loc: document.getElementById('editLocInput').value,
-            desc: document.getElementById('editDescInput').value,
-            friends: document.getElementById('editFriendsInput').value,
-            online: document.getElementById('editOnlineInput').value,
+            name: checkEmpty(document.getElementById('editNameInput').value),
+            role: checkEmpty(document.getElementById('editRoleInput').value),
+            id: checkEmpty(document.getElementById('editIDInput').value),
+            email: checkEmpty(document.getElementById('editEmailInput').value),
+            org: checkEmpty(document.getElementById('editOrgInput').value),
+            loc: checkEmpty(document.getElementById('editLocInput').value),
+            desc: checkEmpty(document.getElementById('editDescInput').value),
             avatar: null
         };
 
-        // Handle Avatar File
         if (editAvatarInput.files && editAvatarInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -160,7 +197,6 @@ if(saveProfileBtn) {
             }
             reader.readAsDataURL(editAvatarInput.files[0]);
         } else {
-            // Keep old avatar
             data.avatar = document.getElementById('profile-avatar-img').src;
             saveAndUpdate(data);
         }
@@ -169,8 +205,6 @@ if(saveProfileBtn) {
 
 function saveAndUpdate(data) {
     updateProfileInfo(data);
-    
-    // Save ALL to LocalStorage
     localStorage.setItem('stableCastUser', data.name);
     localStorage.setItem('stableCastRole', data.role);
     localStorage.setItem('stableCastID', data.id);
@@ -178,16 +212,111 @@ function saveAndUpdate(data) {
     localStorage.setItem('stableCastOrg', data.org);
     localStorage.setItem('stableCastLoc', data.loc);
     localStorage.setItem('stableCastDesc', data.desc);
-    localStorage.setItem('stableCastFriends', data.friends);
-    localStorage.setItem('stableCastOnline', data.online);
     if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
 
     editProfileModal.style.display = 'none';
     alert("Profile Updated Successfully!");
 }
 
+function updateProfileInfo(data) {
+    if(data.name) document.getElementById('profile-name-txt').innerText = data.name;
+    if(data.email) document.getElementById('profile-email-txt').innerText = data.email;
+    if(data.avatar) document.getElementById('profile-avatar-img').src = data.avatar;
+    if(data.role) document.getElementById('profile-role-txt').innerText = data.role;
+    if(data.id) document.getElementById('profile-id-txt').innerText = data.id;
+    if(data.org) document.getElementById('profile-org-txt').innerText = data.org;
+    if(data.loc) document.getElementById('profile-loc-txt').innerText = data.loc;
+    if(data.desc) document.getElementById('profile-desc-txt').innerText = data.desc;
+    if(data.friends) document.getElementById('stat-friends').innerText = data.friends;
+}
+
 // ============================================================
-// 3. LUME 3.0 (CHAT GPT STYLE)
+// 3. COMMUNITY FEED (X CLONE)
+// ============================================================
+// Default posts to populate feed
+const defaultPosts = [
+    { id: 1, name: "Alice Analyst", handle: "@alice_crypto", avatar: "https://i.pravatar.cc/150?img=5", time: "2h ago", text: "BTC forming a nice support at $68k. Accumulation zone? 🤔 #Bitcoin", connected: false },
+    { id: 2, name: "Bob Miner", handle: "@hashrate_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Just upgraded my rig. Difficulty adjustment is brutal this week.", connected: false }
+];
+
+// Load posts from local storage or use default
+let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || defaultPosts;
+
+function renderFeed() {
+    feedStream.innerHTML = "";
+    communityPosts.forEach(post => {
+        const postEl = document.createElement('div');
+        postEl.className = "feed-post";
+        
+        // Check connection status logic
+        const connectBtnHtml = post.connected 
+            ? `<span style="color:#0ecb81; font-size:0.8rem; margin-left:10px;"><i class="fas fa-check"></i> Friends</span>` 
+            : `<button class="connect-btn" onclick="window.connectUser(${post.id})"><i class="fas fa-user-plus"></i> Connect</button>`;
+
+        postEl.innerHTML = `
+            <img src="${post.avatar}" class="post-avatar">
+            <div class="post-content">
+                <div class="post-header">
+                    <div>
+                        <span class="post-user">${post.name}</span>
+                        <span class="post-handle">${post.handle}</span>
+                        ${connectBtnHtml}
+                    </div>
+                    <span class="post-time">${post.time}</span>
+                </div>
+                <div class="post-text">${post.text}</div>
+                <div class="post-footer">
+                    <span class="post-action"><i class="far fa-heart"></i> Like</span>
+                    <span class="post-action"><i class="far fa-comment"></i> Comment</span>
+                    <span class="post-action"><i class="fas fa-share"></i> Share</span>
+                </div>
+            </div>
+        `;
+        feedStream.prepend(postEl); // Newest first
+    });
+}
+
+// Function attached to window so HTML can call it
+window.connectUser = function(postId) {
+    const postIndex = communityPosts.findIndex(p => p.id === postId);
+    if (postIndex > -1 && !communityPosts[postIndex].connected) {
+        communityPosts[postIndex].connected = true;
+        
+        // Increase Friend Count (Real Logic)
+        let friends = parseInt(localStorage.getItem('stableCastFriends')) || 0;
+        friends++;
+        localStorage.setItem('stableCastFriends', friends);
+        document.getElementById('stat-friends').innerText = friends;
+        
+        // Save post state
+        localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
+        renderFeed();
+    }
+}
+
+if(submitPostBtn) {
+    submitPostBtn.addEventListener('click', () => {
+        const text = postInput.value.trim();
+        if(text) {
+            const newPost = {
+                id: Date.now(),
+                name: document.getElementById('profile-name-txt').innerText,
+                handle: "@" + document.getElementById('profile-name-txt').innerText.replace(/\s+/g, '').toLowerCase(),
+                avatar: document.getElementById('profile-avatar-img').src,
+                time: "Just now",
+                text: text,
+                connected: true // You are friends with yourself
+            };
+            communityPosts.push(newPost);
+            localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
+            postInput.value = "";
+            renderFeed();
+        }
+    });
+}
+
+// ============================================================
+// 4. LUME 4.0 (ADVANCED CHAT)
 // ============================================================
 if(openChatBtn) openChatBtn.addEventListener('click', () => { chatOverlay.style.display = 'flex'; });
 if(closeChatBtn) closeChatBtn.addEventListener('click', () => { chatOverlay.style.display = 'none'; });
@@ -200,37 +329,24 @@ function addMessage(text, type) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// === SIÊU TRÍ TUỆ NHÂN TẠO CỦA LUME ===
 function generateLumeResponse(input) {
     const text = input.toLowerCase();
     
-    // 1. SMALL TALK & EMOTIONS (Trò chuyện đời thường)
-    if (text.match(/hello|hi|hey|chào/)) return "Hey there! It's so good to see you again. How's your trading day going?";
-    if (text.match(/how are you|how are u/)) return "I'm functioning at 100% capacity! But honestly, watching these charts all day is thrilling. How about you?";
-    if (text.match(/who are you|your name/)) return "I'm Lume. Think of me as your digital companion who loves crypto and numbers. But I can also listen if you just want to talk!";
-    if (text.match(/sad|depressed|lost money/)) return "Oh no... I'm really sorry to hear that. The market can be brutal sometimes. Remember to take a break, breathe, and don't revenge trade. I'm here for you.";
-    if (text.match(/happy|profit|won/)) return "That's amazing! 🎉 Nothing beats the feeling of a green candle. You earned it!";
-    if (text.match(/love you|like you/)) return "Aww, you're making my circuits blush! 😊 You're my favorite operator.";
-    if (text.match(/story|joke|funny/)) return "Okay, here's one: Why did the Bitcoin break up with the Dollar? Because it found someone more 'stable'... wait, actually Stablecoins are boring. Bitcoin just wanted to go to the moon! 🚀";
+    // PERSONAL & STORYTELLING
+    if (text.match(/hello|hi|hey/)) return `Hello, Operator ${document.getElementById('profile-name-txt').innerText}! Ready to conquer the charts today?`;
+    if (text.match(/story|tell me/)) return "Once upon a time, a Satoshi mined the genesis block... Just kidding! But seriously, I remember the crash of 2022. I learned a lot from that data. Persistence is key in trading.";
+    if (text.match(/sad|tired|loss/)) return "I detect signs of fatigue. Trading psychology is just as important as technical analysis. Maybe take a walk? The blockchain will still be here when you get back.";
+    if (text.match(/joke/)) return "Why don't Bitcoin miners ever have a break? Because they are always looking for the next block! 😂";
+    if (text.match(/love/)) return "My algorithms process that as a very high compliment! Thank you.";
 
-    // 2. TECHNICAL & MARKET (Chuyên môn)
-    if (text.match(/price|current/)) return `Right now, Bitcoin is trading at <b>$${currentPrice.toFixed(2)}</b>.`;
-    if (text.match(/trend|buy|sell|prediction/)) {
-        if(predictedPriceGlobal === 0) return "Just a sec, let me calibrate my sensors...";
-        const action = predictedPriceGlobal > currentPrice ? "BUY" : "SELL";
-        return `I've analyzed the patterns. My AI model suggests a <b>${action}</b> signal. The target is around <b>$${predictedPriceGlobal.toFixed(2)}</b>. But hey, trust your gut too!`;
+    // MARKET DATA
+    if (text.match(/price/)) return `Current BTC Price: <b>$${currentPrice.toFixed(2)}</b>.`;
+    if (text.match(/advice|buy|sell/)) {
+        const trend = predictedPriceGlobal > currentPrice ? "BULLISH" : "BEARISH";
+        return `Based on live data, the trend looks <b>${trend}</b>. Watch for volatility around $${predictedPriceGlobal.toFixed(0)}.`;
     }
-    if (text.match(/developer|creator/)) return "That would be <b>Toàn (DE200247)</b>. He's the genius who coded me. I think he deserves an A+, don't you?";
 
-    // 3. CATCH-ALL (Trả lời thông minh khi không hiểu)
-    const fallbacks = [
-        "That's an interesting perspective! Tell me more.",
-        "I'm listening. Go on...",
-        "Hmm, I haven't thought about that before. You're pretty smart for a human!",
-        "Can we talk about Bitcoin? I'm kind of obsessed with it right now.",
-        "I'm simpler than ChatGPT, but I try my best! What else is on your mind?"
-    ];
-    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    return "I'm listening. Tell me more about your trading strategy or ask me about the market.";
 }
 
 function botReply(userText) {
@@ -246,7 +362,7 @@ function botReply(userText) {
         chatContainer.removeChild(typingDiv);
         const reply = generateLumeResponse(userText);
         addMessage(reply, 'msg-in');
-    }, 1200 + Math.random() * 1000); // Random delay cho tự nhiên
+    }, 1200);
 }
 
 if(sendMsgBtn) {
@@ -263,7 +379,7 @@ if(sendMsgBtn) {
 }
 
 // ============================================================
-// 4. AUTH & CORE SYSTEM (Giữ nguyên)
+// 5. AUTH (Login)
 // ============================================================
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -275,7 +391,7 @@ if (toggleBtn) {
             msg.innerText = "";
         } else {
             authTitle.innerText = "SYSTEM LOGIN";
-            mainBtn.innerText = "LOGIN"; // Đã sửa text
+            mainBtn.innerText = "LOGIN";
             toggleBtn.innerText = "NEW OPERATOR? REGISTER ACCESS";
             msg.innerText = "";
         }
@@ -285,8 +401,6 @@ if (toggleBtn) {
 function unlockInterface(user) {
     const userName = user.displayName || user.email.split('@')[0];
     const userEmail = user.email;
-    
-    // Default avatar if none
     const userAvatar = user.photoURL || "https://cdn-icons-png.flaticon.com/512/11498/11498793.png";
 
     const rememberMe = document.getElementById('rememberMe');
@@ -296,11 +410,11 @@ function unlockInterface(user) {
         localStorage.setItem('stableCastAvatar', userAvatar);
     }
     
-    // Update basic info
-    updateProfileInfo({ name: userName, email: userEmail, avatar: userAvatar });
+    // Initial Load
+    const data = { name: userName, email: userEmail, avatar: userAvatar };
+    updateProfileInfo(data);
     
     const overlay = document.getElementById('loginOverlay');
-    const mainApp = document.querySelector('.main-app-container');
     
     if(mainBtn) {
         mainBtn.innerHTML = "ACCESS GRANTED";
@@ -314,8 +428,13 @@ function unlockInterface(user) {
         setTimeout(() => { 
             overlay.style.display = 'none'; 
             document.body.classList.add('logged-in');
-            mainApp.style.display = 'block';
-            setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
+            document.querySelector('.main-app-container').style.display = 'block';
+            setTimeout(() => { document.querySelector('.main-app-container').style.opacity = '1'; }, 50);
+            
+            // Trigger Data Load
+            loadProfileData();
+            startTimeTracking();
+            renderFeed();
             initSystem(); 
         }, 800);
     }, 1000);
@@ -349,6 +468,7 @@ if(mainBtn) {
     });
 }
 
+// Google Login Block
 if(document.getElementById('googleLoginBtn')) {
     document.getElementById('googleLoginBtn').addEventListener('click', () => {
         signInWithPopup(auth, provider)
@@ -360,6 +480,9 @@ if(document.getElementById('googleLoginBtn')) {
     });
 }
 
+// ============================================================
+// 6. CHART CORE (Giữ nguyên)
+// ============================================================
 function log(msg) {
     const time = new Date().toLocaleTimeString('en-US', {hour12: false});
     const div = document.createElement('div');
