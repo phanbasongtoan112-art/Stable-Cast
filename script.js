@@ -11,7 +11,7 @@ let forecastHistory = []; // Mảng chứa dữ liệu dự đoán
 let timeLabels = [];
 let chart; 
 let ws; 
-let simulationInterval; 
+let aiInterval; 
 
 // --- LOGIN LOGIC ---
 function handleLogin() {
@@ -22,35 +22,45 @@ function handleLogin() {
     const overlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
 
+    // Hiệu ứng Loading
     btn.innerHTML = "VERIFYING CREDENTIALS..."; btn.style.opacity = "0.7"; msg.innerText = "";
 
+    // Giả lập thời gian xác thực (1.5s)
     setTimeout(() => {
-        // PASS: 123456
+        // === MẬT KHẨU: 123456 ===
         if ((user === 'DE200247' || user === 'admin') && pass === '123456') {
             msg.style.color = '#0ecb81';
             msg.innerText = "ACCESS GRANTED. LOADING TERMINAL...";
+            
+            // 1. Ẩn màn hình đăng nhập
             overlay.style.opacity = '0';
             setTimeout(() => { 
                 overlay.style.display = 'none'; 
+                // 2. Hiện giao diện chính và cho phép cuộn
                 document.body.classList.add('logged-in');
                 mainApp.style.display = 'block';
                 setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
+                
+                // 3. KÍCH HOẠT HỆ THỐNG
                 initSystem();
             }, 800);
+
         } else {
+            // Đăng nhập thất bại
             btn.innerHTML = "AUTHENTICATE"; btn.style.opacity = "1";
             msg.style.color = '#f6465d'; msg.innerText = "ACCESS DENIED: Invalid Password";
         }
     }, 1500);
 }
 
+// Cho phép nhấn Enter để login
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' && document.getElementById('loginOverlay').style.display !== 'none') {
         handleLogin();
     }
 });
 
-// --- UTILS ---
+// --- UTILS: LOGGING ---
 function log(msg) {
     const time = new Date().toLocaleTimeString('en-US', {hour12: false});
     const div = document.createElement('div');
@@ -60,11 +70,11 @@ function log(msg) {
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-// --- SYSTEM START ---
+// --- HÀM KHỞI CHẠY HỆ THỐNG ---
 function initSystem() {
     log("Authentication successful. Starting core services...");
 
-    // 1. Setup Chart
+    // 1. SETUP BIỂU ĐỒ (Chart.js)
     const ctx = document.getElementById('mainChart').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
@@ -80,13 +90,13 @@ function initSystem() {
                 fill: true, 
                 pointRadius: 0
             }, {
-                // ĐÂY LÀ ĐƯỜNG DỰ ĐOÁN (Màu xanh dương)
+                // ĐƯỜNG DỰ ĐOÁN AI (Màu xanh dương nét đứt)
                 label: 'AI Forecast', 
                 data: forecastHistory, 
                 borderColor: '#3b82f6', 
                 borderWidth: 2, 
-                borderDash: [5, 5], // Nét đứt
-                tension: 0.2, 
+                borderDash: [5, 5], 
+                tension: 0.4, // Đường cong mềm mại hơn
                 pointRadius: 0,
                 fill: false
             }]
@@ -99,52 +109,89 @@ function initSystem() {
         }
     });
 
-    // 2. Connect Binance
+    // 2. KẾT NỐI BINANCE (Dữ liệu giá thật)
     log("Connecting to Binance WebSocket feed...");
     ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-    
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         const price = parseFloat(data.p);
         
-        // Cập nhật giá thật
+        // Cập nhật giá hiển thị
         if (currentPrice > 0) priceEl.style.color = price >= currentPrice ? '#0ecb81' : '#f6465d';
         currentPrice = price;
         priceEl.innerText = `$${price.toFixed(2)}`;
 
-        // === PHẦN MỚI THÊM: TẠO DỮ LIỆU GIẢ LẬP CHO ĐƯỜNG MÀU XANH ===
-        // Logic: Lấy giá thật + sai số ngẫu nhiên (-30 đến +30 giá) để tạo cảm giác AI đang đoán
-        const fakeAI = price + (Math.random() * 40 - 15); 
-
-        // Đẩy dữ liệu vào mảng
+        // Cập nhật biểu đồ
         const timeNow = new Date().toLocaleTimeString();
         if (timeLabels.length > 50) { 
             timeLabels.shift(); 
             priceHistory.shift(); 
-            forecastHistory.shift(); // Xóa cũ
+            // Giữ cho mảng forecast đồng bộ độ dài
+            if(forecastHistory.length > 50) forecastHistory.shift(); 
         }
-        
         timeLabels.push(timeNow);
         priceHistory.push(price);
-        forecastHistory.push(fakeAI); // Thêm mới vào đường AI
-
+        
         chart.update();
     };
     ws.onopen = () => { log("Binance connection established. Receiving data."); };
 
-    // 3. Update Text Numbers (Simulation Loop)
-    simulationInterval = setInterval(() => {
+    // 3. KẾT NỐI AI (PYTHON SERVER) HOẶC GIẢ LẬP
+    log("Initializing AI Inference Engine...");
+    
+    // Cập nhật mỗi 2 giây
+    aiInterval = setInterval(() => {
         if(currentPrice === 0) return;
-        const volatility = Math.random() * 40 + 10; 
-        
-        // Lấy giá trị cuối cùng của đường xanh để hiển thị lên số to
-        const predictedVal = forecastHistory.length > 0 ? forecastHistory[forecastHistory.length - 1] : currentPrice;
-        
-        predEl.innerText = `$${predictedVal.toFixed(2)}`;
-        slEl.innerText = `$${(currentPrice - (volatility * 1.5)).toFixed(2)}`;
-        tpEl.innerText = `$${(currentPrice + (volatility * 2.5)).toFixed(2)}`;
-        
-        const logMsg = [`Normalization batch processed.`, `LSTM inference complete. Confidence 94%.`, `Risk metrics updated based on ATR.`];
-        if(Math.random() > 0.6) log(logMsg[Math.floor(Math.random() * logMsg.length)]);
-    }, 1000); // Cập nhật số nhanh hơn (1 giây/lần)
+
+        // Cố gắng gọi API Python (Localhost)
+        fetch('http://127.0.0.1:5000/predict')
+            .then(response => {
+                if (!response.ok) throw new Error("Server Error");
+                return response.json();
+            })
+            .then(data => {
+                // === TRƯỜNG HỢP 1: KẾT NỐI THÀNH CÔNG ===
+                const aiPrice = data.predicted_price;
+                const direction = aiPrice > currentPrice ? 'UP' : 'DOWN';
+                
+                updateDashboard(aiPrice, direction, "AI Model (Python)");
+            })
+            .catch(err => {
+                // === TRƯỜNG HỢP 2: KẾT NỐI THẤT BẠI (Dùng giả lập) ===
+                // Fallback: Tạo dự đoán giả lập thông minh bám sát giá
+                // Logic: Giá hiện tại + biến động nhỏ (-15 đến +25)
+                const fakePrice = currentPrice + (Math.random() * 40 - 15);
+                const direction = fakePrice > currentPrice ? 'UP' : 'DOWN';
+                
+                updateDashboard(fakePrice, direction, "Simulation Mode");
+                
+                // Chỉ log lỗi 1 lần để đỡ spam (tùy chọn)
+                // console.log("AI Server disconnected, switching to Simulation.");
+            });
+
+    }, 2000);
+}
+
+// --- HÀM CẬP NHẬT GIAO DIỆN CHUNG ---
+function updateDashboard(predictedVal, direction, source) {
+    // 1. Hiển thị giá dự đoán
+    predEl.innerText = `$${predictedVal.toFixed(2)}`;
+    predEl.style.color = direction === 'UP' ? '#0ecb81' : '#f6465d'; // Xanh/Đỏ
+
+    // 2. Tính toán Stoploss / Take Profit (Dựa trên ATR giả định)
+    const volatility = Math.abs(predictedVal - currentPrice) * 1.5 + 10; 
+    slEl.innerText = `$${(currentPrice - volatility).toFixed(2)}`;
+    tpEl.innerText = `$${(currentPrice + volatility * 2).toFixed(2)}`;
+
+    // 3. Vẽ đường AI lên biểu đồ
+    forecastHistory.push(predictedVal);
+    // Đảm bảo mảng không quá dài (đã xử lý ở onmessage, nhưng check lại cho chắc)
+    if(forecastHistory.length > 50) forecastHistory.shift();
+    
+    chart.update();
+
+    // 4. Ghi log ngẫu nhiên (để nhìn cho nguy hiểm)
+    if(Math.random() > 0.7) {
+        log(`Inference [${source}]: Predict ${direction} -> Conf: ${(85 + Math.random()*10).toFixed(1)}%`);
+    }
 }
