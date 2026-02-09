@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phan Bá Song Toàn | AI Student</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-sec: #8b949e;
+            --accent: #58a6ff;
+            --border: #30363d;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            background-color: var(--border);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }
+        h1 { margin: 0; font-size: 24px; color: var(--accent); }
+        .role { color: var(--text-sec); font-size: 14px; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .info { margin: 20px 0; font-size: 15px; line-height: 1.6; }
+        .tag {
+            display: inline-block;
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 2px;
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+        .btn {
+            display: block;
+            margin-top: 25px;
+            padding: 12px;
+            background: #238636;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #2ea043; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="avatar">👨‍💻</div>
+        <h1>Phan Bá Song Toàn</h1>
+        <p class="role">AI Student @ FPT University</p>
+        
+        <div class="info">
+            <p>MSSV: <b>DE200247</b></p>
+            <p>Đam mê: Data Science, Crypto & Guitar 🎸</p>
+            <p>Trình độ tiếng Nhật: N5 🇯🇵</p>
+        </div>
+
+        <div>
+            <span class="tag">Python</span>
+            <span class="tag">Machine Learning</span>
+            <span class="tag">Arknights</span>
+        </div>
+
+        <a href="mailto:phanbasongtoan112@gmail.com" class="btn">Liên hệ tôi</a>
+    </div>
+</body>
+</html>
