@@ -4,32 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StableCast | AI TRADING TERMINAL</title>
-    
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* === RESET & BASE STYLE === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
-        
-        body { 
-            background-color: #0b0c10; 
-            color: #c5c6c7; 
-            overflow-y: auto; 
-            min-height: 100vh; 
-            padding-bottom: 40px; 
-        }
-
-        /* SCROLLBAR */
+        body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
         
-        /* === LOGIN SCREEN === */
+        /* LOGIN */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
@@ -42,21 +30,18 @@
         button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         button#googleLoginBtn:hover { border-color: #fff; background: #222; }
         .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
-        .toggle-auth:hover { color: #0ecb81; }
         #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
 
-        /* === MAIN APP CONTAINER === */
+        /* MAIN APP */
         .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
-        
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
-        
         .nav-tabs { display: flex; gap: 20px; background: #111; padding: 5px; border-radius: 30px; border: 1px solid #333; }
         .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .nav-btn:hover { color: #fff; }
         .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
 
-        /* === DASHBOARD === */
+        /* DASHBOARD */
         #dashboard-view { display: block; }
         .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
         .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
@@ -74,19 +59,11 @@
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-time { color: #555; margin-right: 10px; }
 
-        /* === PROFILE === */
+        /* PROFILE */
         #profile-view { display: none; }
         .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
         .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; position: relative; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* ẢNH ĐẠI DIỆN USER (Mặc định) */
-        .profile-avatar { 
-            width: 140px; height: 140px; border-radius: 50%; 
-            border: 4px solid #0b0e11; margin-top: -90px; 
-            background: #222; object-fit: cover; 
-            box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); 
-        }
-        
+        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); }
         .profile-name { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 15px; }
         .profile-role { color: #3b82f6; font-size: 0.9rem; margin-bottom: 15px; letter-spacing: 1px; }
         .profile-actions { display: flex; gap: 10px; }
@@ -105,24 +82,30 @@
         .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
         .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
 
-        /* === MODAL EDIT PROFILE === */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #111; border: 1px solid #333; padding: 30px; width: 400px; border-radius: 8px; position: relative; }
-        .modal-header { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; }
+        /* MODAL EDIT - IMPROVED */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-box { background: #111; border: 1px solid #333; padding: 0; width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
         .close-modal { cursor: pointer; color: #555; }
         .close-modal:hover { color: #f6465d; }
-        .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; }
-        .form-input:focus { border-color: #3b82f6; }
         
-        .file-upload-label { display: block; padding: 10px; background: #1a1a1a; border: 1px dashed #555; text-align: center; color: #888; cursor: pointer; margin-bottom: 15px; font-size: 0.9rem; transition: 0.3s; }
-        .file-upload-label:hover { border-color: #0ecb81; color: #0ecb81; }
-        .save-btn { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; cursor: pointer; font-weight: bold; }
-        .save-btn:hover { background: #2563eb; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-section-title { color: #0ecb81; font-size: 0.8rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        
+        .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; }
+        .form-input:focus { border-color: #3b82f6; }
+        .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; height: 80px; resize: none; }
+        .form-textarea:focus { border-color: #3b82f6; }
 
-        /* === CHAT SYSTEM === */
+        .file-upload-label { display: block; padding: 15px; background: #1a1a1a; border: 1px dashed #555; text-align: center; color: #888; cursor: pointer; margin-bottom: 15px; border-radius: 4px; transition: 0.3s; }
+        .file-upload-label:hover { border-color: #0ecb81; color: #0ecb81; background: #222; }
+        
+        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .save-btn:hover { background: #0be08d; }
+
+        /* CHAT SYSTEM */
         .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
         .chat-window { width: 950px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        
         .chat-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
         .chat-header { padding: 20px; border-bottom: 1px solid #333; font-weight: bold; color: #0ecb81; display: flex; justify-content: space-between; align-items: center; }
         .friend-list { flex: 1; overflow-y: auto; }
@@ -130,22 +113,19 @@
         .friend-item:hover { background: #1a1a1a; }
         .friend-item.active { background: #1f2937; border-left: 3px solid #3b82f6; }
         
-        /* ẢNH AVATAR CỦA LUME (Đã sửa link) */
+        /* AVATAR LUME (XINH ĐẸP) */
         .friend-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
         
         .friend-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 3px; font-weight: bold; }
         .friend-info p { font-size: 0.75rem; color: #888; }
         .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
-
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
         .chat-title-bar { padding: 15px 20px; border-bottom: 1px solid #333; color: #fff; display: flex; justify-content: space-between; align-items: center; background: #131722; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        
         .message { max-width: 75%; padding: 12px 18px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; position: relative; }
         .msg-in { align-self: flex-start; background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 0; border: 1px solid #374151; }
         .msg-out { align-self: flex-end; background: #059669; color: #fff; border-bottom-right-radius: 0; border: 1px solid #047857; }
         .msg-time { font-size: 0.7rem; color: #9ca3af; margin-top: 5px; text-align: right; opacity: 0.8; }
-
         .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
         .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: #fff; outline: none; border-radius: 6px; }
         .chat-input:focus { border-color: #3b82f6; }
@@ -154,7 +134,6 @@
         .close-chat-btn { color: #888; cursor: pointer; font-size: 1.2rem; }
         .close-chat-btn:hover { color: #f6465d; }
         .lume-avatar-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-
     </style>
 </head>
 <body>
@@ -168,7 +147,7 @@
                 <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
                 <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
             </div>
-            <button id="mainAuthBtn">AUTHENTICATE</button>
+            <button id="mainAuthBtn">LOGIN</button>
             <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
             <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
                 <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
@@ -239,20 +218,20 @@
                     <h3><i class="fas fa-id-card" style="margin-right: 10px;"></i> Contact Info</h3>
                     <div class="detail-row"><div class="detail-icon"><i class="fas fa-user-circle"></i></div><div><div class="detail-text" id="profile-id-txt">DE200247</div><span class="detail-sub">Operator ID</span></div></div>
                     <div class="detail-row"><div class="detail-icon"><i class="fas fa-envelope"></i></div><div><div class="detail-text" id="profile-email-txt">toanpbs@fpt.edu.vn</div><span class="detail-sub">Email Address</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-university"></i></div><div><div class="detail-text">FPT University</div><span class="detail-sub">Organization</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div><div><div class="detail-text">Da Nang, Vietnam</div><span class="detail-sub">Location</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-university"></i></div><div><div class="detail-text" id="profile-org-txt">FPT University</div><span class="detail-sub">Organization</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div><div><div class="detail-text" id="profile-loc-txt">Da Nang, Vietnam</div><span class="detail-sub">Location</span></div></div>
                 </div>
                 <div class="info-card">
-                    <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> About Project</h3>
-                    <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
+                    <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> Description</h3>
+                    <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="profile-desc-txt">
                         StableCast is an advanced AI-powered cryptocurrency price prediction terminal. 
                         Developed as part of the ADY201m Laboratory course, it utilizes a Hybrid Ensemble model combining LSTM and XGBoost.
                     </p>
-                    <h3><i class="fas fa-chart-pie" style="margin-right: 10px;"></i> Trading Statistics</h3>
+                    <h3><i class="fas fa-users" style="margin-right: 10px;"></i> Social Stats</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div class="stat-box"><div class="stat-num">98.2%</div><div class="stat-label">Accuracy</div></div>
-                        <div class="stat-box"><div class="stat-num">$12K</div><div class="stat-label">Volume</div></div>
-                        <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">45</div><div class="stat-label">Signals</div></div>
+                        <div class="stat-box"><div class="stat-num" id="stat-friends">128</div><div class="stat-label">Friends</div></div>
+                        <div class="stat-box"><div class="stat-num" id="stat-hours">45h</div><div class="stat-label">Online Time</div></div>
+                        <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">98%</div><div class="stat-label">Reputation</div></div>
                     </div>
                 </div>
             </div>
@@ -268,17 +247,51 @@
                 <i class="fas fa-times close-modal" id="closeEditModal"></i>
             </div>
             
-            <label style="color: #888; font-size: 0.8rem;">DISPLAY NAME</label>
-            <input type="text" id="editNameInput" class="form-input" placeholder="Enter new name">
-            
-            <label style="color: #888; font-size: 0.8rem;">JOB TITLE</label>
-            <input type="text" id="editRoleInput" class="form-input" placeholder="e.g. Senior Trader">
-            
-            <label style="color: #888; font-size: 0.8rem;">AVATAR IMAGE</label>
-            <label class="file-upload-label" for="editAvatarInput">
-                <i class="fas fa-cloud-upload-alt"></i> Click to Upload Image
-            </label>
-            <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
+            <div class="modal-body">
+                <div class="modal-section-title">Visual Identity</div>
+                <label class="file-upload-label" for="editAvatarInput">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload New Avatar
+                </label>
+                <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
+
+                <div class="modal-section-title">Personal Information</div>
+                <label style="color:#888; font-size:0.8rem;">DISPLAY NAME</label>
+                <input type="text" id="editNameInput" class="form-input" placeholder="Name">
+                
+                <label style="color:#888; font-size:0.8rem;">JOB TITLE</label>
+                <input type="text" id="editRoleInput" class="form-input" placeholder="Title">
+
+                <div class="modal-section-title">Contact Details</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="color:#888; font-size:0.8rem;">OPERATOR ID</label>
+                        <input type="text" id="editIDInput" class="form-input">
+                    </div>
+                    <div>
+                        <label style="color:#888; font-size:0.8rem;">EMAIL</label>
+                        <input type="text" id="editEmailInput" class="form-input">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="color:#888; font-size:0.8rem;">ORGANIZATION</label>
+                        <input type="text" id="editOrgInput" class="form-input">
+                    </div>
+                    <div>
+                        <label style="color:#888; font-size:0.8rem;">LOCATION</label>
+                        <input type="text" id="editLocInput" class="form-input">
+                    </div>
+                </div>
+
+                <div class="modal-section-title">Description</div>
+                <textarea id="editDescInput" class="form-textarea"></textarea>
+
+                <div class="modal-section-title">Social Stats (Fake Data)</div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="editFriendsInput" class="form-input" placeholder="Friends Count">
+                    <input type="text" id="editOnlineInput" class="form-input" placeholder="Online Time">
+                </div>
+            </div>
             
             <button class="save-btn" id="saveProfileBtn">SAVE CHANGES</button>
         </div>
@@ -295,8 +308,8 @@
                     <div class="friend-item active">
                         <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop" class="friend-avatar lume-avatar-glow">
                         <div class="friend-info">
-                            <h4>Lume (AI Assistant)</h4>
-                            <p>StableCast Analysis Core</p>
+                            <h4>Lume (AI)</h4>
+                            <p>Online</p>
                         </div>
                         <div class="status-online"></div>
                     </div>
@@ -311,14 +324,14 @@
                 </div>
                 <div class="chat-messages" id="chatContainer">
                     <div class="message msg-in">
-                        Hello Operator! I am <b>Lume</b>. I have access to the StableCast Knowledge Base.
+                        Hello! I am <b>Lume</b>. 
                         <br><br>
-                        You can ask me about the <b>Developer</b>, <b>Technical Stack (LSTM/XGBoost)</b>, or current <b>Market Trends</b>.
+                        I'm not just a bot; I can understand your stories, feelings, and analyze the market for you. Tell me, how was your day?
                         <div class="msg-time">System</div>
                     </div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Ask Lume about the project or market...">
+                    <input type="text" class="chat-input" id="msgInput" placeholder="Chat with Lume...">
                     <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
