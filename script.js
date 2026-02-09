@@ -1,8 +1,8 @@
-// 1. IMPORT FIREBASE (Lấy hàng xịn từ Google)
+// 1. IMPORT FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// 2. CẤU HÌNH (DÁN CODE CỦA BẠN VÀO ĐÂY)
+// 2. CẤU HÌNH
 const firebaseConfig = {
     apiKey: "DÁN_API_KEY_CUA_BAN_VAO_DAY",
     authDomain: "stablecast-login.firebaseapp.com",
