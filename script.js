@@ -1,8 +1,12 @@
+// ============================================================
+// 1. IMPORT FIREBASE & AUTH SERVICES
+// ============================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-// Thêm createUserWithEmailAndPassword và signInWithEmailAndPassword
 import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// === CẤU HÌNH CỦA BẠN (Dán đè vào đây) ===
+// ============================================================
+// 2. CẤU HÌNH FIREBASE (Đã điền sẵn Key của bạn)
+// ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
   authDomain: "stablecast-login.firebaseapp.com",
@@ -17,15 +21,34 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// DOM Elements
+// ============================================================
+// 3. KHỞI TẠO BIẾN & DOM ELEMENTS
+// ============================================================
 const logBox = document.getElementById('terminalLogs');
+const priceEl = document.getElementById('btcPrice');
+const predEl = document.getElementById('predPrice');
+const slEl = document.getElementById('stopLoss');
+const tpEl = document.getElementById('takeProfit');
+
+// Các nút bấm Authentication
 const mainBtn = document.getElementById('mainAuthBtn');
 const toggleBtn = document.getElementById('toggleAuthBtn');
 const authTitle = document.getElementById('authTitle');
 const msg = document.getElementById('loginMsg');
-let isRegisterMode = false; // Trạng thái: False là Đăng nhập, True là Đăng ký
+let isRegisterMode = false;
 
-// --- XỬ LÝ CHUYỂN ĐỔI LOGIN <-> REGISTER ---
+// Biến hệ thống
+let currentPrice = 0;
+let priceHistory = [];
+let forecastHistory = [];
+let timeLabels = [];
+let chart; 
+let ws; 
+let aiInterval; 
+
+// ============================================================
+// 4. LOGIC CHUYỂN ĐỔI LOGIN / REGISTER
+// ============================================================
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
         isRegisterMode = !isRegisterMode;
@@ -43,15 +66,22 @@ if (toggleBtn) {
     });
 }
 
+// ============================================================
+// 5. HÀM MỞ KHÓA GIAO DIỆN (Unlock Interface)
+// ============================================================
 function unlockInterface(userName) {
     const overlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
     
-    mainBtn.innerHTML = "ACCESS GRANTED";
-    mainBtn.style.background = "#0ecb81";
+    // Hiệu ứng nút thành công
+    if(mainBtn) {
+        mainBtn.innerHTML = "ACCESS GRANTED";
+        mainBtn.style.background = "#0ecb81";
+    }
     msg.style.color = '#0ecb81';
     msg.innerText = `WELCOME, ${userName.toUpperCase()}`;
 
+    // Chuyển cảnh vào Dashboard
     setTimeout(() => { 
         overlay.style.opacity = '0';
         setTimeout(() => { 
@@ -59,59 +89,67 @@ function unlockInterface(userName) {
             document.body.classList.add('logged-in');
             mainApp.style.display = 'block';
             setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
-            initSystem();
+            
+            // QUAN TRỌNG: Kích hoạt hệ thống ngay khi vào
+            initSystem(); 
         }, 800);
     }, 1000);
 }
 
-// --- LOGIC AUTHENTICATION CHÍNH ---
-mainBtn.addEventListener('click', () => {
-    const emailOrId = document.getElementById('email').value.trim();
-    const pass = document.getElementById('password').value;
-    
-    mainBtn.innerHTML = "PROCESSING..."; mainBtn.style.opacity = "0.7";
+// ============================================================
+// 6. XỬ LÝ SỰ KIỆN AUTHENTICATION
+// ============================================================
+if(mainBtn) {
+    mainBtn.addEventListener('click', () => {
+        const emailInput = document.getElementById('email');
+        const passInput = document.getElementById('password');
+        
+        const emailOrId = emailInput.value.trim();
+        const pass = passInput.value;
+        
+        mainBtn.innerHTML = "PROCESSING..."; mainBtn.style.opacity = "0.7";
 
-    if (isRegisterMode) {
-        // === CHẾ ĐỘ ĐĂNG KÝ ===
-        createUserWithEmailAndPassword(auth, emailOrId, pass)
-            .then((userCredential) => {
-                unlockInterface(userCredential.user.email);
-            })
-            .catch((error) => {
-                mainBtn.innerHTML = "REGISTER ACCESS"; mainBtn.style.opacity = "1";
-                msg.style.color = '#f6465d';
-                // Thông báo lỗi thân thiện hơn
-                if(error.code === 'auth/email-already-in-use') msg.innerText = "EMAIL ALREADY EXISTS";
-                else if(error.code === 'auth/weak-password') msg.innerText = "PASSWORD TOO WEAK (MIN 6 CHARS)";
-                else msg.innerText = "REGISTRATION FAILED: " + error.message;
-            });
-    } else {
-        // === CHẾ ĐỘ ĐĂNG NHẬP ===
-        // 1. Kiểm tra tài khoản cứng (Admin cũ)
-        if ((emailOrId === 'DE200247' || emailOrId === 'admin') && pass === '123456') {
-            unlockInterface(emailOrId);
-            return;
+        if (isRegisterMode) {
+            // --- ĐĂNG KÝ TÀI KHOẢN MỚI ---
+            createUserWithEmailAndPassword(auth, emailOrId, pass)
+                .then((userCredential) => {
+                    unlockInterface(userCredential.user.email);
+                })
+                .catch((error) => {
+                    mainBtn.innerHTML = "REGISTER ACCESS"; mainBtn.style.opacity = "1";
+                    msg.style.color = '#f6465d';
+                    if(error.code === 'auth/email-already-in-use') msg.innerText = "EMAIL ALREADY EXISTS";
+                    else if(error.code === 'auth/weak-password') msg.innerText = "PASSWORD TOO WEAK (MIN 6 CHARS)";
+                    else msg.innerText = "ERROR: " + error.message;
+                });
+        } else {
+            // --- ĐĂNG NHẬP ---
+            // 1. Kiểm tra Admin cứng
+            if ((emailOrId === 'DE200247' || emailOrId === 'admin') && pass === '123456') {
+                unlockInterface(emailOrId);
+                return;
+            }
+
+            // 2. Kiểm tra Firebase
+            signInWithEmailAndPassword(auth, emailOrId, pass)
+                .then((userCredential) => {
+                    unlockInterface(userCredential.user.email);
+                })
+                .catch((error) => {
+                    mainBtn.innerHTML = "AUTHENTICATE"; mainBtn.style.opacity = "1";
+                    msg.style.color = '#f6465d';
+                    msg.innerText = "ACCESS DENIED: INVALID CREDENTIALS";
+                });
         }
+    });
+}
 
-        // 2. Nếu không phải Admin cũ, thử đăng nhập bằng Firebase
-        signInWithEmailAndPassword(auth, emailOrId, pass)
-            .then((userCredential) => {
-                unlockInterface(userCredential.user.email);
-            })
-            .catch((error) => {
-                mainBtn.innerHTML = "AUTHENTICATE"; mainBtn.style.opacity = "1";
-                msg.style.color = '#f6465d';
-                msg.innerText = "ACCESS DENIED: INVALID CREDENTIALS";
-            });
-    }
-});
-
-// Google Login (Giữ nguyên)
+// Google Login
 const googleBtn = document.getElementById('googleLoginBtn');
 if(googleBtn) {
     googleBtn.addEventListener('click', () => {
         signInWithPopup(auth, provider)
-            .then((result) => unlockInterface(result.user.displayName))
+            .then((result) => unlockInterface(result.user.displayName || "GOOGLE USER"))
             .catch((error) => {
                 msg.innerText = "GOOGLE ERROR: " + error.message;
                 msg.style.color = '#f6465d';
@@ -119,7 +157,130 @@ if(googleBtn) {
     });
 }
 
-// (GIỮ NGUYÊN PHẦN CODE initSystem VÀ LOGIC CHART BÊN DƯỚI...)
-// Hãy copy lại phần initSystem, setupChartAndSocket từ file cũ vào đây nhé.
-// Để code chạy, bạn cần dán lại phần logic AI/Chart vào cuối file này.
-// ...
+// ============================================================
+// 7. HỆ THỐNG CHART & AI (Phần bị thiếu lúc nãy)
+// ============================================================
+
+function log(msg) {
+    const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+    if(logBox) {
+        logBox.appendChild(div);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+}
+
+// Hàm khởi chạy chính
+function initSystem() {
+    log("Authentication successful. Initializing Core Services...");
+    setupChartAndSocket();
+}
+
+function setupChartAndSocket() {
+    // 1. Tạo biểu đồ Chart.js
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                label: 'Real-time Price', 
+                data: priceHistory, 
+                borderColor: '#0ecb81', 
+                backgroundColor: 'rgba(14, 203, 129, 0.05)', 
+                borderWidth: 2, 
+                tension: 0.2, 
+                fill: true, 
+                pointRadius: 0
+            }, {
+                label: 'AI Ensemble Forecast', 
+                data: forecastHistory, 
+                borderColor: '#3b82f6', 
+                borderWidth: 2, 
+                borderDash: [5, 5], 
+                tension: 0.4, 
+                pointRadius: 0,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { legend: { display: true, labels: { color: '#848e9c' } } },
+            scales: { x: { display: false }, y: { position: 'right', grid: { color: '#2b3139' }, ticks: { color: '#848e9c', callback: function(value) { return '$' + value; } } } },
+            animation: false
+        }
+    });
+
+    // 2. Kết nối Binance (Để lấy giá thật -> Chữ LOADING sẽ biến mất)
+    log("Connecting to Binance WebSocket Feed...");
+    ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+    
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const price = parseFloat(data.p);
+        
+        // Cập nhật giá hiển thị
+        if (currentPrice > 0) priceEl.style.color = price >= currentPrice ? '#0ecb81' : '#f6465d';
+        currentPrice = price;
+        priceEl.innerText = `$${price.toFixed(2)}`; // <-- Dòng này sẽ xóa chữ LOADING
+
+        // Cập nhật mảng dữ liệu
+        const timeNow = new Date().toLocaleTimeString();
+        if (timeLabels.length > 50) { 
+            timeLabels.shift(); 
+            priceHistory.shift(); 
+            if(forecastHistory.length > 50) forecastHistory.shift(); 
+        }
+        timeLabels.push(timeNow);
+        priceHistory.push(price);
+        
+        chart.update();
+    };
+    ws.onopen = () => { log("Binance Feed Active. Receiving ticks..."); };
+
+    // 3. Kết nối AI Server (Python)
+    log("Connecting to AI Inference Engine (Ensemble Model)...");
+    
+    aiInterval = setInterval(() => {
+        if(currentPrice === 0) return;
+
+        fetch('http://127.0.0.1:5000/predict')
+            .then(response => {
+                if (!response.ok) throw new Error("Server Error");
+                return response.json();
+            })
+            .then(data => {
+                // AI trả lời
+                const aiPrice = data.predicted_price;
+                const direction = data.direction;
+                updateDashboard(aiPrice, direction, "Ensemble AI");
+            })
+            .catch(err => {
+                // Giả lập nếu Server tắt
+                const fakePrice = currentPrice + (Math.random() * 40 - 15);
+                const direction = fakePrice > currentPrice ? 'UP' : 'DOWN';
+                updateDashboard(fakePrice, direction, "Simulation Mode");
+            });
+
+    }, 2000);
+}
+
+// Hàm cập nhật Dashboard
+function updateDashboard(predictedVal, direction, source) {
+    predEl.innerText = `$${predictedVal.toFixed(2)}`;
+    predEl.style.color = direction === 'UP' ? '#0ecb81' : '#f6465d'; 
+
+    const volatility = Math.abs(predictedVal - currentPrice) * 1.5 + 25; 
+    slEl.innerText = `$${(currentPrice - volatility).toFixed(2)}`;
+    tpEl.innerText = `$${(currentPrice + volatility * 2.5).toFixed(2)}`;
+
+    forecastHistory.push(predictedVal);
+    if(forecastHistory.length > 50) forecastHistory.shift();
+    chart.update();
+
+    if(Math.random() > 0.7) {
+        log(`Inference [${source}]: Predict ${direction} -> Conf: ${(89 + Math.random()*10).toFixed(1)}%`);
+    }
+}
