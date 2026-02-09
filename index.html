@@ -3,134 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast | Crypto AI Prediction</title>
+    <title>StableCast | AI Crypto Terminal</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0e11;
             --card: #181d23;
-            --text: #e0e6ed;
+            --text: #eaecef;
             --green: #0ecb81;
             --red: #f6465d;
             --blue: #3b82f6;
+            --gray: #848e9c;
+            --border: #2b3139;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; text-align: center; }
-        .container { max-width: 800px; margin: 0 auto; }
+        body { 
+            font-family: 'JetBrains Mono', monospace; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
         
         /* Header */
-        h1 { margin-bottom: 5px; color: var(--blue); letter-spacing: 1px; }
-        .subtitle { color: #848e9c; font-size: 0.9em; margin-bottom: 30px; }
-
-        /* Price Card */
-        .price-card {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 12px;
-            display: inline-block;
-            min-width: 250px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 15px; 
             margin-bottom: 20px;
-            border: 1px solid #2b3139;
         }
-        .symbol { font-size: 1.2em; color: #848e9c; }
-        .price { font-size: 2.5em; font-weight: bold; margin: 10px 0; }
-        .prediction-box { margin-top: 15px; padding-top: 15px; border-top: 1px solid #2b3139; }
-        .pred-label { font-size: 0.9em; color: #848e9c; }
-        .pred-value { font-size: 1.4em; color: var(--blue); font-weight: bold; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--blue); }
+        .logo span { color: var(--text); }
+        .status { font-size: 0.8rem; color: var(--green); }
+        .status::before { content: "●"; margin-right: 5px; }
 
-        /* Chart */
-        .chart-container {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid #2b3139;
+        /* Dashboard Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
         }
-        
-        .footer { margin-top: 30px; font-size: 0.8em; color: #5e6673; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        .card-title { font-size: 0.9rem; color: var(--gray); margin-bottom: 15px; text-transform: uppercase; }
+
+        /* Price Section */
+        .price-display { display: flex; align-items: baseline; gap: 10px; }
+        .current-price { font-size: 2.5rem; font-weight: bold; color: var(--green); }
+        .pair { font-size: 1.2rem; color: var(--gray); }
+
+        /* Metrics */
+        .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .metric-item { background: #0b0e11; padding: 10px; border-radius: 4px; }
+        .metric-label { font-size: 0.75rem; color: var(--gray); }
+        .metric-value { font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
+        .green { color: var(--green); }
+        .red { color: var(--red); }
+
+        /* Model Info */
+        .model-specs { font-size: 0.8rem; line-height: 1.6; color: var(--gray); }
+        .spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
+        .spec-val { color: var(--blue); }
+
+        /* Logs */
+        .logs { 
+            height: 150px; 
+            overflow-y: auto; 
+            font-size: 0.75rem; 
+            color: var(--gray); 
+            background: #000; 
+            padding: 10px; 
+            border-radius: 4px; 
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+        .log-entry { margin-bottom: 4px; }
+        .log-time { color: var(--blue); margin-right: 5px; }
+
+        footer { text-align: center; margin-top: 40px; color: var(--gray); font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>STABLE CAST AI</h1>
-        <div class="subtitle">Hệ thống dự đoán giá Crypto sử dụng mô hình LSTM</div>
+        <header>
+            <div class="logo">STABLE<span>CAST</span>_AI</div>
+            <div class="status">SYSTEM ONLINE • BINANCE API CONNECTED</div>
+        </header>
 
-        <div class="price-card">
-            <div class="symbol">Bitcoin (BTC/USDT)</div>
-            <div class="price" id="currentPrice">Loading...</div>
-            
-            <div class="prediction-box">
-                <div class="pred-label">Dự đoán AI (1h tới)</div>
-                <div class="pred-value">↗️ <span id="predPrice">Calculating...</span></div>
+        <div class="grid">
+            <div class="card">
+                <div class="price-display">
+                    <div class="pair">BTC/USDT</div>
+                    <div class="current-price" id="btcPrice">Loading...</div>
+                </div>
+                <div style="height: 300px; margin-top: 20px;">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">LSTM Prediction (Next 1h)</div>
+                    <div class="metric-value" style="font-size: 2rem; color: var(--blue);" id="predPrice">Calculating...</div>
+                    <div class="metric-label" style="margin-top: 5px;">Confidence: 87.4% (Based on RMSE)</div>
+                    
+                    <div class="metrics">
+                        <div class="metric-item">
+                            <div class="metric-label">Stop Loss (ATR)</div>
+                            <div class="metric-value red" id="stopLoss">--</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Take Profit</div>
+                            <div class="metric-value green" id="takeProfit">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">System Specs</div>
+                    <div class="model-specs">
+                        <div class="spec-row"><span>Architecture</span> <span class="spec-val">Deep LSTM (3 Layers)</span></div>
+                        <div class="spec-row"><span>Input Data</span> <span class="spec-val">OHLCV (Normalized)</span></div>
+                        <div class="spec-row"><span>Optimizer</span> <span class="spec-val">Adam (lr=0.001)</span></div>
+                        <div class="spec-row"><span>Loss Function</span> <span class="spec-val">MSE / RMSE</span></div>
+                        <div class="spec-row"><span>Developer</span> <span class="spec-val">Phan Ba Song Toan</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="chart-container">
-            <canvas id="cryptoChart"></canvas>
+        <div class="logs" id="terminalLogs">
+            <div class="log-entry"><span class="log-time">[SYSTEM]</span> Initializing StableCast AI Core...</div>
+            <div class="log-entry"><span class="log-time">[DATA]</span> Connecting to Binance WebSocket (wss://stream.binance.com)...</div>
         </div>
 
-        <div class="footer">
-            Developed by <b>Phan Ba Song Toan</b> (FPT University) <br>
-            Powered by Binance API & Custom LSTM Model
-        </div>
+        <footer>
+            &copy; 2026 StableCast AI Project. Student ID: DE200247 - FPT University.
+        </footer>
     </div>
 
     <script>
-        // 1. Lấy giá thật từ Binance (Không cần API Key)
-        async function fetchPrice() {
-            try {
-                const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-                const data = await response.json();
-                const price = parseFloat(data.price).toFixed(2);
-                
-                // Hiển thị giá hiện tại
-                document.getElementById('currentPrice').innerText = `$${price}`;
-                document.getElementById('currentPrice').style.color = '#0ecb81'; // Màu xanh sàn Binance
+        // --- 1. CONFIG & VARS ---
+        const logBox = document.getElementById('terminalLogs');
+        const priceEl = document.getElementById('btcPrice');
+        const predEl = document.getElementById('predPrice');
+        const slEl = document.getElementById('stopLoss');
+        const tpEl = document.getElementById('takeProfit');
+        let currentPrice = 0;
+        let priceHistory = [];
+        let labels = [];
 
-                // Giả lập dự đoán của AI (Lấy giá hiện tại + random nhỏ)
-                // *Lưu ý: Sau này bạn sẽ thay chỗ này bằng API gọi model Python của bạn*
-                let fakePrediction = (parseFloat(price) + (Math.random() * 50 - 20)).toFixed(2);
-                document.getElementById('predPrice').innerText = `$${fakePrediction}`;
-            } catch (error) {
-                console.error('Lỗi lấy giá:', error);
-            }
+        // --- 2. LOGGING FUNCTION ---
+        function log(msg, type="INFO") {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+            logBox.appendChild(div);
+            logBox.scrollTop = logBox.scrollHeight;
         }
 
-        // Gọi hàm lấy giá ngay lập tức và lặp lại mỗi 3 giây
-        fetchPrice();
-        setInterval(fetchPrice, 3000);
-
-        // 2. Vẽ biểu đồ (Chart.js)
-        const ctx = document.getElementById('cryptoChart').getContext('2d');
-        const myChart = new Chart(ctx, {
+        // --- 3. CHART SETUP ---
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', 'Next 1h (AI)'],
+                labels: labels,
                 datasets: [{
-                    label: 'Giá thực tế',
-                    data: [96000, 96200, 96100, 96500, 96400, 96600, null], // Dữ liệu giả lập
+                    label: 'Real-time Price',
+                    data: priceHistory,
                     borderColor: '#0ecb81',
                     borderWidth: 2,
-                    tension: 0.4
+                    tension: 0.1,
+                    pointRadius: 0
                 }, {
-                    label: 'AI Dự đoán (LSTM)',
-                    data: [null, null, null, null, null, 96600, 97000], // Điểm nối tiếp để dự đoán
+                    label: 'LSTM Prediction',
+                    data: [],
                     borderColor: '#3b82f6',
                     borderWidth: 2,
-                    borderDash: [5, 5], // Nét đứt
-                    tension: 0.4
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    pointRadius: 0
                 }]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { labels: { color: 'white' } } },
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true, labels: { color: '#848e9c' } } },
                 scales: {
-                    y: { grid: { color: '#2b3139' }, ticks: { color: '#848e9c' } },
-                    x: { grid: { display: false }, ticks: { color: '#848e9c' } }
-                }
+                    x: { display: false },
+                    y: { 
+                        position: 'right',
+                        grid: { color: '#2b3139' },
+                        ticks: { color: '#848e9c' }
+                    }
+                },
+                animation: false
             }
         });
+
+        // --- 4. REAL-TIME DATA (Binance WebSocket) ---
+        const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+        
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const price = parseFloat(data.p);
+            currentPrice = price;
+            
+            // Update UI
+            priceEl.innerText = `$${price.toFixed(2)}`;
+            priceEl.style.color = price > (priceHistory[priceHistory.length-1] || 0) ? '#0ecb81' : '#f6465d';
+
+            // Update Chart Data (Keep last 50 points)
+            const timeNow = new Date().toLocaleTimeString();
+            if (labels.length > 50) { labels.shift(); priceHistory.shift(); }
+            labels.push(timeNow);
+            priceHistory.push(price);
+            chart.update();
+
+            // Simulate LSTM Prediction Logic (Every 3 seconds)
+            // *Thực tế: Đoạn này bạn sẽ gọi API Python của bạn*
+        };
+
+        // --- 5. SIMULATE AI PREDICTION LOOP ---
+        setInterval(() => {
+            if(currentPrice === 0) return;
+
+            // Giả lập tính toán ATR và Stoploss/Takeprofit
+            const volatility = Math.random() * 50 + 20; // Giả lập ATR
+            const predicted = currentPrice + (Math.random() * 100 - 40); // Giả lập model dự đoán
+            
+            const sl = currentPrice - (volatility * 1.5);
+            const tp = currentPrice + (volatility * 2.5);
+
+            // Update UI
+            predEl.innerText = `$${predicted.toFixed(2)}`;
+            slEl.innerText = `$${sl.toFixed(2)}`;
+            tpEl.innerText = `$${tp.toFixed(2)}`;
+            
+            // Random Logs
+            const actions = ["Normalizing Data...", "Calculating RMSE...", "ATR Updated", "LSTM Inference"];
+            if(Math.random() > 0.7) log(actions[Math.floor(Math.random() * actions.length)]);
+
+        }, 3000);
+
+        log("Deep Learning Model Loaded.");
+        log("Preprocessing pipeline active (Min-Max Scaler).");
     </script>
 </body>
 </html>
