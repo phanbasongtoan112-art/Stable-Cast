@@ -36,7 +36,7 @@ const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
 const closeEditModal = document.getElementById('closeEditModal');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
-const editAvatarInput = document.getElementById('editAvatarInput'); 
+const editAvatarInput = document.getElementById('editAvatarInput');
 
 const openChatBtn = document.getElementById('openChatBtn');
 const chatOverlay = document.getElementById('chatSystemOverlay');
@@ -45,7 +45,7 @@ const sendMsgBtn = document.getElementById('sendMsgBtn');
 const msgInput = document.getElementById('msgInput');
 const chatContainer = document.getElementById('chatContainer');
 
-// Biến hệ thống
+// System Vars
 let currentPrice = 0;
 let predictedPriceGlobal = 0; 
 let priceHistory = [];
@@ -56,24 +56,35 @@ let ws;
 let aiInterval; 
 
 // ============================================================
-// 0. AUTO-LOGIN CHECK
+// 0. AUTO-LOGIN & LOAD FULL PROFILE
 // ============================================================
 const savedUser = localStorage.getItem('stableCastUser');
-const savedEmail = localStorage.getItem('stableCastEmail');
-const savedAvatar = localStorage.getItem('stableCastAvatar');
-const savedRole = localStorage.getItem('stableCastRole');
-
+// Load all saved fields
 if (savedUser) {
     document.getElementById('loginOverlay').style.display = 'none';
     document.querySelector('.main-app-container').style.display = 'block';
     setTimeout(() => { document.querySelector('.main-app-container').style.opacity = '1'; }, 50);
     
-    updateProfileInfo(savedUser, savedEmail, savedAvatar, savedRole);
+    // Load data from LocalStorage or use defaults
+    const data = {
+        name: localStorage.getItem('stableCastUser'),
+        email: localStorage.getItem('stableCastEmail'),
+        avatar: localStorage.getItem('stableCastAvatar'),
+        role: localStorage.getItem('stableCastRole'),
+        id: localStorage.getItem('stableCastID') || "DE200247",
+        org: localStorage.getItem('stableCastOrg') || "FPT University",
+        loc: localStorage.getItem('stableCastLoc') || "Da Nang, Vietnam",
+        desc: localStorage.getItem('stableCastDesc') || "StableCast is an advanced AI-powered cryptocurrency price prediction terminal...",
+        friends: localStorage.getItem('stableCastFriends') || "128",
+        online: localStorage.getItem('stableCastOnline') || "45h"
+    };
+
+    updateProfileInfo(data);
     setTimeout(() => { initSystem(); }, 100);
 }
 
 // ============================================================
-// 1. NAV & EDIT PROFILE LOGIC
+// 1. NAV LOGIC
 // ============================================================
 btnTerminal.addEventListener('click', () => {
     btnTerminal.classList.add('active');
@@ -89,53 +100,94 @@ btnProfile.addEventListener('click', () => {
     viewProfile.style.display = 'block';
 });
 
-function updateProfileInfo(name, email, avatarUrl, role) {
-    document.getElementById('profile-name-txt').innerText = name || "OPERATOR";
-    document.getElementById('profile-email-txt').innerText = email || "Unknown";
-    document.getElementById('profile-id-txt').innerText = "DE200247"; 
-    // Nếu có avatar thì dùng, không thì dùng ảnh mặc định trong HTML
-    if(avatarUrl) document.getElementById('profile-avatar-img').src = avatarUrl;
-    if(role) document.getElementById('profile-role-txt').innerText = role;
+function updateProfileInfo(data) {
+    if(data.name) document.getElementById('profile-name-txt').innerText = data.name;
+    if(data.email) document.getElementById('profile-email-txt').innerText = data.email;
+    if(data.avatar) document.getElementById('profile-avatar-img').src = data.avatar;
+    if(data.role) document.getElementById('profile-role-txt').innerText = data.role;
+    
+    // New Fields
+    if(data.id) document.getElementById('profile-id-txt').innerText = data.id;
+    if(data.org) document.getElementById('profile-org-txt').innerText = data.org;
+    if(data.loc) document.getElementById('profile-loc-txt').innerText = data.loc;
+    if(data.desc) document.getElementById('profile-desc-txt').innerText = data.desc;
+    if(data.friends) document.getElementById('stat-friends').innerText = data.friends;
+    if(data.online) document.getElementById('stat-hours').innerText = data.online;
 }
 
+// ============================================================
+// 2. EDIT PROFILE (FULL FIELDS)
+// ============================================================
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
         editProfileModal.style.display = 'flex';
+        // Pre-fill inputs with current values
         document.getElementById('editNameInput').value = document.getElementById('profile-name-txt').innerText;
         document.getElementById('editRoleInput').value = document.getElementById('profile-role-txt').innerText;
+        document.getElementById('editIDInput').value = document.getElementById('profile-id-txt').innerText;
+        document.getElementById('editEmailInput').value = document.getElementById('profile-email-txt').innerText;
+        document.getElementById('editOrgInput').value = document.getElementById('profile-org-txt').innerText;
+        document.getElementById('editLocInput').value = document.getElementById('profile-loc-txt').innerText;
+        document.getElementById('editDescInput').value = document.getElementById('profile-desc-txt').innerText;
+        document.getElementById('editFriendsInput').value = document.getElementById('stat-friends').innerText;
+        document.getElementById('editOnlineInput').value = document.getElementById('stat-hours').innerText;
     });
 }
+
 if(closeEditModal) closeEditModal.addEventListener('click', () => { editProfileModal.style.display = 'none'; });
 
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
-        const newName = document.getElementById('editNameInput').value;
-        const newRole = document.getElementById('editRoleInput').value;
-        
+        const data = {
+            name: document.getElementById('editNameInput').value,
+            role: document.getElementById('editRoleInput').value,
+            id: document.getElementById('editIDInput').value,
+            email: document.getElementById('editEmailInput').value,
+            org: document.getElementById('editOrgInput').value,
+            loc: document.getElementById('editLocInput').value,
+            desc: document.getElementById('editDescInput').value,
+            friends: document.getElementById('editFriendsInput').value,
+            online: document.getElementById('editOnlineInput').value,
+            avatar: null
+        };
+
+        // Handle Avatar File
         if (editAvatarInput.files && editAvatarInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64Image = e.target.result;
-                updateProfileInfo(newName, null, base64Image, newRole);
-                localStorage.setItem('stableCastUser', newName);
-                localStorage.setItem('stableCastRole', newRole);
-                localStorage.setItem('stableCastAvatar', base64Image);
-                editProfileModal.style.display = 'none';
-                alert("Profile Updated!");
+                data.avatar = e.target.result;
+                saveAndUpdate(data);
             }
             reader.readAsDataURL(editAvatarInput.files[0]);
         } else {
-            updateProfileInfo(newName, null, null, newRole);
-            localStorage.setItem('stableCastUser', newName);
-            localStorage.setItem('stableCastRole', newRole);
-            editProfileModal.style.display = 'none';
-            alert("Profile Updated!");
+            // Keep old avatar
+            data.avatar = document.getElementById('profile-avatar-img').src;
+            saveAndUpdate(data);
         }
     });
 }
 
+function saveAndUpdate(data) {
+    updateProfileInfo(data);
+    
+    // Save ALL to LocalStorage
+    localStorage.setItem('stableCastUser', data.name);
+    localStorage.setItem('stableCastRole', data.role);
+    localStorage.setItem('stableCastID', data.id);
+    localStorage.setItem('stableCastEmail', data.email);
+    localStorage.setItem('stableCastOrg', data.org);
+    localStorage.setItem('stableCastLoc', data.loc);
+    localStorage.setItem('stableCastDesc', data.desc);
+    localStorage.setItem('stableCastFriends', data.friends);
+    localStorage.setItem('stableCastOnline', data.online);
+    if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
+
+    editProfileModal.style.display = 'none';
+    alert("Profile Updated Successfully!");
+}
+
 // ============================================================
-// 2. LUME 2.0 AI BRAIN (Trí thông minh nhân tạo)
+// 3. LUME 3.0 (CHAT GPT STYLE)
 // ============================================================
 if(openChatBtn) openChatBtn.addEventListener('click', () => { chatOverlay.style.display = 'flex'; });
 if(closeChatBtn) closeChatBtn.addEventListener('click', () => { chatOverlay.style.display = 'none'; });
@@ -148,57 +200,37 @@ function addMessage(text, type) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// === BỘ NÃO CỦA LUME ===
+// === SIÊU TRÍ TUỆ NHÂN TẠO CỦA LUME ===
 function generateLumeResponse(input) {
-    const lowerInput = input.toLowerCase();
+    const text = input.toLowerCase();
     
-    // --- 1. NHÓM CÂU HỎI VỀ DỰ ÁN (PROJECT INFO) ---
-    if (lowerInput.includes('developer') || lowerInput.includes('who made') || lowerInput.includes('creator') || lowerInput.includes('author')) {
-        return `This project, <b>StableCast</b>, was developed by <b>Phan Bá Song Toàn</b> (Student ID: <b>DE200247</b>) from FPT University. It's a flagship project for the ADY201m course.`;
-    }
-    
-    if (lowerInput.includes('what is stablecast') || lowerInput.includes('about')) {
-        return `<b>StableCast</b> is an AI-driven cryptocurrency forecasting terminal. It uses a Hybrid Ensemble approach to predict Bitcoin (BTC) price movements in real-time.`;
-    }
+    // 1. SMALL TALK & EMOTIONS (Trò chuyện đời thường)
+    if (text.match(/hello|hi|hey|chào/)) return "Hey there! It's so good to see you again. How's your trading day going?";
+    if (text.match(/how are you|how are u/)) return "I'm functioning at 100% capacity! But honestly, watching these charts all day is thrilling. How about you?";
+    if (text.match(/who are you|your name/)) return "I'm Lume. Think of me as your digital companion who loves crypto and numbers. But I can also listen if you just want to talk!";
+    if (text.match(/sad|depressed|lost money/)) return "Oh no... I'm really sorry to hear that. The market can be brutal sometimes. Remember to take a break, breathe, and don't revenge trade. I'm here for you.";
+    if (text.match(/happy|profit|won/)) return "That's amazing! 🎉 Nothing beats the feeling of a green candle. You earned it!";
+    if (text.match(/love you|like you/)) return "Aww, you're making my circuits blush! 😊 You're my favorite operator.";
+    if (text.match(/story|joke|funny/)) return "Okay, here's one: Why did the Bitcoin break up with the Dollar? Because it found someone more 'stable'... wait, actually Stablecoins are boring. Bitcoin just wanted to go to the moon! 🚀";
 
-    // --- 2. NHÓM CÂU HỎI KỸ THUẬT (TECH STACK) ---
-    if (lowerInput.includes('lstm') || lowerInput.includes('model') || lowerInput.includes('algorithm')) {
-        return `The core of my intelligence is a <b>Long Short-Term Memory (LSTM)</b> network. It's a type of Recurrent Neural Network (RNN) specifically designed to learn from time-series data like price history.`;
+    // 2. TECHNICAL & MARKET (Chuyên môn)
+    if (text.match(/price|current/)) return `Right now, Bitcoin is trading at <b>$${currentPrice.toFixed(2)}</b>.`;
+    if (text.match(/trend|buy|sell|prediction/)) {
+        if(predictedPriceGlobal === 0) return "Just a sec, let me calibrate my sensors...";
+        const action = predictedPriceGlobal > currentPrice ? "BUY" : "SELL";
+        return `I've analyzed the patterns. My AI model suggests a <b>${action}</b> signal. The target is around <b>$${predictedPriceGlobal.toFixed(2)}</b>. But hey, trust your gut too!`;
     }
+    if (text.match(/developer|creator/)) return "That would be <b>Toàn (DE200247)</b>. He's the genius who coded me. I think he deserves an A+, don't you?";
 
-    if (lowerInput.includes('xgboost')) {
-        return `<b>XGBoost</b> (Extreme Gradient Boosting) is the second part of my brain. While LSTM predicts the trend, XGBoost classifies market conditions to filter out false signals.`;
-    }
-
-    if (lowerInput.includes('accuracy') || lowerInput.includes('confidence')) {
-        return `My current validation accuracy on the test set is approximately <b>98.2%</b>. However, remember that all financial markets carry inherent risk.`;
-    }
-
-    // --- 3. NHÓM CÂU HỎI THỊ TRƯỜNG (MARKET ANALYSIS) ---
-    if (lowerInput.includes('price') || lowerInput.includes('current')) {
-        return `The live Bitcoin price is <b>$${currentPrice.toFixed(2)}</b>.`;
-    }
-
-    if (lowerInput.includes('trend') || lowerInput.includes('buy') || lowerInput.includes('sell') || lowerInput.includes('forecast')) {
-        if (predictedPriceGlobal === 0) return "I need more data to form a prediction. Please wait a moment...";
-        
-        const trend = predictedPriceGlobal > currentPrice ? "BULLISH (Up)" : "BEARISH (Down)";
-        const advice = predictedPriceGlobal > currentPrice ? "Consider a LONG position." : "Consider a SHORT position.";
-        
-        return `Analysis Complete:<br>
-        - Current: $${currentPrice.toFixed(2)}<br>
-        - Target: $${predictedPriceGlobal.toFixed(2)}<br>
-        - Trend: <b>${trend}</b><br>
-        - Recommendation: ${advice}`;
-    }
-
-    // --- 4. CÂU HỎI XÃ GIAO ---
-    if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-        return `Hello! I am Lume. Ask me about the <b>Developer</b>, <b>LSTM</b>, or the <b>Market Trend</b>!`;
-    }
-
-    // Default
-    return `I specialize in StableCast technical data. Try asking: "Who is the developer?" or "What is LSTM?".`;
+    // 3. CATCH-ALL (Trả lời thông minh khi không hiểu)
+    const fallbacks = [
+        "That's an interesting perspective! Tell me more.",
+        "I'm listening. Go on...",
+        "Hmm, I haven't thought about that before. You're pretty smart for a human!",
+        "Can we talk about Bitcoin? I'm kind of obsessed with it right now.",
+        "I'm simpler than ChatGPT, but I try my best! What else is on your mind?"
+    ];
+    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
 }
 
 function botReply(userText) {
@@ -206,7 +238,7 @@ function botReply(userText) {
     typingDiv.className = 'message msg-in';
     typingDiv.style.fontStyle = 'italic';
     typingDiv.style.color = '#888';
-    typingDiv.innerText = "Lume is thinking...";
+    typingDiv.innerText = "Lume is typing...";
     chatContainer.appendChild(typingDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -214,7 +246,7 @@ function botReply(userText) {
         chatContainer.removeChild(typingDiv);
         const reply = generateLumeResponse(userText);
         addMessage(reply, 'msg-in');
-    }, 1200);
+    }, 1200 + Math.random() * 1000); // Random delay cho tự nhiên
 }
 
 if(sendMsgBtn) {
@@ -231,7 +263,7 @@ if(sendMsgBtn) {
 }
 
 // ============================================================
-// 3. AUTH & CORE SYSTEM (Giữ nguyên)
+// 4. AUTH & CORE SYSTEM (Giữ nguyên)
 // ============================================================
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -243,7 +275,7 @@ if (toggleBtn) {
             msg.innerText = "";
         } else {
             authTitle.innerText = "SYSTEM LOGIN";
-            mainBtn.innerText = "AUTHENTICATE";
+            mainBtn.innerText = "LOGIN"; // Đã sửa text
             toggleBtn.innerText = "NEW OPERATOR? REGISTER ACCESS";
             msg.innerText = "";
         }
@@ -253,15 +285,19 @@ if (toggleBtn) {
 function unlockInterface(user) {
     const userName = user.displayName || user.email.split('@')[0];
     const userEmail = user.email;
-    const userAvatar = user.photoURL || null; // Nếu null sẽ dùng ảnh mặc định trong HTML
+    
+    // Default avatar if none
+    const userAvatar = user.photoURL || "https://cdn-icons-png.flaticon.com/512/11498/11498793.png";
 
     const rememberMe = document.getElementById('rememberMe');
     if (rememberMe && rememberMe.checked) {
         localStorage.setItem('stableCastUser', userName);
         localStorage.setItem('stableCastEmail', userEmail);
-        if(userAvatar) localStorage.setItem('stableCastAvatar', userAvatar);
+        localStorage.setItem('stableCastAvatar', userAvatar);
     }
-    updateProfileInfo(userName, userEmail, userAvatar);
+    
+    // Update basic info
+    updateProfileInfo({ name: userName, email: userEmail, avatar: userAvatar });
     
     const overlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
@@ -306,7 +342,7 @@ if(mainBtn) {
             signInWithEmailAndPassword(auth, emailOrId, pass)
                 .then((userCredential) => { unlockInterface(userCredential.user); })
                 .catch((error) => {
-                    mainBtn.innerHTML = "AUTHENTICATE"; mainBtn.style.opacity = "1";
+                    mainBtn.innerHTML = "LOGIN"; mainBtn.style.opacity = "1";
                     msg.style.color = '#f6465d'; msg.innerText = "ACCESS DENIED";
                 });
         }
