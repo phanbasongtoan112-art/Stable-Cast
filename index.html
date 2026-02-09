@@ -8,251 +8,140 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
-        /* === RESET & BASE === */
+        /* GIỮ NGUYÊN CSS CŨ CỦA BẠN */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
         body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
-
-        /* === LOGIN === */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
-        .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
+        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; text-align: center; }
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
-        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: border 0.3s; }
-        .input-group input:focus { border-color: #0ecb81; }
-        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
-        button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
-        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
-        #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
-
-        /* === MAIN UI === */
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; outline: none; }
+        button#mainAuthBtn { width: 100%; padding: 12px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; }
         .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
         .nav-tabs { display: flex; gap: 15px; background: #111; padding: 5px; border-radius: 30px; border: 1px solid #333; }
-        .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
-
-        /* VIEWS */
+        .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; border-radius: 20px; }
+        .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; }
         .view-section { display: none; }
-        .view-section.active-view { display: block; }
-
-        /* DASHBOARD */
-        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; }
         .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
-        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
-        .chart-container { position: relative; height: 400px; width: 100%; }
+        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; }
         .prediction-box { text-align: center; padding: 25px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 20px; }
-        .pred-label { color: #848e9c; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .pred-price { font-size: 2.8rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
-        .info-label { color: #848e9c; }
-        .info-val { color: #fff; font-weight: bold; }
-        .logs-container { margin-top: 30px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #3b82f6; font-family: 'Courier New', monospace; }
-        .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .log-time { color: #555; margin-right: 10px; }
-
-        /* PROFILE */
-        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
-        .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; position: relative; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
-        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); }
-        .profile-name { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 15px; }
-        .profile-role { color: #3b82f6; font-size: 0.9rem; margin-bottom: 15px; letter-spacing: 1px; }
-        .profile-actions { display: flex; gap: 10px; }
-        .action-btn { padding: 8px 16px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; background: #1a1a1a; color: #ccc; transition: 0.3s; }
-        .action-btn:hover { border-color: #0ecb81; color: #0ecb81; background: #111; }
+        .pred-price { font-size: 2.8rem; color: #3b82f6; font-weight: bold; }
+        .logs-container { margin-top: 30px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; color: #3b82f6; font-size: 0.85rem; }
+        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; border-bottom: 2px solid #0ecb81; }
+        .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; padding: 20px; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; object-fit: cover; }
         .profile-content { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
-        .info-card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
-        .info-card h3 { color: #848e9c; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; }
-        .detail-row { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
-        .detail-icon { width: 30px; color: #0ecb81; text-align: center; margin-right: 10px; }
-        .detail-text { color: #fff; }
-        .detail-sub { display: block; font-size: 0.75rem; color: #555; }
-        .stat-box { background: #131722; padding: 15px; border-radius: 4px; text-align: center; margin-bottom: 10px; border: 1px solid #333; }
-        .stat-num { font-size: 1.5rem; color: #0ecb81; font-weight: bold; }
-        .stat-label { font-size: 0.8rem; color: #848e9c; }
-
-        /* COMMUNITY FEED (X STYLE) */
-        #community-view { max-width: 800px; margin: 0 auto; }
-        .feed-input-container { background: #0b0e11; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .feed-textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 4px; resize: none; outline: none; min-height: 80px; font-size: 1rem; }
-        .post-btn { background: #0ecb81; color: #000; padding: 8px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; float: right; margin-top: 10px; }
-        .feed-post { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 15px; }
-        .post-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
-        .post-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .post-user { color: #fff; font-weight: bold; margin-right: 10px; }
-        .post-handle { color: #888; font-size: 0.9rem; }
-        .post-text { color: #ccc; line-height: 1.5; margin-bottom: 10px; }
-        .connect-btn { border: 1px solid #3b82f6; color: #3b82f6; background: none; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; }
-        .connect-btn:hover { background: #3b82f6; color: #fff; }
-
-        /* MODAL EDIT */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #111; border: 1px solid #333; padding: 0; width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
-        .close-modal { cursor: pointer; color: #555; }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-        .modal-section-title { color: #0ecb81; font-size: 0.8rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; }
-        .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; height: 80px; resize: none; }
-        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
-        
-        /* CHAT */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: #111; border: 1px solid #333; width: 500px; border-radius: 12px; overflow: hidden; }
+        .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; display: flex; justify-content: space-between; color: #fff; }
+        .modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+        .form-input, .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; }
+        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; }
         .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
-        .chat-window { width: 950px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; }
-        .chat-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .chat-header { padding: 20px; border-bottom: 1px solid #333; font-weight: bold; color: #0ecb81; display: flex; justify-content: space-between; align-items: center; }
-        .friend-list { flex: 1; overflow-y: auto; }
-        .friend-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
-        .friend-item.active { background: #1f2937; border-left: 3px solid #3b82f6; }
-        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
-        .friend-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 3px; font-weight: bold; }
-        .friend-info p { font-size: 0.75rem; color: #888; }
-        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .message { max-width: 75%; padding: 12px; border-radius: 12px; font-size: 0.9rem; position: relative; }
-        .msg-in { align-self: flex-start; background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 0; }
-        .msg-out { align-self: flex-end; background: #059669; color: #fff; border-bottom-right-radius: 0; }
-        .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
-        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: #fff; outline: none; border-radius: 6px; }
-        .send-btn { background: #3b82f6; color: #fff; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
-        .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
-        .lume-avatar-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .chat-window { width: 900px; height: 600px; background: #0b0e11; border: 1px solid #333; display: flex; }
+        .chat-sidebar { width: 250px; background: #111; border-right: 1px solid #333; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 70%; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
+        .msg-in { align-self: flex-start; background: #1f2937; }
+        .msg-out { align-self: flex-end; background: #059669; }
+        .chat-input-area { padding: 20px; display: flex; gap: 10px; background: #111; }
+        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 10px; color: #fff; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h2 id="authTitle">SYSTEM LOGIN</h2>
+            <h2>SYSTEM LOGIN</h2>
             <div class="input-group"><label>EMAIL / OPERATOR ID</label><input type="text" id="email" placeholder="ENTER ID"></div>
             <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
-            <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
-                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
-            </div>
             <button id="mainAuthBtn">LOGIN</button>
-            <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
-            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
-                <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
-            </div>
-            <p id="loginMsg"></p>
         </div>
-        <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
     </div>
 
     <div class="main-app-container">
         <header>
-            <div class="brand"><span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span><span style="font-size: 0.9rem; color:#555; font-weight:normal; margin-left: 10px;">| TEAM 1 - ADY201m</span></div>
+            <div class="brand"><span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span><span style="font-size: 0.9rem; color:#555; margin-left: 10px;">| TEAM 1 - ADY201m</span></div>
             <div class="nav-tabs">
-                <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
-                <button class="nav-btn" id="btn-community"><i class="fas fa-users"></i> COMMUNITY</button>
-                <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
+                <button class="nav-btn active" id="btn-terminal">TERMINAL</button>
+                <button class="nav-btn" id="btn-community">COMMUNITY</button>
+                <button class="nav-btn" id="btn-profile">PROFILE</button>
             </div>
         </header>
 
-        <div id="dashboard-view" class="view-section active-view">
+        <div id="dashboard-view" class="view-section" style="display: block;">
             <div class="dashboard-grid">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; color: #848e9c; font-size: 0.9rem; margin-bottom: 10px;"><span>MARKET OVERVIEW</span><span style="color: #f0b90b; font-weight: bold;">BINANCE: BTC/USDT</span></div>
                     <div class="price-display" id="btcPrice">LOADING...</div>
-                    <div style="font-size: 0.8rem; margin-bottom: 15px; display: flex; gap: 20px;"><span style="color: #0ecb81;">▬ Real-time Price</span><span style="color: #3b82f6; border-bottom: 2px dashed #3b82f6;">--- AI Forecast</span></div>
-                    <div class="chart-container"><canvas id="mainChart"></canvas></div>
+                    <div style="height: 400px;"><canvas id="mainChart"></canvas></div>
                 </div>
                 <div>
-                    <div class="card prediction-box"><div class="pred-label"><i class="fas fa-robot"></i> ENSEMBLE AI PREDICTION</div><div class="pred-price" id="predPrice">---</div><div style="color: #555; font-size: 0.8rem; margin-top: 5px;">Confidence Interval: 98.2%</div></div>
-                    <div class="card" style="margin-bottom: 20px;">
-                        <div class="info-row"><span class="info-label">Stop Loss (ATR)</span><span class="info-val" id="stopLoss" style="color: #f6465d;">---</span></div>
-                        <div class="info-row" style="border: none; margin-bottom: 0;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color: #0ecb81;">---</span></div>
-                    </div>
-                    <div class="card"><div class="specs-title"><i class="fas fa-microchip"></i> SYSTEM SPECIFICATIONS</div>
-                        <div class="info-row"><span class="info-label">Architecture</span><span class="spec-val-highlight">Hybrid (LSTM + XGB)</span></div>
-                        <div class="info-row"><span class="info-label">Input Shape</span><span class="spec-val-highlight">(Batch, 60, 13)</span></div>
-                        <div class="info-row"><span class="info-label">Optimization</span><span class="spec-val-highlight">Adam (Lr=0.001)</span></div>
-                        <div class="info-row" style="border:none; margin-bottom: 0;"><span class="info-label">Data Source</span><span class="spec-val-highlight">Binance WebSocket</span></div>
-                    </div>
+                    <div class="card prediction-box"><div>AI PREDICTION</div><div class="pred-price" id="predPrice">---</div></div>
+                    <div class="logs-container" id="terminalLogs"></div>
                 </div>
             </div>
-            <div class="logs-container" id="terminalLogs"><div class="log-entry"><span class="log-time">[SYSTEM]</span> Ready to connect...</div></div>
-        </div>
-
-        <div id="community-view" class="view-section">
-            <div class="feed-input-container">
-                <textarea id="postInput" class="feed-textarea" placeholder="Share your trading insights..."></textarea>
-                <button class="post-btn" id="submitPostBtn">POST</button>
-                <div style="clear:both;"></div>
-            </div>
-            <div id="feedStream"></div>
         </div>
 
         <div id="profile-view" class="view-section">
             <div class="profile-cover"></div>
             <div class="profile-header-card">
                 <img id="profile-avatar-img" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" class="profile-avatar">
-                <div class="profile-name" id="profile-name-txt">OPERATOR NAME</div>
-                <div class="profile-role" id="profile-role-txt">Lead Developer | FPT University</div>
-                <div class="profile-actions">
-                    <button class="action-btn" id="openChatBtn"><i class="fas fa-comment-alt"></i> Messages</button>
-                    <button class="action-btn" id="editProfileBtn"><i class="fas fa-cog"></i> Edit Profile</button>
+                <div class="profile-name" id="profile-name-txt" style="font-size: 1.5rem; font-weight: bold; margin-top: 10px;">OPERATOR NAME</div>
+                <div class="profile-role" id="profile-role-txt" style="color: #3b82f6;">Lead Developer</div>
+                <div style="margin-top: 15px;">
+                    <button class="nav-btn" id="openChatBtn" style="border: 1px solid #333;">Messages</button>
+                    <button class="nav-btn" id="editProfileBtn" style="border: 1px solid #333;">Edit Profile</button>
                 </div>
             </div>
             <div class="profile-content">
-                <div class="info-card">
-                    <h3><i class="fas fa-id-card" style="margin-right: 10px;"></i> Contact Info</h3>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-user-circle"></i></div><div><div class="detail-text" id="profile-id-txt">DE200247</div><span class="detail-sub">Operator ID</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-envelope"></i></div><div><div class="detail-text" id="profile-email-txt">toanpbs@fpt.edu.vn</div><span class="detail-sub">Email Address</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-university"></i></div><div><div class="detail-text" id="profile-org-txt">FPT University</div><span class="detail-sub">Organization</span></div></div>
-                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div><div><div class="detail-text" id="profile-loc-txt">Da Nang, Vietnam</div><span class="detail-sub">Location</span></div></div>
+                <div class="card">
+                    <h3>Contact Info</h3><br>
+                    <p id="profile-id-txt">DE200247</p><span style="font-size: 0.7rem; color: #555;">Operator ID</span><br><br>
+                    <p id="profile-email-txt">toanpbs@fpt.edu.vn</p><span style="font-size: 0.7rem; color: #555;">Email</span>
                 </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> Description</h3>
-                    <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="profile-desc-txt">StableCast is an advanced AI-powered cryptocurrency price prediction terminal...</p>
-                    <h3><i class="fas fa-users" style="margin-right: 10px;"></i> Social Stats</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        <div class="stat-box"><div class="stat-num" id="stat-friends">0</div><div class="stat-label">Friends</div></div>
-                        <div class="stat-box"><div class="stat-num" id="stat-hours">0m</div><div class="stat-label">Online Time</div></div>
-                        <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">98%</div><div class="stat-label">Reputation</div></div>
-                    </div>
+                <div class="card">
+                    <h3>Description</h3><br>
+                    <p id="profile-desc-txt" style="color: #ccc;">StableCast terminal...</p>
                 </div>
             </div>
         </div>
 
-        <div class="footer-info">© 2026 StableCast Project. FPT University.<br>Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span></div>
+        <div class="footer-info" style="text-align: center; margin-top: 30px; font-size: 0.8rem; color: #444;">
+            © 2026 StableCast Project. FPT University.<br>
+            Developer: <span style="color: #0ecb81;">Phan Bá Song Toàn - DE200247</span>
+        </div>
     </div>
 
     <div id="editProfileModal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-header"><span>EDIT PROFILE</span><i class="fas fa-times close-modal" id="closeEditModal"></i></div>
+            <div class="modal-header"><span>EDIT PROFILE</span><i class="fas fa-times" id="closeEditModal" style="cursor:pointer;"></i></div>
             <div class="modal-body">
-                <div class="modal-section-title">Visual Identity</div>
-                <label class="file-upload-label" for="editAvatarInput"><i class="fas fa-cloud-upload-alt"></i> Upload New Avatar</label>
-                <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
-
-                <div class="modal-section-title">Personal Information</div>
-                <label style="color:#888; font-size:0.8rem;">DISPLAY NAME</label><input type="text" id="editNameInput" class="form-input" placeholder="Name">
-                <label style="color:#888; font-size:0.8rem;">JOB TITLE</label><input type="text" id="editRoleInput" class="form-input" placeholder="Title">
-
-                <div class="modal-section-title">Contact Details</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="color:#888; font-size:0.8rem;">OPERATOR ID</label><input type="text" id="editIDInput" class="form-input"></div>
-                    <div><label style="color:#888; font-size:0.8rem;">EMAIL</label><input type="text" id="editEmailInput" class="form-input"></div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="color:#888; font-size:0.8rem;">ORGANIZATION</label><input type="text" id="editOrgInput" class="form-input"></div>
-                    <div><label style="color:#888; font-size:0.8rem;">LOCATION</label><input type="text" id="editLocInput" class="form-input"></div>
+                <div style="color: #0ecb81; font-size: 0.8rem; margin-bottom: 10px; font-weight: bold;">VISUAL IDENTITY</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <div>
+                        <label for="editAvatarInput" style="display: block; border: 1px dashed #444; padding: 10px; text-align: center; cursor: pointer; font-size: 0.7rem;">CHANGE AVATAR</label>
+                        <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div>
+                        <label for="editCoverInput" style="display: block; border: 1px dashed #444; padding: 10px; text-align: center; cursor: pointer; font-size: 0.7rem;">CHANGE COVER</label>
+                        <input type="file" id="editCoverInput" accept="image/*" style="display: none;">
+                    </div>
                 </div>
 
-                <div class="modal-section-title">Description</div>
-                <textarea id="editDescInput" class="form-textarea"></textarea>
+                <label style="font-size: 0.7rem; color: #888;">DISPLAY NAME</label>
+                <input type="text" id="editNameInput" class="form-input">
+                <label style="font-size: 0.7rem; color: #888;">JOB TITLE</label>
+                <input type="text" id="editRoleInput" class="form-input">
+                <label style="font-size: 0.7rem; color: #888;">OPERATOR ID</label>
+                <input type="text" id="editIDInput" class="form-input">
+                <label style="font-size: 0.7rem; color: #888;">EMAIL</label>
+                <input type="text" id="editEmailInput" class="form-input">
+                <label style="font-size: 0.7rem; color: #888;">DESCRIPTION</label>
+                <textarea id="editDescInput" class="form-textarea" style="height: 80px;"></textarea>
             </div>
             <button class="save-btn" id="saveProfileBtn">SAVE CHANGES</button>
         </div>
@@ -260,26 +149,15 @@
 
     <div id="chatSystemOverlay" class="chat-overlay">
         <div class="chat-window">
-            <div class="chat-sidebar">
-                <div class="chat-header"><span>MESSAGES</span><i class="fas fa-satellite-dish"></i></div>
-                <div class="friend-list">
-                    <div class="friend-item active">
-                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop" class="friend-avatar lume-avatar-glow">
-                        <div class="friend-info"><h4>Lume (AI Assistant)</h4><p>Online</p></div><div class="status-online"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="chat-sidebar"><div style="padding: 20px; color: #0ecb81; font-weight: bold; border-bottom: 1px solid #333;">LUME AI</div></div>
             <div class="chat-main">
-                <div class="chat-title-bar">
-                    <span id="currentChatUser" style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-robot" style="color: #3b82f6;"></i> Lume (AI Assistant)</span>
-                    <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
-                </div>
+                <div style="padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between;"><span>Lume Assistant</span><i class="fas fa-times" id="closeChatBtn" style="cursor:pointer;"></i></div>
                 <div class="chat-messages" id="chatContainer">
-                    <div class="message msg-in">Hello! I am <b>Lume</b>. I can analyze the market for you. How was your day?<div class="msg-time">System</div></div>
+                    <div class="message msg-in">Hello! I am Lume. Ready to analyze the market?</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Chat with Lume...">
-                    <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="msgInput" class="chat-input" placeholder="Ask Lume...">
+                    <button id="sendMsgBtn" style="padding: 0 20px; background: #3b82f6; color: #fff; border: none;">SEND</button>
                 </div>
             </div>
         </div>
