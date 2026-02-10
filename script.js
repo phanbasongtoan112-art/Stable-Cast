@@ -1,371 +1,519 @@
-// ==================== CONFIG & VARIABLES ====================
-let user = {
-    name: "Guest",
-    id: "DE200247",
-    role: "Trader",
-    avatar: "https://cdn-icons-png.flaticon.com/512/11498/11498793.png",
-    cover: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1600&q=80",
-    email: "student@fpt.edu.vn",
-    org: "FPT University",
-    loc: "Da Nang, VN",
-    desc: "AI driven crypto analyst."
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// === CẤU HÌNH (GIỮ NGUYÊN) ===
+const firebaseConfig = {
+  apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
+  authDomain: "stablecast-login.firebaseapp.com",
+  projectId: "stablecast-login",
+  storageBucket: "stablecast-login.firebasestorage.app",
+  messagingSenderId: "282707836063",
+  appId: "1:282707836063:web:cdbe29c541635ca2ba76aa",
+  measurementId: "G-D2BXTH0MMF"
 };
 
-// Friends Data (0: Add, 1: Requested, 2: Friend)
-let friends = [
-    { id: 1, name: "Nguyễn Quốc Đạt", role: "Backend Dev", status: 0, mutual: 12, avatar: "https://i.pravatar.cc/150?u=1", cover: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=500", desc: "Expert in Node.js & Microservices." },
-    { id: 2, name: "Trần Thái Sơn", role: "AI Researcher", status: 0, mutual: 8, avatar: "https://i.pravatar.cc/150?u=2", cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500", desc: "Building next-gen trading algos." },
-    { id: 3, name: "Lê Minh Quân", role: "Data Analyst", status: 0, mutual: 15, avatar: "https://i.pravatar.cc/150?u=3", cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500", desc: "Converting data into profit." },
-    { id: 4, name: "Phạm Gia Huy", role: "Security Ops", status: 0, mutual: 5, avatar: "https://i.pravatar.cc/150?u=4", cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500", desc: "Keeping the terminal secure." },
-    { id: 5, name: "Nguyễn Văn Tân", role: "Frontend Dev", status: 0, mutual: 20, avatar: "https://i.pravatar.cc/150?u=5", cover: "https://images.unsplash.com/photo-1550439062-609e1531270e?w=500", desc: "Pixel perfect interfaces." },
-    { id: 6, name: "Đỗ Thu Hiền", role: "Designer", status: 0, mutual: 32, avatar: "https://i.pravatar.cc/150?u=9", cover: "https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?w=500", desc: "UI/UX Specialist." }
-];
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-let notifications = [
-    { text: "System ready. Welcome back.", time: "Just now", read: false },
-    { text: "Market volatility high.", time: "10m ago", read: false }
-];
-
-let chart;
+// System Vars
+let currentPrice = 0;
+let predictedPriceGlobal = 0; 
 let priceHistory = [];
+let forecastHistory = [];
 let timeLabels = [];
-let cropper;
-let currentCropType = null;
-let tempAvatar = null;
-let tempCover = null;
+let chart; 
+let ws; 
+let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
+    { id: 1, name: "Alice Crypto", handle: "@alice_btc", avatar: "https://i.pravatar.cc/150?img=5", time: "2h ago", text: "BTC holding strong support at $68k. Accumulation phase? #Bitcoin", connected: false },
+    { id: 2, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate is spiking again. Difficulty adjustment incoming.", connected: false }
+];
 
-// ==================== INIT & LOGIN ====================
-document.addEventListener('DOMContentLoaded', () => {
-    const savedUser = localStorage.getItem('stableUser');
+// --- DỮ LIỆU BẠN BÈ (CẬP NHẬT THÊM COVER & DESC) ---
+const friendList = [
+    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", cover: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=500&q=60", desc: "Expert in Node.js & Microservices.", mutual: 12 },
+    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=60", desc: "Building the next gen trading algos.", mutual: 8 },
+    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=60", desc: "Converting data into profit.", mutual: 15 },
+    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=500&q=60", desc: "Keeping the terminal secure.", mutual: 5 },
+    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", cover: "https://images.unsplash.com/photo-1550439062-609e1531270e?auto=format&fit=crop&w=500&q=60", desc: "Pixel perfect interfaces.", mutual: 20 },
+    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", cover: "https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop&w=500&q=60", desc: "UI/UX Specialist for Trading Apps.", mutual: 32 }
+];
+
+// ============================================================
+// 0. AUTO-LOGIN & INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('stableCastUser');
     if (savedUser) {
-        user = JSON.parse(savedUser);
-        initApp();
-    } else {
-        document.getElementById('loginOverlay').style.display = 'flex';
-    }
-});
-
-document.getElementById('mainAuthBtn').addEventListener('click', () => {
-    const emailInput = document.getElementById('email').value;
-    if(emailInput) user.name = emailInput;
-    localStorage.setItem('stableUser', JSON.stringify(user));
-    initApp();
-});
-
-function initApp() {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.querySelector('.main-app-container').style.display = 'block';
-    
-    renderProfile();
-    renderFriends();
-    initChart();
-    startSimulation();
-    renderNotifications();
-    setupNavigation();
-}
-
-// ==================== NAVIGATION ====================
-function setupNavigation() {
-    const tabs = {
-        'btn-terminal': 'dashboard-view',
-        'btn-community': 'community-view',
-        'btn-profile': 'profile-view'
-    };
-
-    Object.keys(tabs).forEach(btnId => {
-        document.getElementById(btnId).addEventListener('click', function() {
-            // Remove active
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
-            
-            // Set active
-            this.classList.add('active');
-            document.getElementById(tabs[btnId]).classList.add('active-view');
-        });
-    });
-
-    // Notifications
-    const notiBtn = document.getElementById('btn-notifications');
-    const notiDrop = document.getElementById('notificationDropdown');
-    notiBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notiDrop.style.display = notiDrop.style.display === 'block' ? 'none' : 'block';
-    });
-    window.addEventListener('click', () => notiDrop.style.display = 'none');
-}
-
-// ==================== PROFILE LOGIC ====================
-function renderProfile() {
-    // Header
-    document.getElementById('profile-name-txt').innerText = user.name;
-    document.getElementById('profile-role-txt').innerText = user.role;
-    document.getElementById('profile-avatar-img').src = user.avatar;
-    document.querySelector('.profile-cover').style.backgroundImage = `url('${user.cover}')`;
-    
-    // Details
-    document.getElementById('profile-id-txt').innerText = user.id;
-    document.getElementById('profile-email-txt').innerText = user.email;
-    document.getElementById('profile-org-txt').innerText = user.org;
-    document.getElementById('profile-loc-txt').innerText = user.loc;
-    document.getElementById('profile-desc-txt').innerText = user.desc;
-}
-
-// Edit Modal Logic
-const editModal = document.getElementById('editProfileModal');
-document.getElementById('editProfileBtn').addEventListener('click', () => {
-    editModal.style.display = 'flex';
-    document.getElementById('edit-form-container').style.display = 'block';
-    document.getElementById('cropper-container').style.display = 'none';
-    
-    // Fill inputs
-    document.getElementById('editNameInput').value = user.name;
-    document.getElementById('editRoleInput').value = user.role;
-    document.getElementById('editIDInput').value = user.id;
-    document.getElementById('editEmailInput').value = user.email;
-    document.getElementById('editOrgInput').value = user.org;
-    document.getElementById('editLocInput').value = user.loc;
-    document.getElementById('editDescInput').value = user.desc;
-});
-
-document.getElementById('closeEditModal').addEventListener('click', () => editModal.style.display = 'none');
-
-// Save Profile
-document.getElementById('saveProfileBtn').addEventListener('click', () => {
-    user.name = document.getElementById('editNameInput').value || user.name;
-    user.role = document.getElementById('editRoleInput').value || user.role;
-    user.id = document.getElementById('editIDInput').value || user.id;
-    user.email = document.getElementById('editEmailInput').value || user.email;
-    user.org = document.getElementById('editOrgInput').value || user.org;
-    user.loc = document.getElementById('editLocInput').value || user.loc;
-    user.desc = document.getElementById('editDescInput').value || user.desc;
-    
-    if(tempAvatar) user.avatar = tempAvatar;
-    if(tempCover) user.cover = tempCover;
-
-    localStorage.setItem('stableUser', JSON.stringify(user));
-    renderProfile();
-    editModal.style.display = 'none';
-    
-    // Reset temps
-    tempAvatar = null;
-    tempCover = null;
-});
-
-// ==================== CROPPER LOGIC ====================
-const cropImg = document.getElementById('cropper-image');
-
-function handleFileSelect(input, type) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            cropImg.src = e.target.result;
-            document.getElementById('edit-form-container').style.display = 'none';
-            document.getElementById('edit-footer').style.display = 'none';
-            document.getElementById('cropper-container').style.display = 'flex';
-            currentCropType = type;
-            
-            if(cropper) cropper.destroy();
-            cropper = new Cropper(cropImg, {
-                aspectRatio: type === 'avatar' ? 1 : 3.5,
-                viewMode: 1
-            });
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-    input.value = ''; // Reset
-}
-
-document.getElementById('editAvatarInput').addEventListener('change', function() { handleFileSelect(this, 'avatar'); });
-document.getElementById('editCoverInput').addEventListener('change', function() { handleFileSelect(this, 'cover'); });
-
-document.getElementById('crop-confirm-btn').addEventListener('click', () => {
-    if(!cropper) return;
-    const canvas = cropper.getCroppedCanvas({ width: currentCropType === 'avatar' ? 300 : 1000 });
-    const result = canvas.toDataURL();
-
-    if(currentCropType === 'avatar') {
-        tempAvatar = result;
-        document.getElementById('profile-avatar-img').src = result; // Preview
-    } else {
-        tempCover = result;
-        document.querySelector('.profile-cover').style.backgroundImage = `url('${result}')`; // Preview
-    }
-
-    // Close crop view
-    cropper.destroy();
-    cropper = null;
-    document.getElementById('cropper-container').style.display = 'none';
-    document.getElementById('edit-form-container').style.display = 'block';
-    document.getElementById('edit-footer').style.display = 'block';
-});
-
-document.getElementById('crop-cancel-btn').addEventListener('click', () => {
-    if(cropper) { cropper.destroy(); cropper = null; }
-    document.getElementById('cropper-container').style.display = 'none';
-    document.getElementById('edit-form-container').style.display = 'block';
-    document.getElementById('edit-footer').style.display = 'block';
-});
-
-// ==================== FRIENDS LOGIC ====================
-function renderFriends() {
-    const container = document.getElementById('friendGridContainer');
-    container.innerHTML = '';
-    
-    friends.forEach((f, idx) => {
-        const div = document.createElement('div');
-        div.className = 'friend-card';
+        const loginOverlay = document.getElementById('loginOverlay');
+        if(loginOverlay) loginOverlay.style.display = 'none';
         
-        let btnHTML = '';
-        if(f.status === 0) btnHTML = `<button class="friend-btn btn-add" onclick="toggleFriend(${idx})"><i class="fas fa-user-plus"></i> Add</button>`;
-        else if(f.status === 1) btnHTML = `<button class="friend-btn btn-sent"><i class="fas fa-clock"></i> Sent</button>`;
-        else btnHTML = `<button class="friend-btn btn-friend"><i class="fas fa-check"></i> Friend</button>`;
+        const mainApp = document.querySelector('.main-app-container');
+        if(mainApp) {
+            mainApp.style.display = 'block';
+            setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
+        }
+        
+        loadProfileData();
+        renderFriendList();
+        startTimeTracking();
+        renderFeed();
+        
+        setTimeout(() => { initSystem(); }, 500);
+    }
+});
+
+// Helper: Nếu chuỗi rỗng -> Trả về "None"
+function checkEmpty(val) {
+    if (!val || val.trim() === "") return "None";
+    return val;
+}
+
+function loadProfileData() {
+    const data = {
+        name: localStorage.getItem('stableCastUser'),
+        email: localStorage.getItem('stableCastEmail'),
+        avatar: localStorage.getItem('stableCastAvatar'),
+        cover: localStorage.getItem('stableCastCover') || "https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg",
+        role: localStorage.getItem('stableCastRole'),
+        id: localStorage.getItem('stableCastID') || "DE200247",
+        org: localStorage.getItem('stableCastOrg') || "FPT University",
+        loc: localStorage.getItem('stableCastLoc') || "Da Nang, Vietnam",
+        desc: localStorage.getItem('stableCastDesc') || "StableCast is an advanced AI-powered cryptocurrency price prediction terminal...",
+        friends: localStorage.getItem('stableCastFriends') || "0"
+    };
+    updateProfileInfo(data);
+}
+
+// --- HÀM RENDER BẠN BÈ & CLICK EVENT ---
+function renderFriendList() {
+    const container = document.getElementById('friendGridContainer');
+    if(!container) return;
+    container.innerHTML = "";
+
+    friendList.forEach((friend, index) => {
+        const div = document.createElement('div');
+        div.className = "friend-card";
+        div.style.cursor = "pointer"; // Thêm con trỏ để biết bấm được
+        
+        // Thêm sự kiện click để mở profile bạn bè
+        div.onclick = (e) => {
+            // Nếu bấm vào nút Add Friend thì không mở modal
+            if(e.target.closest('.friend-add-btn')) return;
+            openFriendModal(index);
+        };
 
         div.innerHTML = `
-            <img src="${f.avatar}" class="friend-card-img" onclick="viewFriend(${idx})" style="cursor:pointer">
-            <div style="flex:1; cursor:pointer;" onclick="viewFriend(${idx})">
-                <div class="friend-card-name">${f.name}</div>
-                <div class="friend-card-role">${f.role}</div>
+            <img src="${friend.avatar}" class="friend-card-img">
+            <div class="friend-card-info">
+                <div class="friend-card-name">${friend.name}</div>
+                <div class="friend-card-role">${friend.role}</div>
+                <div class="friend-card-mutual">${friend.mutual} mutual friends</div>
             </div>
-            ${btnHTML}
+            <button class="friend-add-btn"><i class="fas fa-user-plus"></i> Add Friend</button>
         `;
         container.appendChild(div);
     });
-
-    document.getElementById('friendCountDisplay').innerText = `(${friends.filter(f => f.status === 2).length})`;
+    
+    const countEl = document.getElementById('friendCountDisplay');
+    if(countEl) countEl.innerText = `(${friendList.length})`;
 }
 
-window.toggleFriend = (index) => {
-    const f = friends[index];
-    if(f.status === 0) {
-        f.status = 1; // Sent
-        setTimeout(() => {
-            f.status = 2; // Accepted simulation
-            addNotification(`${f.name} accepted your request.`);
-            renderFriends();
-        }, 2000);
+// --- HÀM MỞ MODAL XEM PROFILE BẠN BÈ (MỚI) ---
+function openFriendModal(index) {
+    const friend = friendList[index];
+    const modal = document.getElementById('viewFriendModal');
+    
+    // Cập nhật dữ liệu vào modal
+    document.getElementById('friend-modal-cover').style.backgroundImage = `url('${friend.cover}')`;
+    document.getElementById('friend-modal-avatar').src = friend.avatar;
+    document.getElementById('friend-modal-name').innerText = friend.name;
+    document.getElementById('friend-modal-role').innerText = friend.role;
+    document.getElementById('friend-modal-desc').innerText = friend.desc;
+    document.getElementById('friend-modal-mutual').innerText = friend.mutual;
+    
+    modal.style.display = 'flex';
+}
+
+// ============================================================
+// 1. NAV LOGIC
+// ============================================================
+const btnTerminal = document.getElementById('btn-terminal');
+const btnCommunity = document.getElementById('btn-community');
+const btnProfile = document.getElementById('btn-profile');
+const views = {
+    dashboard: document.getElementById('dashboard-view'),
+    community: document.getElementById('community-view'),
+    profile: document.getElementById('profile-view')
+};
+
+function switchView(viewName) {
+    if(btnTerminal) btnTerminal.classList.remove('active');
+    if(btnCommunity) btnCommunity.classList.remove('active');
+    if(btnProfile) btnProfile.classList.remove('active');
+    
+    if(viewName === 'dashboard' && btnTerminal) btnTerminal.classList.add('active');
+    if(viewName === 'community' && btnCommunity) btnCommunity.classList.add('active');
+    if(viewName === 'profile' && btnProfile) btnProfile.classList.add('active');
+
+    if(views.dashboard) views.dashboard.style.display = 'none';
+    if(views.community) views.community.style.display = 'none';
+    if(views.profile) views.profile.style.display = 'none';
+    
+    if(views[viewName]) views[viewName].style.display = 'block';
+}
+
+if(btnTerminal) btnTerminal.addEventListener('click', () => switchView('dashboard'));
+if(btnCommunity) btnCommunity.addEventListener('click', () => switchView('community'));
+if(btnProfile) btnProfile.addEventListener('click', () => switchView('profile'));
+
+// ============================================================
+// 2. EDIT PROFILE (CẬP NHẬT LOGIC ẢNH BÌA)
+// ============================================================
+const editProfileBtn = document.getElementById('editProfileBtn');
+const editProfileModal = document.getElementById('editProfileModal');
+const closeEditModal = document.getElementById('closeEditModal');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+const editAvatarInput = document.getElementById('editAvatarInput');
+const editCoverInput = document.getElementById('editCoverInput'); // Thêm input cover
+
+if(editProfileBtn) {
+    editProfileBtn.addEventListener('click', () => {
+        if(editProfileModal) editProfileModal.style.display = 'flex';
+        const setVal = (id, targetId) => {
+            const el = document.getElementById(id);
+            const target = document.getElementById(targetId);
+            if(el && target) el.value = target.innerText === "None" ? "" : target.innerText;
+        };
+        setVal('editNameInput', 'profile-name-txt');
+        setVal('editRoleInput', 'profile-role-txt');
+        setVal('editIDInput', 'profile-id-txt');
+        setVal('editEmailInput', 'profile-email-txt');
+        setVal('editOrgInput', 'profile-org-txt');
+        setVal('editLocInput', 'profile-loc-txt');
+        setVal('editDescInput', 'profile-desc-txt');
+    });
+}
+
+if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileModal.style.display = 'none');
+
+// Logic đóng modal xem bạn bè
+const closeFriendModal = document.getElementById('closeFriendModal');
+if(closeFriendModal) closeFriendModal.addEventListener('click', () => document.getElementById('viewFriendModal').style.display = 'none');
+
+if(saveProfileBtn) {
+    saveProfileBtn.addEventListener('click', () => {
+        const getVal = (id) => {
+            const el = document.getElementById(id);
+            return el ? checkEmpty(el.value) : "None";
+        };
+
+        const data = {
+            name: getVal('editNameInput'),
+            role: getVal('editRoleInput'),
+            id: getVal('editIDInput'),
+            email: getVal('editEmailInput'),
+            org: getVal('editOrgInput'),
+            loc: getVal('editLocInput'),
+            desc: getVal('editDescInput'),
+            avatar: null,
+            cover: null
+        };
+
+        // Hàm helper đọc file
+        const readFile = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Xử lý song song Avatar và Cover
+        const tasks = [];
+        
+        if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
+            tasks.push(readFile(editAvatarInput.files[0]).then(res => data.avatar = res));
+        } else {
+            const img = document.getElementById('profile-avatar-img');
+            data.avatar = img ? img.src : null;
+        }
+
+        if (editCoverInput && editCoverInput.files && editCoverInput.files[0]) {
+            tasks.push(readFile(editCoverInput.files[0]).then(res => data.cover = res));
+        } else {
+            // Lấy ảnh bìa hiện tại từ style background-image
+            const coverEl = document.querySelector('.profile-cover');
+            let currentCover = coverEl.style.backgroundImage;
+            // Làm sạch chuỗi url("...")
+            if(currentCover) currentCover = currentCover.replace(/^url\(['"](.+)['"]\)/, '$1');
+            data.cover = currentCover;
+        }
+
+        Promise.all(tasks).then(() => {
+            saveAndUpdate(data);
+        });
+    });
+}
+
+function saveAndUpdate(data) {
+    updateProfileInfo(data);
+    localStorage.setItem('stableCastUser', data.name);
+    localStorage.setItem('stableCastRole', data.role);
+    localStorage.setItem('stableCastID', data.id);
+    localStorage.setItem('stableCastEmail', data.email);
+    localStorage.setItem('stableCastOrg', data.org);
+    localStorage.setItem('stableCastLoc', data.loc);
+    localStorage.setItem('stableCastDesc', data.desc);
+    if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
+    if(data.cover) localStorage.setItem('stableCastCover', data.cover);
+
+    if(editProfileModal) editProfileModal.style.display = 'none';
+    alert("Profile Updated Successfully!");
+}
+
+function updateProfileInfo(data) {
+    const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if(el && val) el.innerText = val;
+    };
+    setTxt('profile-name-txt', data.name);
+    setTxt('profile-email-txt', data.email);
+    setTxt('profile-role-txt', data.role);
+    setTxt('profile-id-txt', data.id);
+    setTxt('profile-org-txt', data.org);
+    setTxt('profile-loc-txt', data.loc);
+    setTxt('profile-desc-txt', data.desc);
+    setTxt('stat-friends', data.friends);
+    
+    if(data.avatar) {
+        const img = document.getElementById('profile-avatar-img');
+        if(img) img.src = data.avatar;
     }
-    renderFriends();
-};
+    // Cập nhật ảnh bìa
+    if(data.cover) {
+        const coverEl = document.querySelector('.profile-cover');
+        if(coverEl) coverEl.style.backgroundImage = `url('${data.cover}')`;
+    }
+}
 
-window.viewFriend = (index) => {
-    const f = friends[index];
-    document.getElementById('friend-modal-cover').style.backgroundImage = `url('${f.cover}')`;
-    document.getElementById('friend-modal-avatar').src = f.avatar;
-    document.getElementById('friend-modal-name').innerText = f.name;
-    document.getElementById('friend-modal-role').innerText = f.role;
-    document.getElementById('friend-modal-desc').innerText = f.desc;
-    document.getElementById('friend-modal-mutual').innerText = f.mutual;
-    document.getElementById('viewFriendModal').style.display = 'flex';
-};
+// ============================================================
+// 3. REAL-TIME STATS & COMMUNITY
+// ============================================================
+function startTimeTracking() {
+    let totalMinutes = parseInt(localStorage.getItem('stableCastTotalMinutes')) || 0;
+    updateTimeDisplay(totalMinutes);
+    setInterval(() => {
+        totalMinutes++;
+        localStorage.setItem('stableCastTotalMinutes', totalMinutes);
+        updateTimeDisplay(totalMinutes);
+    }, 60000);
+}
 
-document.getElementById('closeFriendModal').addEventListener('click', () => {
-    document.getElementById('viewFriendModal').style.display = 'none';
-});
+function updateTimeDisplay(minutes) {
+    const el = document.getElementById('stat-hours');
+    if(!el) return;
+    if (minutes < 60) el.innerText = `${minutes}m`;
+    else el.innerText = `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+}
 
-// ==================== CHART & SIMULATION ====================
-function initChart() {
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    chart = new Chart(ctx, {
+function renderFeed() {
+    const feedStream = document.getElementById('feedStream');
+    if(!feedStream) return;
+    feedStream.innerHTML = "";
+    
+    communityPosts.forEach(post => {
+        const postEl = document.createElement('div');
+        postEl.className = "feed-post";
+        const connectBtnHtml = post.connected 
+            ? `<span style="color:#0ecb81; font-size:0.8rem; margin-left:10px;"><i class="fas fa-check"></i> Friends</span>` 
+            : `<button class="connect-btn" onclick="window.connectUser(${post.id})"><i class="fas fa-user-plus"></i> Connect</button>`;
+
+        postEl.innerHTML = `
+            <img src="${post.avatar}" class="post-avatar">
+            <div class="post-content">
+                <div class="post-header">
+                    <div><span class="post-user">${post.name}</span><span class="post-handle">${post.handle}</span>${connectBtnHtml}</div>
+                </div>
+                <div class="post-text">${post.text}</div>
+            </div>`;
+        feedStream.prepend(postEl);
+    });
+}
+
+window.connectUser = function(postId) {
+    const postIndex = communityPosts.findIndex(p => p.id === postId);
+    if (postIndex > -1 && !communityPosts[postIndex].connected) {
+        communityPosts[postIndex].connected = true;
+        let friends = parseInt(localStorage.getItem('stableCastFriends')) || 0;
+        friends++;
+        localStorage.setItem('stableCastFriends', friends);
+        document.getElementById('stat-friends').innerText = friends;
+        localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
+        renderFeed();
+    }
+}
+
+const submitPostBtn = document.getElementById('submitPostBtn');
+if(submitPostBtn) {
+    submitPostBtn.addEventListener('click', () => {
+        const input = document.getElementById('postInput');
+        const text = input.value.trim();
+        if(text) {
+            const name = document.getElementById('profile-name-txt').innerText;
+            const newPost = {
+                id: Date.now(),
+                name: name,
+                handle: "@" + name.replace(/\s+/g, '').toLowerCase(),
+                avatar: document.getElementById('profile-avatar-img').src,
+                time: "Just now",
+                text: text,
+                connected: true
+            };
+            communityPosts.push(newPost);
+            localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
+            input.value = "";
+            renderFeed();
+        }
+    });
+}
+
+// ============================================================
+// 4. LUME & CHAT
+// ============================================================
+const openChatBtn = document.getElementById('openChatBtn');
+const chatOverlay = document.getElementById('chatSystemOverlay');
+const closeChatBtn = document.getElementById('closeChatBtn');
+const sendMsgBtn = document.getElementById('sendMsgBtn');
+const msgInput = document.getElementById('msgInput');
+const chatContainer = document.getElementById('chatContainer');
+
+if(openChatBtn) openChatBtn.addEventListener('click', () => { if(chatOverlay) chatOverlay.style.display = 'flex'; });
+if(closeChatBtn) closeChatBtn.addEventListener('click', () => { if(chatOverlay) chatOverlay.style.display = 'none'; });
+
+function addMessage(text, type) {
+    if(!chatContainer) return;
+    const div = document.createElement('div');
+    div.className = `message ${type}`;
+    div.innerHTML = `${text}<div class="msg-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
+    chatContainer.appendChild(div);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function generateLumeResponse(input) {
+    const text = input.toLowerCase();
+    if (text.match(/hello|hi|hey/)) return `Hello, Operator ${document.getElementById('profile-name-txt').innerText}! Ready for some market action?`;
+    if (text.match(/price/)) return `BTC is currently at <b>$${currentPrice.toFixed(2)}</b>.`;
+    if (text.match(/buy|sell|trend/)) {
+        if(predictedPriceGlobal === 0) return "Gathering data... Ask me in a few seconds.";
+        const trend = predictedPriceGlobal > currentPrice ? "BULLISH" : "BEARISH";
+        return `My analysis indicates a <b>${trend}</b> trend targeting $${predictedPriceGlobal.toFixed(2)}.`;
+    }
+    return "I'm listening. Ask me about the price, trends, or just chat with me!";
+}
+
+if(sendMsgBtn) {
+    const handleSend = () => {
+        const text = msgInput.value.trim();
+        if(text) {
+            addMessage(text, 'msg-out');
+            msgInput.value = '';
+            setTimeout(() => {
+                const reply = generateLumeResponse(text);
+                addMessage(reply, 'msg-in');
+            }, 1000);
+        }
+    };
+    sendMsgBtn.addEventListener('click', handleSend);
+    if(msgInput) msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
+}
+
+// ============================================================
+// 5. CHART & CORE
+// ============================================================
+function initSystem() {
+    const logBox = document.getElementById('terminalLogs');
+    const log = (msg) => {
+        if(!logBox) return;
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+        logBox.appendChild(div);
+        logBox.scrollTop = logBox.scrollHeight;
+    };
+    
+    log("System initialized. Welcome back.");
+    
+    const ctx = document.getElementById('mainChart');
+    if(!ctx) return; 
+
+    chart = new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
             labels: timeLabels,
             datasets: [{
-                label: 'BTC/USDT',
-                data: priceHistory,
-                borderColor: '#0ecb81',
-                borderWidth: 2,
-                backgroundColor: 'rgba(14, 203, 129, 0.05)',
-                fill: true,
-                tension: 0.1,
-                pointRadius: 0
+                label: 'Real-time Price', data: priceHistory, borderColor: '#0ecb81', borderWidth: 2, tension: 0.2, pointRadius: 0
+            }, {
+                label: 'AI Ensemble Forecast', data: forecastHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], tension: 0.4, pointRadius: 0
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { position: 'right', grid: { color: '#2b3139' }, ticks: { color: '#888' } }
-            },
+            responsive: true, maintainAspectRatio: false, 
+            scales: { x: { display: false }, y: { position: 'right', grid: { color: '#2b3139' }, ticks: { color: '#848e9c' } } },
             animation: false
         }
     });
-}
 
-function startSimulation() {
-    let currentPrice = 68000;
-    
-    // Initial Data
-    for(let i=0; i<50; i++) {
-        timeLabels.push('');
-        priceHistory.push(currentPrice);
-    }
-    chart.update();
-
-    setInterval(() => {
-        // Price Randomizer
-        let change = (Math.random() - 0.5) * 50;
-        currentPrice += change;
+    log("Connecting to Binance WebSocket...");
+    ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const price = parseFloat(data.p);
         
-        // Update Chart
-        priceHistory.push(currentPrice);
-        timeLabels.push('');
-        if(priceHistory.length > 50) {
-            priceHistory.shift();
-            timeLabels.shift();
+        const priceEl = document.getElementById('btcPrice');
+        if(priceEl) {
+            if (currentPrice > 0) priceEl.style.color = price >= currentPrice ? '#0ecb81' : '#f6465d';
+            priceEl.innerText = `$${price.toFixed(2)}`;
         }
-        chart.update();
+        currentPrice = price;
+
+        const slPrice = price * 0.99; 
+        const tpPrice = price * 1.015;
+
+        const slEl = document.getElementById('stopLoss');
+        const tpEl = document.getElementById('takeProfit');
+        if(slEl) slEl.innerText = `$${slPrice.toFixed(2)}`;
+        if(tpEl) tpEl.innerText = `$${tpPrice.toFixed(2)}`;
+
+        const timeNow = new Date().toLocaleTimeString();
+        if (timeLabels.length > 50) { timeLabels.shift(); priceHistory.shift(); if(forecastHistory.length > 50) forecastHistory.shift(); }
+        timeLabels.push(timeNow);
+        priceHistory.push(price);
+        if(chart) chart.update();
+    };
+
+    aiInterval = setInterval(() => {
+        if(currentPrice === 0) return;
+        const fakePrice = currentPrice + (Math.random() * 40 - 15);
+        predictedPriceGlobal = fakePrice;
         
-        // Update UI
-        document.getElementById('btcPrice').innerText = currentPrice.toFixed(2);
-        document.getElementById('btcPrice').style.color = change >= 0 ? '#0ecb81' : '#f6465d';
+        const predEl = document.getElementById('predPrice');
+        if(predEl) {
+            predEl.innerText = `$${fakePrice.toFixed(2)}`;
+            predEl.style.color = fakePrice > currentPrice ? '#0ecb81' : '#f6465d';
+        }
         
-        // Update Pred
-        const pred = currentPrice + (Math.random() - 0.5) * 100;
-        document.getElementById('predPrice').innerText = pred.toFixed(2);
-        
-        // Update Logs
-        const log = document.createElement('div');
-        log.className = 'log-entry';
-        const time = new Date().toLocaleTimeString();
-        log.innerHTML = `<span class="log-time">[${time}]</span> Price update: ${currentPrice.toFixed(2)}`;
-        const logCont = document.getElementById('terminalLogs');
-        logCont.prepend(log);
-        if(logCont.children.length > 20) logCont.lastChild.remove();
-        
-    }, 1000);
+        forecastHistory.push(fakePrice);
+        if(forecastHistory.length > 50) forecastHistory.shift();
+        if(chart) chart.update();
+    }, 2000);
 }
 
-// ==================== NOTIFICATIONS ====================
-function renderNotifications() {
-    const container = document.getElementById('notificationDropdown');
-    container.innerHTML = '<div style="padding:10px; color:#fff; border-bottom:1px solid #333; font-weight:bold;">Notifications</div>';
-    
-    notifications.forEach(n => {
-        const div = document.createElement('div');
-        div.className = `notif-item ${n.read ? '' : 'unread'}`;
-        div.innerHTML = `
-            <i class="fas fa-bell" style="color:${n.read ? '#888' : '#0ecb81'}"></i>
-            <div>
-                <div class="notif-text">${n.text}</div>
-                <div class="notif-time">${n.time}</div>
-            </div>
-        `;
-        container.appendChild(div);
+const mainBtn = document.getElementById('mainAuthBtn');
+if(mainBtn) {
+    mainBtn.addEventListener('click', () => {
+        const user = document.getElementById('email').value || "Guest";
+        localStorage.setItem('stableCastUser', user);
+        location.reload();
     });
-    
-    // Badge
-    const unreadCount = notifications.filter(n => !n.read).length;
-    const badge = document.getElementById('noti-badge');
-    if(unreadCount > 0) {
-        badge.style.display = 'block';
-    } else {
-        badge.style.display = 'none';
-    }
-}
-
-function addNotification(text) {
-    notifications.unshift({ text: text, time: "Just now", read: false });
-    renderNotifications();
 }
