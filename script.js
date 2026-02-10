@@ -276,7 +276,8 @@ function initCropper(file, type) {
         
         const aspectRatio = type === 'avatar' ? 1 : 3.5; // Tỉ lệ 3.5 cho ảnh bìa
         
-        cropper = new Cropper(cropperImage, {
+        // Sử dụng window.Cropper để đảm bảo library đã load
+        cropper = new window.Cropper(cropperImage, {
             aspectRatio: aspectRatio,
             viewMode: 1,
             autoCropArea: 1,
