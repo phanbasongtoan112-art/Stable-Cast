@@ -29,14 +29,14 @@ let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
     { id: 2, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate is spiking again. Difficulty adjustment incoming.", connected: false }
 ];
 
-// --- DỮ LIỆU BẠN BÈ ---
+// --- DỮ LIỆU BẠN BÈ (CẬP NHẬT THÊM COVER & DESC) ---
 const friendList = [
-    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", mutual: 12 },
-    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", mutual: 8 },
-    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", mutual: 15 },
-    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", mutual: 5 },
-    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", mutual: 20 },
-    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", mutual: 32 }
+    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", cover: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=500&q=60", desc: "Expert in Node.js & Microservices.", mutual: 12 },
+    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=60", desc: "Building the next gen trading algos.", mutual: 8 },
+    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=60", desc: "Converting data into profit.", mutual: 15 },
+    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=500&q=60", desc: "Keeping the terminal secure.", mutual: 5 },
+    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", cover: "https://images.unsplash.com/photo-1550439062-609e1531270e?auto=format&fit=crop&w=500&q=60", desc: "Pixel perfect interfaces.", mutual: 20 },
+    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", cover: "https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop&w=500&q=60", desc: "UI/UX Specialist for Trading Apps.", mutual: 32 }
 ];
 
 // ============================================================
@@ -63,6 +63,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Helper: Nếu chuỗi rỗng -> Trả về "None"
 function checkEmpty(val) {
     if (!val || val.trim() === "") return "None";
     return val;
@@ -73,6 +74,7 @@ function loadProfileData() {
         name: localStorage.getItem('stableCastUser'),
         email: localStorage.getItem('stableCastEmail'),
         avatar: localStorage.getItem('stableCastAvatar'),
+        cover: localStorage.getItem('stableCastCover') || "https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg",
         role: localStorage.getItem('stableCastRole'),
         id: localStorage.getItem('stableCastID') || "DE200247",
         org: localStorage.getItem('stableCastOrg') || "FPT University",
@@ -83,16 +85,24 @@ function loadProfileData() {
     updateProfileInfo(data);
 }
 
-// --- HÀM RENDER BẠN BÈ (CẬP NHẬT NÚT ADD FRIEND) ---
+// --- HÀM RENDER BẠN BÈ & CLICK EVENT ---
 function renderFriendList() {
     const container = document.getElementById('friendGridContainer');
     if(!container) return;
     container.innerHTML = "";
 
-    friendList.forEach(friend => {
+    friendList.forEach((friend, index) => {
         const div = document.createElement('div');
         div.className = "friend-card";
-        // Thay đổi nút từ "Friends" (check) sang "Add Friend" (plus)
+        div.style.cursor = "pointer"; // Thêm con trỏ để biết bấm được
+        
+        // Thêm sự kiện click để mở profile bạn bè
+        div.onclick = (e) => {
+            // Nếu bấm vào nút Add Friend thì không mở modal
+            if(e.target.closest('.friend-add-btn')) return;
+            openFriendModal(index);
+        };
+
         div.innerHTML = `
             <img src="${friend.avatar}" class="friend-card-img">
             <div class="friend-card-info">
@@ -107,6 +117,22 @@ function renderFriendList() {
     
     const countEl = document.getElementById('friendCountDisplay');
     if(countEl) countEl.innerText = `(${friendList.length})`;
+}
+
+// --- HÀM MỞ MODAL XEM PROFILE BẠN BÈ (MỚI) ---
+function openFriendModal(index) {
+    const friend = friendList[index];
+    const modal = document.getElementById('viewFriendModal');
+    
+    // Cập nhật dữ liệu vào modal
+    document.getElementById('friend-modal-cover').style.backgroundImage = `url('${friend.cover}')`;
+    document.getElementById('friend-modal-avatar').src = friend.avatar;
+    document.getElementById('friend-modal-name').innerText = friend.name;
+    document.getElementById('friend-modal-role').innerText = friend.role;
+    document.getElementById('friend-modal-desc').innerText = friend.desc;
+    document.getElementById('friend-modal-mutual').innerText = friend.mutual;
+    
+    modal.style.display = 'flex';
 }
 
 // ============================================================
@@ -142,13 +168,14 @@ if(btnCommunity) btnCommunity.addEventListener('click', () => switchView('commun
 if(btnProfile) btnProfile.addEventListener('click', () => switchView('profile'));
 
 // ============================================================
-// 2. EDIT PROFILE
+// 2. EDIT PROFILE (CẬP NHẬT LOGIC ẢNH BÌA)
 // ============================================================
 const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
 const closeEditModal = document.getElementById('closeEditModal');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 const editAvatarInput = document.getElementById('editAvatarInput');
+const editCoverInput = document.getElementById('editCoverInput'); // Thêm input cover
 
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
@@ -170,6 +197,10 @@ if(editProfileBtn) {
 
 if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileModal.style.display = 'none');
 
+// Logic đóng modal xem bạn bè
+const closeFriendModal = document.getElementById('closeFriendModal');
+if(closeFriendModal) closeFriendModal.addEventListener('click', () => document.getElementById('viewFriendModal').style.display = 'none');
+
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
         const getVal = (id) => {
@@ -185,21 +216,43 @@ if(saveProfileBtn) {
             org: getVal('editOrgInput'),
             loc: getVal('editLocInput'),
             desc: getVal('editDescInput'),
-            avatar: null
+            avatar: null,
+            cover: null
         };
 
+        // Hàm helper đọc file
+        const readFile = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Xử lý song song Avatar và Cover
+        const tasks = [];
+        
         if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                data.avatar = e.target.result;
-                saveAndUpdate(data);
-            }
-            reader.readAsDataURL(editAvatarInput.files[0]);
+            tasks.push(readFile(editAvatarInput.files[0]).then(res => data.avatar = res));
         } else {
             const img = document.getElementById('profile-avatar-img');
             data.avatar = img ? img.src : null;
-            saveAndUpdate(data);
         }
+
+        if (editCoverInput && editCoverInput.files && editCoverInput.files[0]) {
+            tasks.push(readFile(editCoverInput.files[0]).then(res => data.cover = res));
+        } else {
+            // Lấy ảnh bìa hiện tại từ style background-image
+            const coverEl = document.querySelector('.profile-cover');
+            let currentCover = coverEl.style.backgroundImage;
+            // Làm sạch chuỗi url("...")
+            if(currentCover) currentCover = currentCover.replace(/^url\(['"](.+)['"]\)/, '$1');
+            data.cover = currentCover;
+        }
+
+        Promise.all(tasks).then(() => {
+            saveAndUpdate(data);
+        });
     });
 }
 
@@ -213,6 +266,7 @@ function saveAndUpdate(data) {
     localStorage.setItem('stableCastLoc', data.loc);
     localStorage.setItem('stableCastDesc', data.desc);
     if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
+    if(data.cover) localStorage.setItem('stableCastCover', data.cover);
 
     if(editProfileModal) editProfileModal.style.display = 'none';
     alert("Profile Updated Successfully!");
@@ -235,6 +289,11 @@ function updateProfileInfo(data) {
     if(data.avatar) {
         const img = document.getElementById('profile-avatar-img');
         if(img) img.src = data.avatar;
+    }
+    // Cập nhật ảnh bìa
+    if(data.cover) {
+        const coverEl = document.querySelector('.profile-cover');
+        if(coverEl) coverEl.style.backgroundImage = `url('${data.cover}')`;
     }
 }
 
@@ -418,9 +477,6 @@ function initSystem() {
         }
         currentPrice = price;
 
-        // --- TÍNH TOÁN SL/TP (CẬP NHẬT MỚI) ---
-        // Stop Loss: -1% giá hiện tại
-        // Take Profit: +1.5% giá hiện tại
         const slPrice = price * 0.99; 
         const tpPrice = price * 1.015;
 
@@ -428,7 +484,6 @@ function initSystem() {
         const tpEl = document.getElementById('takeProfit');
         if(slEl) slEl.innerText = `$${slPrice.toFixed(2)}`;
         if(tpEl) tpEl.innerText = `$${tpPrice.toFixed(2)}`;
-        // ------------------------------------
 
         const timeNow = new Date().toLocaleTimeString();
         if (timeLabels.length > 50) { timeLabels.shift(); priceHistory.shift(); if(forecastHistory.length > 50) forecastHistory.shift(); }
@@ -437,7 +492,6 @@ function initSystem() {
         if(chart) chart.update();
     };
 
-    // AI Simulation
     aiInterval = setInterval(() => {
         if(currentPrice === 0) return;
         const fakePrice = currentPrice + (Math.random() * 40 - 15);
