@@ -1,519 +1,336 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StableCast | AI TRADING TERMINAL</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* GIỮ NGUYÊN CSS CŨ */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
+        body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
 
-// === CẤU HÌNH (GIỮ NGUYÊN) ===
-const firebaseConfig = {
-  apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
-  authDomain: "stablecast-login.firebaseapp.com",
-  projectId: "stablecast-login",
-  storageBucket: "stablecast-login.firebasestorage.app",
-  messagingSenderId: "282707836063",
-  appId: "1:282707836063:web:cdbe29c541635ca2ba76aa",
-  measurementId: "G-D2BXTH0MMF"
-};
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
+        .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: border 0.3s; }
+        .input-group input:focus { border-color: #0ecb81; }
+        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+        button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
+        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
+        #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+        .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .nav-tabs { display: flex; gap: 15px; background: #111; padding: 5px; border-radius: 30px; border: 1px solid #333; }
+        .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
+        .nav-icon-btn { background: #111; border: 1px solid #333; color: #848e9c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .nav-icon-btn:hover { color: #0ecb81; border-color: #0ecb81; }
 
-// System Vars
-let currentPrice = 0;
-let predictedPriceGlobal = 0; 
-let priceHistory = [];
-let forecastHistory = [];
-let timeLabels = [];
-let chart; 
-let ws; 
-let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
-    { id: 1, name: "Alice Crypto", handle: "@alice_btc", avatar: "https://i.pravatar.cc/150?img=5", time: "2h ago", text: "BTC holding strong support at $68k. Accumulation phase? #Bitcoin", connected: false },
-    { id: 2, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate is spiking again. Difficulty adjustment incoming.", connected: false }
-];
+        .view-section { display: none; }
+        .view-section.active-view { display: block; }
 
-// --- DỮ LIỆU BẠN BÈ (CẬP NHẬT THÊM COVER & DESC) ---
-const friendList = [
-    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", cover: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=500&q=60", desc: "Expert in Node.js & Microservices.", mutual: 12 },
-    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=60", desc: "Building the next gen trading algos.", mutual: 8 },
-    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=60", desc: "Converting data into profit.", mutual: 15 },
-    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=500&q=60", desc: "Keeping the terminal secure.", mutual: 5 },
-    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", cover: "https://images.unsplash.com/photo-1550439062-609e1531270e?auto=format&fit=crop&w=500&q=60", desc: "Pixel perfect interfaces.", mutual: 20 },
-    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", cover: "https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop&w=500&q=60", desc: "UI/UX Specialist for Trading Apps.", mutual: 32 }
-];
+        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
+        .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
+        .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
+        .prediction-box { text-align: center; padding: 25px; background: #131722; border: 1px solid #3b82f6; margin-bottom: 20px; }
+        .pred-label { color: #848e9c; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .pred-price { font-size: 2.8rem; color: #3b82f6; font-weight: bold; margin: 5px 0; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
+        .info-label { color: #848e9c; }
+        .info-val { color: #fff; font-weight: bold; }
+        .logs-container { margin-top: 30px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #3b82f6; font-family: 'Courier New', monospace; }
+        .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-time { color: #555; margin-right: 10px; }
 
-// ============================================================
-// 0. AUTO-LOGIN & INIT
-// ============================================================
-window.addEventListener('DOMContentLoaded', () => {
-    const savedUser = localStorage.getItem('stableCastUser');
-    if (savedUser) {
-        const loginOverlay = document.getElementById('loginOverlay');
-        if(loginOverlay) loginOverlay.style.display = 'none';
+        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
+        .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; position: relative; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
+        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); }
+        .profile-name { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 15px; }
+        .profile-role { color: #3b82f6; font-size: 0.9rem; margin-bottom: 15px; letter-spacing: 1px; }
+        .profile-actions { display: flex; gap: 10px; }
+        .action-btn { padding: 8px 16px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid #333; background: #1a1a1a; color: #ccc; transition: 0.3s; }
+        .action-btn:hover { border-color: #0ecb81; color: #0ecb81; background: #111; }
+        .profile-content { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .info-card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
+        .info-card h3 { color: #848e9c; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; }
+        .detail-row { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
+        .detail-icon { width: 30px; color: #0ecb81; text-align: center; margin-right: 10px; }
+        .detail-text { color: #fff; }
+        .detail-sub { display: block; font-size: 0.75rem; color: #555; }
+        .stat-box { background: #131722; padding: 15px; border-radius: 4px; text-align: center; margin-bottom: 10px; border: 1px solid #333; }
+        .stat-num { font-size: 1.5rem; color: #0ecb81; font-weight: bold; }
+        .stat-label { font-size: 0.8rem; color: #848e9c; }
+
+        .friends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .friend-card { background: #131722; border: 1px solid #2b3139; padding: 15px; border-radius: 4px; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .friend-card:hover { border-color: #0ecb81; }
+        .friend-card-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #2b3139; }
+        .friend-card-info { flex: 1; }
+        .friend-card-name { font-weight: bold; color: #fff; font-size: 0.95rem; }
+        .friend-card-role { color: #3b82f6; font-size: 0.75rem; margin-top: 2px; }
+        .friend-card-mutual { color: #888; font-size: 0.75rem; margin-top: 2px; }
+        .friend-add-btn { background: #1f2937; color: #fff; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .friend-add-btn:hover { border-color: #3b82f6; color: #3b82f6; background: #1a1a1a; }
+
+        #community-view { max-width: 800px; margin: 0 auto; }
+        .feed-input-container { background: #0b0e11; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .feed-textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 4px; resize: none; outline: none; min-height: 80px; font-size: 1rem; }
+        .post-btn { background: #0ecb81; color: #000; padding: 8px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; float: right; margin-top: 10px; }
+        .feed-post { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 15px; }
+        .post-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .post-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .post-user { color: #fff; font-weight: bold; margin-right: 10px; }
+        .post-handle { color: #888; font-size: 0.9rem; }
+        .post-text { color: #ccc; line-height: 1.5; margin-bottom: 10px; }
+        .connect-btn { border: 1px solid #3b82f6; color: #3b82f6; background: none; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; }
+        .connect-btn:hover { background: #3b82f6; color: #fff; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #111; border: 1px solid #333; padding: 0; width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
+        .close-modal { cursor: pointer; color: #555; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-section-title { color: #0ecb81; font-size: 0.8rem; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .form-input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; }
+        .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; height: 80px; resize: none; }
+        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
         
-        const mainApp = document.querySelector('.main-app-container');
-        if(mainApp) {
-            mainApp.style.display = 'block';
-            setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
-        }
-        
-        loadProfileData();
-        renderFriendList();
-        startTimeTracking();
-        renderFeed();
-        
-        setTimeout(() => { initSystem(); }, 500);
-    }
-});
+        .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
+        .chat-window { width: 950px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; }
+        .chat-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .chat-header { padding: 20px; border-bottom: 1px solid #333; font-weight: bold; color: #0ecb81; display: flex; justify-content: space-between; align-items: center; }
+        .friend-list { flex: 1; overflow-y: auto; }
+        .friend-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
+        .friend-item.active { background: #1f2937; border-left: 3px solid #3b82f6; }
+        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .friend-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 3px; font-weight: bold; }
+        .friend-info p { font-size: 0.75rem; color: #888; }
+        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { max-width: 75%; padding: 12px; border-radius: 12px; font-size: 0.9rem; position: relative; }
+        .msg-in { align-self: flex-start; background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 0; }
+        .msg-out { align-self: flex-end; background: #059669; color: #fff; border-bottom-right-radius: 0; }
+        .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
+        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: #fff; outline: none; border-radius: 6px; }
+        .send-btn { background: #3b82f6; color: #fff; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
+        .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
+        .lume-avatar-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body>
 
-// Helper: Nếu chuỗi rỗng -> Trả về "None"
-function checkEmpty(val) {
-    if (!val || val.trim() === "") return "None";
-    return val;
-}
-
-function loadProfileData() {
-    const data = {
-        name: localStorage.getItem('stableCastUser'),
-        email: localStorage.getItem('stableCastEmail'),
-        avatar: localStorage.getItem('stableCastAvatar'),
-        cover: localStorage.getItem('stableCastCover') || "https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg",
-        role: localStorage.getItem('stableCastRole'),
-        id: localStorage.getItem('stableCastID') || "DE200247",
-        org: localStorage.getItem('stableCastOrg') || "FPT University",
-        loc: localStorage.getItem('stableCastLoc') || "Da Nang, Vietnam",
-        desc: localStorage.getItem('stableCastDesc') || "StableCast is an advanced AI-powered cryptocurrency price prediction terminal...",
-        friends: localStorage.getItem('stableCastFriends') || "0"
-    };
-    updateProfileInfo(data);
-}
-
-// --- HÀM RENDER BẠN BÈ & CLICK EVENT ---
-function renderFriendList() {
-    const container = document.getElementById('friendGridContainer');
-    if(!container) return;
-    container.innerHTML = "";
-
-    friendList.forEach((friend, index) => {
-        const div = document.createElement('div');
-        div.className = "friend-card";
-        div.style.cursor = "pointer"; // Thêm con trỏ để biết bấm được
-        
-        // Thêm sự kiện click để mở profile bạn bè
-        div.onclick = (e) => {
-            // Nếu bấm vào nút Add Friend thì không mở modal
-            if(e.target.closest('.friend-add-btn')) return;
-            openFriendModal(index);
-        };
-
-        div.innerHTML = `
-            <img src="${friend.avatar}" class="friend-card-img">
-            <div class="friend-card-info">
-                <div class="friend-card-name">${friend.name}</div>
-                <div class="friend-card-role">${friend.role}</div>
-                <div class="friend-card-mutual">${friend.mutual} mutual friends</div>
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2 id="authTitle">SYSTEM LOGIN</h2>
+            <div class="input-group"><label>EMAIL / OPERATOR ID</label><input type="text" id="email" placeholder="ENTER ID"></div>
+            <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
+            <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
+                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
             </div>
-            <button class="friend-add-btn"><i class="fas fa-user-plus"></i> Add Friend</button>
-        `;
-        container.appendChild(div);
-    });
-    
-    const countEl = document.getElementById('friendCountDisplay');
-    if(countEl) countEl.innerText = `(${friendList.length})`;
-}
+            <button id="mainAuthBtn">LOGIN</button>
+            <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
+            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
+            </div>
+        </div>
+        <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
+    </div>
 
-// --- HÀM MỞ MODAL XEM PROFILE BẠN BÈ (MỚI) ---
-function openFriendModal(index) {
-    const friend = friendList[index];
-    const modal = document.getElementById('viewFriendModal');
-    
-    // Cập nhật dữ liệu vào modal
-    document.getElementById('friend-modal-cover').style.backgroundImage = `url('${friend.cover}')`;
-    document.getElementById('friend-modal-avatar').src = friend.avatar;
-    document.getElementById('friend-modal-name').innerText = friend.name;
-    document.getElementById('friend-modal-role').innerText = friend.role;
-    document.getElementById('friend-modal-desc').innerText = friend.desc;
-    document.getElementById('friend-modal-mutual').innerText = friend.mutual;
-    
-    modal.style.display = 'flex';
-}
-
-// ============================================================
-// 1. NAV LOGIC
-// ============================================================
-const btnTerminal = document.getElementById('btn-terminal');
-const btnCommunity = document.getElementById('btn-community');
-const btnProfile = document.getElementById('btn-profile');
-const views = {
-    dashboard: document.getElementById('dashboard-view'),
-    community: document.getElementById('community-view'),
-    profile: document.getElementById('profile-view')
-};
-
-function switchView(viewName) {
-    if(btnTerminal) btnTerminal.classList.remove('active');
-    if(btnCommunity) btnCommunity.classList.remove('active');
-    if(btnProfile) btnProfile.classList.remove('active');
-    
-    if(viewName === 'dashboard' && btnTerminal) btnTerminal.classList.add('active');
-    if(viewName === 'community' && btnCommunity) btnCommunity.classList.add('active');
-    if(viewName === 'profile' && btnProfile) btnProfile.classList.add('active');
-
-    if(views.dashboard) views.dashboard.style.display = 'none';
-    if(views.community) views.community.style.display = 'none';
-    if(views.profile) views.profile.style.display = 'none';
-    
-    if(views[viewName]) views[viewName].style.display = 'block';
-}
-
-if(btnTerminal) btnTerminal.addEventListener('click', () => switchView('dashboard'));
-if(btnCommunity) btnCommunity.addEventListener('click', () => switchView('community'));
-if(btnProfile) btnProfile.addEventListener('click', () => switchView('profile'));
-
-// ============================================================
-// 2. EDIT PROFILE (CẬP NHẬT LOGIC ẢNH BÌA)
-// ============================================================
-const editProfileBtn = document.getElementById('editProfileBtn');
-const editProfileModal = document.getElementById('editProfileModal');
-const closeEditModal = document.getElementById('closeEditModal');
-const saveProfileBtn = document.getElementById('saveProfileBtn');
-const editAvatarInput = document.getElementById('editAvatarInput');
-const editCoverInput = document.getElementById('editCoverInput'); // Thêm input cover
-
-if(editProfileBtn) {
-    editProfileBtn.addEventListener('click', () => {
-        if(editProfileModal) editProfileModal.style.display = 'flex';
-        const setVal = (id, targetId) => {
-            const el = document.getElementById(id);
-            const target = document.getElementById(targetId);
-            if(el && target) el.value = target.innerText === "None" ? "" : target.innerText;
-        };
-        setVal('editNameInput', 'profile-name-txt');
-        setVal('editRoleInput', 'profile-role-txt');
-        setVal('editIDInput', 'profile-id-txt');
-        setVal('editEmailInput', 'profile-email-txt');
-        setVal('editOrgInput', 'profile-org-txt');
-        setVal('editLocInput', 'profile-loc-txt');
-        setVal('editDescInput', 'profile-desc-txt');
-    });
-}
-
-if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileModal.style.display = 'none');
-
-// Logic đóng modal xem bạn bè
-const closeFriendModal = document.getElementById('closeFriendModal');
-if(closeFriendModal) closeFriendModal.addEventListener('click', () => document.getElementById('viewFriendModal').style.display = 'none');
-
-if(saveProfileBtn) {
-    saveProfileBtn.addEventListener('click', () => {
-        const getVal = (id) => {
-            const el = document.getElementById(id);
-            return el ? checkEmpty(el.value) : "None";
-        };
-
-        const data = {
-            name: getVal('editNameInput'),
-            role: getVal('editRoleInput'),
-            id: getVal('editIDInput'),
-            email: getVal('editEmailInput'),
-            org: getVal('editOrgInput'),
-            loc: getVal('editLocInput'),
-            desc: getVal('editDescInput'),
-            avatar: null,
-            cover: null
-        };
-
-        // Hàm helper đọc file
-        const readFile = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.readAsDataURL(file);
-            });
-        };
-
-        // Xử lý song song Avatar và Cover
-        const tasks = [];
-        
-        if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
-            tasks.push(readFile(editAvatarInput.files[0]).then(res => data.avatar = res));
-        } else {
-            const img = document.getElementById('profile-avatar-img');
-            data.avatar = img ? img.src : null;
-        }
-
-        if (editCoverInput && editCoverInput.files && editCoverInput.files[0]) {
-            tasks.push(readFile(editCoverInput.files[0]).then(res => data.cover = res));
-        } else {
-            // Lấy ảnh bìa hiện tại từ style background-image
-            const coverEl = document.querySelector('.profile-cover');
-            let currentCover = coverEl.style.backgroundImage;
-            // Làm sạch chuỗi url("...")
-            if(currentCover) currentCover = currentCover.replace(/^url\(['"](.+)['"]\)/, '$1');
-            data.cover = currentCover;
-        }
-
-        Promise.all(tasks).then(() => {
-            saveAndUpdate(data);
-        });
-    });
-}
-
-function saveAndUpdate(data) {
-    updateProfileInfo(data);
-    localStorage.setItem('stableCastUser', data.name);
-    localStorage.setItem('stableCastRole', data.role);
-    localStorage.setItem('stableCastID', data.id);
-    localStorage.setItem('stableCastEmail', data.email);
-    localStorage.setItem('stableCastOrg', data.org);
-    localStorage.setItem('stableCastLoc', data.loc);
-    localStorage.setItem('stableCastDesc', data.desc);
-    if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
-    if(data.cover) localStorage.setItem('stableCastCover', data.cover);
-
-    if(editProfileModal) editProfileModal.style.display = 'none';
-    alert("Profile Updated Successfully!");
-}
-
-function updateProfileInfo(data) {
-    const setTxt = (id, val) => {
-        const el = document.getElementById(id);
-        if(el && val) el.innerText = val;
-    };
-    setTxt('profile-name-txt', data.name);
-    setTxt('profile-email-txt', data.email);
-    setTxt('profile-role-txt', data.role);
-    setTxt('profile-id-txt', data.id);
-    setTxt('profile-org-txt', data.org);
-    setTxt('profile-loc-txt', data.loc);
-    setTxt('profile-desc-txt', data.desc);
-    setTxt('stat-friends', data.friends);
-    
-    if(data.avatar) {
-        const img = document.getElementById('profile-avatar-img');
-        if(img) img.src = data.avatar;
-    }
-    // Cập nhật ảnh bìa
-    if(data.cover) {
-        const coverEl = document.querySelector('.profile-cover');
-        if(coverEl) coverEl.style.backgroundImage = `url('${data.cover}')`;
-    }
-}
-
-// ============================================================
-// 3. REAL-TIME STATS & COMMUNITY
-// ============================================================
-function startTimeTracking() {
-    let totalMinutes = parseInt(localStorage.getItem('stableCastTotalMinutes')) || 0;
-    updateTimeDisplay(totalMinutes);
-    setInterval(() => {
-        totalMinutes++;
-        localStorage.setItem('stableCastTotalMinutes', totalMinutes);
-        updateTimeDisplay(totalMinutes);
-    }, 60000);
-}
-
-function updateTimeDisplay(minutes) {
-    const el = document.getElementById('stat-hours');
-    if(!el) return;
-    if (minutes < 60) el.innerText = `${minutes}m`;
-    else el.innerText = `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
-}
-
-function renderFeed() {
-    const feedStream = document.getElementById('feedStream');
-    if(!feedStream) return;
-    feedStream.innerHTML = "";
-    
-    communityPosts.forEach(post => {
-        const postEl = document.createElement('div');
-        postEl.className = "feed-post";
-        const connectBtnHtml = post.connected 
-            ? `<span style="color:#0ecb81; font-size:0.8rem; margin-left:10px;"><i class="fas fa-check"></i> Friends</span>` 
-            : `<button class="connect-btn" onclick="window.connectUser(${post.id})"><i class="fas fa-user-plus"></i> Connect</button>`;
-
-        postEl.innerHTML = `
-            <img src="${post.avatar}" class="post-avatar">
-            <div class="post-content">
-                <div class="post-header">
-                    <div><span class="post-user">${post.name}</span><span class="post-handle">${post.handle}</span>${connectBtnHtml}</div>
+    <div class="main-app-container">
+        <header>
+            <div class="brand"><span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span><span style="font-size: 0.9rem; color:#555; font-weight:normal; margin-left: 10px;">| TEAM 1 - ADY201m</span></div>
+            <div class="header-actions">
+                <div class="nav-tabs">
+                    <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
+                    <button class="nav-btn" id="btn-community"><i class="fas fa-users"></i> COMMUNITY</button>
+                    <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
                 </div>
-                <div class="post-text">${post.text}</div>
-            </div>`;
-        feedStream.prepend(postEl);
-    });
-}
+                <button class="nav-icon-btn" id="btn-notifications"><i class="fas fa-bell"></i></button>
+            </div>
+        </header>
 
-window.connectUser = function(postId) {
-    const postIndex = communityPosts.findIndex(p => p.id === postId);
-    if (postIndex > -1 && !communityPosts[postIndex].connected) {
-        communityPosts[postIndex].connected = true;
-        let friends = parseInt(localStorage.getItem('stableCastFriends')) || 0;
-        friends++;
-        localStorage.setItem('stableCastFriends', friends);
-        document.getElementById('stat-friends').innerText = friends;
-        localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
-        renderFeed();
-    }
-}
+        <div id="dashboard-view" class="view-section active-view">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; color: #848e9c; font-size: 0.9rem; margin-bottom: 10px;"><span>MARKET OVERVIEW</span><span style="color: #f0b90b; font-weight: bold;">BINANCE: BTC/USDT</span></div>
+                    <div class="price-display" id="btcPrice">LOADING...</div>
+                    <div style="font-size: 0.8rem; margin-bottom: 15px; display: flex; gap: 20px;"><span style="color: #0ecb81;">▬ Real-time Price</span><span style="color: #3b82f6; border-bottom: 2px dashed #3b82f6;">--- AI Forecast</span></div>
+                    <div class="chart-container"><canvas id="mainChart"></canvas></div>
+                </div>
+                <div>
+                    <div class="card prediction-box"><div class="pred-label"><i class="fas fa-robot"></i> ENSEMBLE AI PREDICTION</div><div class="pred-price" id="predPrice">---</div><div style="color: #555; font-size: 0.8rem; margin-top: 5px;">Confidence Interval: 98.2%</div></div>
+                    <div class="card" style="margin-bottom: 20px;">
+                        <div class="info-row"><span class="info-label">Stop Loss (ATR)</span><span class="info-val" id="stopLoss" style="color: #f6465d;">---</span></div>
+                        <div class="info-row" style="border: none; margin-bottom: 0;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color: #0ecb81;">---</span></div>
+                    </div>
+                    <div class="card"><div class="specs-title"><i class="fas fa-microchip"></i> SYSTEM SPECIFICATIONS</div>
+                        <div class="info-row"><span class="info-label">Architecture</span><span class="spec-val-highlight">Hybrid (LSTM + XGB)</span></div>
+                        <div class="info-row"><span class="info-label">Input Shape</span><span class="spec-val-highlight">(Batch, 60, 13)</span></div>
+                        <div class="info-row"><span class="info-label">Optimization</span><span class="spec-val-highlight">Adam (Lr=0.001)</span></div>
+                        <div class="info-row" style="border:none; margin-bottom: 0;"><span class="info-label">Data Source</span><span class="spec-val-highlight">Binance WebSocket</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="logs-container" id="terminalLogs"><div class="log-entry"><span class="log-time">[SYSTEM]</span> Ready to connect...</div></div>
+        </div>
 
-const submitPostBtn = document.getElementById('submitPostBtn');
-if(submitPostBtn) {
-    submitPostBtn.addEventListener('click', () => {
-        const input = document.getElementById('postInput');
-        const text = input.value.trim();
-        if(text) {
-            const name = document.getElementById('profile-name-txt').innerText;
-            const newPost = {
-                id: Date.now(),
-                name: name,
-                handle: "@" + name.replace(/\s+/g, '').toLowerCase(),
-                avatar: document.getElementById('profile-avatar-img').src,
-                time: "Just now",
-                text: text,
-                connected: true
-            };
-            communityPosts.push(newPost);
-            localStorage.setItem('stableCastPosts', JSON.stringify(communityPosts));
-            input.value = "";
-            renderFeed();
-        }
-    });
-}
+        <div id="community-view" class="view-section">
+            <div class="feed-input-container">
+                <textarea id="postInput" class="feed-textarea" placeholder="Share your trading insights..."></textarea>
+                <button class="post-btn" id="submitPostBtn">POST</button>
+                <div style="clear:both;"></div>
+            </div>
+            <div id="feedStream"></div>
+        </div>
 
-// ============================================================
-// 4. LUME & CHAT
-// ============================================================
-const openChatBtn = document.getElementById('openChatBtn');
-const chatOverlay = document.getElementById('chatSystemOverlay');
-const closeChatBtn = document.getElementById('closeChatBtn');
-const sendMsgBtn = document.getElementById('sendMsgBtn');
-const msgInput = document.getElementById('msgInput');
-const chatContainer = document.getElementById('chatContainer');
+        <div id="profile-view" class="view-section">
+            <div class="profile-cover"></div>
+            <div class="profile-header-card">
+                <img id="profile-avatar-img" src="https://cdn-icons-png.flaticon.com/512/11498/11498793.png" class="profile-avatar">
+                <div class="profile-name" id="profile-name-txt">OPERATOR NAME</div>
+                <div class="profile-role" id="profile-role-txt">Lead Developer | FPT University</div>
+                <div class="profile-actions">
+                    <button class="action-btn" id="openChatBtn"><i class="fas fa-comment-alt"></i> Messages</button>
+                    <button class="action-btn" id="editProfileBtn"><i class="fas fa-cog"></i> Edit Profile</button>
+                </div>
+            </div>
+            <div class="profile-content">
+                <div class="info-card">
+                    <h3><i class="fas fa-id-card" style="margin-right: 10px;"></i> Contact Info</h3>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-user-circle"></i></div><div><div class="detail-text" id="profile-id-txt">DE200247</div><span class="detail-sub">Operator ID</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-envelope"></i></div><div><div class="detail-text" id="profile-email-txt">toanpbs@fpt.edu.vn</div><span class="detail-sub">Email Address</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-university"></i></div><div><div class="detail-text" id="profile-org-txt">FPT University</div><span class="detail-sub">Organization</span></div></div>
+                    <div class="detail-row"><div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div><div><div class="detail-text" id="profile-loc-txt">Da Nang, Vietnam</div><span class="detail-sub">Location</span></div></div>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle" style="margin-right: 10px;"></i> Description</h3>
+                    <p style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;" id="profile-desc-txt">StableCast is an advanced AI-powered cryptocurrency price prediction terminal...</p>
+                    <h3><i class="fas fa-users" style="margin-right: 10px;"></i> Social Stats</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div class="stat-box"><div class="stat-num" id="stat-friends">0</div><div class="stat-label">Friends</div></div>
+                        <div class="stat-box"><div class="stat-num" id="stat-hours">0m</div><div class="stat-label">Online Time</div></div>
+                        <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">98%</div><div class="stat-label">Reputation</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <h3><i class="fas fa-user-friends" style="color: #0ecb81; margin-right: 10px;"></i> Friends <span id="friendCountDisplay" style="color: #888; font-size: 0.9rem;">(0)</span></h3>
+                    <button style="background: none; border: 1px solid #333; color: #888; padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Find Friends</button>
+                </div>
+                <div class="friends-grid" id="friendGridContainer">
+                    </div>
+            </div>
+        </div>
 
-if(openChatBtn) openChatBtn.addEventListener('click', () => { if(chatOverlay) chatOverlay.style.display = 'flex'; });
-if(closeChatBtn) closeChatBtn.addEventListener('click', () => { if(chatOverlay) chatOverlay.style.display = 'none'; });
+        <div class="footer-info">© 2026 StableCast Project. FPT University.<br>Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span></div>
+    </div>
 
-function addMessage(text, type) {
-    if(!chatContainer) return;
-    const div = document.createElement('div');
-    div.className = `message ${type}`;
-    div.innerHTML = `${text}<div class="msg-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
-    chatContainer.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
+    <div id="editProfileModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header"><span>EDIT PROFILE</span><i class="fas fa-times close-modal" id="closeEditModal"></i></div>
+            <div class="modal-body">
+                <div class="modal-section-title">Visual Identity</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div>
+                        <label class="file-upload-label" for="editAvatarInput" style="display:block; border: 1px dashed #444; padding: 10px; text-align: center; cursor: pointer; color: #888; font-size: 0.8rem;"><i class="fas fa-user"></i> Change Avatar</label>
+                        <input type="file" id="editAvatarInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div>
+                        <label class="file-upload-label" for="editCoverInput" style="display:block; border: 1px dashed #444; padding: 10px; text-align: center; cursor: pointer; color: #888; font-size: 0.8rem;"><i class="fas fa-image"></i> Change Cover</label>
+                        <input type="file" id="editCoverInput" accept="image/*" style="display: none;">
+                    </div>
+                </div>
 
-function generateLumeResponse(input) {
-    const text = input.toLowerCase();
-    if (text.match(/hello|hi|hey/)) return `Hello, Operator ${document.getElementById('profile-name-txt').innerText}! Ready for some market action?`;
-    if (text.match(/price/)) return `BTC is currently at <b>$${currentPrice.toFixed(2)}</b>.`;
-    if (text.match(/buy|sell|trend/)) {
-        if(predictedPriceGlobal === 0) return "Gathering data... Ask me in a few seconds.";
-        const trend = predictedPriceGlobal > currentPrice ? "BULLISH" : "BEARISH";
-        return `My analysis indicates a <b>${trend}</b> trend targeting $${predictedPriceGlobal.toFixed(2)}.`;
-    }
-    return "I'm listening. Ask me about the price, trends, or just chat with me!";
-}
+                <div class="modal-section-title">Personal Information</div>
+                <label style="color:#888; font-size:0.8rem;">DISPLAY NAME</label><input type="text" id="editNameInput" class="form-input" placeholder="Name">
+                <label style="color:#888; font-size:0.8rem;">JOB TITLE</label><input type="text" id="editRoleInput" class="form-input" placeholder="Title">
 
-if(sendMsgBtn) {
-    const handleSend = () => {
-        const text = msgInput.value.trim();
-        if(text) {
-            addMessage(text, 'msg-out');
-            msgInput.value = '';
-            setTimeout(() => {
-                const reply = generateLumeResponse(text);
-                addMessage(reply, 'msg-in');
-            }, 1000);
-        }
-    };
-    sendMsgBtn.addEventListener('click', handleSend);
-    if(msgInput) msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
-}
+                <div class="modal-section-title">Contact Details</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><label style="color:#888; font-size:0.8rem;">OPERATOR ID</label><input type="text" id="editIDInput" class="form-input"></div>
+                    <div><label style="color:#888; font-size:0.8rem;">EMAIL</label><input type="text" id="editEmailInput" class="form-input"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><label style="color:#888; font-size:0.8rem;">ORGANIZATION</label><input type="text" id="editOrgInput" class="form-input"></div>
+                    <div><label style="color:#888; font-size:0.8rem;">LOCATION</label><input type="text" id="editLocInput" class="form-input"></div>
+                </div>
 
-// ============================================================
-// 5. CHART & CORE
-// ============================================================
-function initSystem() {
-    const logBox = document.getElementById('terminalLogs');
-    const log = (msg) => {
-        if(!logBox) return;
-        const div = document.createElement('div');
-        div.className = 'log-entry';
-        div.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
-        logBox.appendChild(div);
-        logBox.scrollTop = logBox.scrollHeight;
-    };
-    
-    log("System initialized. Welcome back.");
-    
-    const ctx = document.getElementById('mainChart');
-    if(!ctx) return; 
+                <div class="modal-section-title">Description</div>
+                <textarea id="editDescInput" class="form-textarea"></textarea>
+            </div>
+            <button class="save-btn" id="saveProfileBtn">SAVE CHANGES</button>
+        </div>
+    </div>
 
-    chart = new Chart(ctx.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: timeLabels,
-            datasets: [{
-                label: 'Real-time Price', data: priceHistory, borderColor: '#0ecb81', borderWidth: 2, tension: 0.2, pointRadius: 0
-            }, {
-                label: 'AI Ensemble Forecast', data: forecastHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], tension: 0.4, pointRadius: 0
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false, 
-            scales: { x: { display: false }, y: { position: 'right', grid: { color: '#2b3139' }, ticks: { color: '#848e9c' } } },
-            animation: false
-        }
-    });
+    <div id="viewFriendModal" class="modal-overlay" style="z-index: 10002;">
+        <div class="modal-box" style="width: 700px; max-height: 90vh;">
+            <div class="modal-header"><span>FRIEND PROFILE</span><i class="fas fa-times close-modal" id="closeFriendModal"></i></div>
+            <div class="modal-body" style="padding: 0;">
+                <div id="friend-modal-cover" style="height: 180px; width: 100%; background: #333 center/cover no-repeat; position: relative; border-bottom: 2px solid #0ecb81;"></div>
+                <div style="padding: 20px; text-align: center; margin-top: -70px;">
+                    <img id="friend-modal-avatar" src="" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #111; background: #222; object-fit: cover;">
+                    <div id="friend-modal-name" style="font-size: 1.5rem; font-weight: bold; color: #fff; margin-top: 10px;"></div>
+                    <div id="friend-modal-role" style="color: #3b82f6; font-size: 0.9rem;"></div>
+                    <p id="friend-modal-desc" style="color: #ccc; margin-top: 15px; font-size: 0.9rem; max-width: 80%; margin-left: auto; margin-right: auto;"></p>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;">
+                        <div style="text-align: center;"><div style="font-weight: bold; font-size: 1.2rem; color: #fff;" id="friend-modal-mutual">0</div><div style="font-size: 0.8rem; color: #888;">Mutual Friends</div></div>
+                        <div style="text-align: center;"><div style="font-weight: bold; font-size: 1.2rem; color: #fff;">142</div><div style="font-size: 0.8rem; color: #888;">Reputation</div></div>
+                    </div>
+                </div>
+                <div style="padding: 20px; text-align: center; background: #131722;">
+                    <button class="friend-add-btn" style="display: inline-block; padding: 10px 25px; font-size: 0.9rem;">Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    log("Connecting to Binance WebSocket...");
-    ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        const price = parseFloat(data.p);
-        
-        const priceEl = document.getElementById('btcPrice');
-        if(priceEl) {
-            if (currentPrice > 0) priceEl.style.color = price >= currentPrice ? '#0ecb81' : '#f6465d';
-            priceEl.innerText = `$${price.toFixed(2)}`;
-        }
-        currentPrice = price;
+    <div id="chatSystemOverlay" class="chat-overlay">
+        <div class="chat-window">
+            <div class="chat-sidebar">
+                <div class="chat-header"><span>MESSAGES</span><i class="fas fa-satellite-dish"></i></div>
+                <div class="friend-list">
+                    <div class="friend-item active">
+                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop" class="friend-avatar lume-avatar-glow">
+                        <div class="friend-info"><h4>Lume (AI Assistant)</h4><p>Online</p></div><div class="status-online"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-main">
+                <div class="chat-title-bar">
+                    <span id="currentChatUser" style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-robot" style="color: #3b82f6;"></i> Lume (AI Assistant)</span>
+                    <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
+                </div>
+                <div class="chat-messages" id="chatContainer">
+                    <div class="message msg-in">Hello! I am <b>Lume</b>. I can analyze the market for you. How was your day?<div class="msg-time">System</div></div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="msgInput" placeholder="Chat with Lume...">
+                    <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const slPrice = price * 0.99; 
-        const tpPrice = price * 1.015;
-
-        const slEl = document.getElementById('stopLoss');
-        const tpEl = document.getElementById('takeProfit');
-        if(slEl) slEl.innerText = `$${slPrice.toFixed(2)}`;
-        if(tpEl) tpEl.innerText = `$${tpPrice.toFixed(2)}`;
-
-        const timeNow = new Date().toLocaleTimeString();
-        if (timeLabels.length > 50) { timeLabels.shift(); priceHistory.shift(); if(forecastHistory.length > 50) forecastHistory.shift(); }
-        timeLabels.push(timeNow);
-        priceHistory.push(price);
-        if(chart) chart.update();
-    };
-
-    aiInterval = setInterval(() => {
-        if(currentPrice === 0) return;
-        const fakePrice = currentPrice + (Math.random() * 40 - 15);
-        predictedPriceGlobal = fakePrice;
-        
-        const predEl = document.getElementById('predPrice');
-        if(predEl) {
-            predEl.innerText = `$${fakePrice.toFixed(2)}`;
-            predEl.style.color = fakePrice > currentPrice ? '#0ecb81' : '#f6465d';
-        }
-        
-        forecastHistory.push(fakePrice);
-        if(forecastHistory.length > 50) forecastHistory.shift();
-        if(chart) chart.update();
-    }, 2000);
-}
-
-const mainBtn = document.getElementById('mainAuthBtn');
-if(mainBtn) {
-    mainBtn.addEventListener('click', () => {
-        const user = document.getElementById('email').value || "Guest";
-        localStorage.setItem('stableCastUser', user);
-        location.reload();
-    });
-}
+    <script type="module" src="script.js"></script>
+</body>
+</html>
