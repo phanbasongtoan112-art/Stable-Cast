@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stable Cast</title>
+    <title>StableCast | AI TRADING TERMINAL</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,6 +32,7 @@
         .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; border-radius: 20px; transition: 0.3s; }
         .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; }
         
+        /* NOTIFICATION BUTTON & DROPDOWN */
         .nav-icon-btn { background: #111; border: 1px solid #333; color: #848e9c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .nav-icon-btn:hover { color: #0ecb81; border-color: #0ecb81; }
         .notification-dropdown { display: none; position: absolute; top: 50px; right: 0; width: 300px; background: #111; border: 1px solid #333; border-radius: 8px; z-index: 5000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
@@ -55,6 +56,7 @@
         .profile-content { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 20px;}
         .info-card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
         
+        /* FRIEND GRID */
         .friends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
         .friend-card { background: #131722; border: 1px solid #2b3139; padding: 15px; border-radius: 4px; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
         .friend-card:hover { border-color: #0ecb81; }
@@ -64,59 +66,30 @@
         .friend-card-role { color: #3b82f6; font-size: 0.75rem; }
         .friend-card-mutual { color: #888; font-size: 0.75rem; }
         
+        /* ADD FRIEND BUTTON STATE */
         .friend-add-btn { background: #1f2937; color: #fff; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .friend-add-btn:hover { border-color: #3b82f6; color: #3b82f6; }
         .friend-add-btn.requested { background: #374151; color: #fbbf24; border-color: #fbbf24; }
         .friend-add-btn.connected { background: #064e3b; color: #0ecb81; border-color: #0ecb81; }
 
+        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; }
         .modal-box { background: #111; border: 1px solid #333; width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
         .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
         .form-input, .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; }
-        .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
         
-        .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
-        .chat-window { width: 950px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; }
-        .chat-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .chat-header { padding: 20px; border-bottom: 1px solid #333; font-weight: bold; color: #0ecb81; display: flex; justify-content: space-between; align-items: center; }
-        .friend-list { flex: 1; overflow-y: auto; }
-        .friend-item { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
-        .friend-item.active { background: #1f2937; border-left: 3px solid #3b82f6; }
-        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
-        .friend-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 3px; font-weight: bold; }
-        .friend-info p { font-size: 0.75rem; color: #888; }
-        .status-online { width: 8px; height: 8px; background: #0ecb81; border-radius: 50%; box-shadow: 0 0 5px #0ecb81; }
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0b0e11; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .message { max-width: 75%; padding: 12px; border-radius: 12px; font-size: 0.9rem; position: relative; }
-        .msg-in { align-self: flex-start; background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 0; }
-        .msg-out { align-self: flex-end; background: #059669; color: #fff; border-bottom-right-radius: 0; }
-        .chat-input-area { padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background: #111; }
-        .chat-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: #fff; outline: none; border-radius: 6px; }
-        .send-btn { background: #3b82f6; color: #fff; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
-        .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
-        .lume-avatar-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-
+        /* CROPPER CSS FIX */
         .cropper-modal { background-color: #000; opacity: 0.8; }
         .cropper-bg { background-image: none; background: #000; }
         
-        /* FIX FRIEND PROFILE AVATAR */
+        /* FRIEND PROFILE MODAL FIXED */
         #friend-modal-avatar { 
-            position: relative; /* Quan trọng để z-index hoạt động */
-            z-index: 5000; /* Đẩy lên cao hơn ảnh bìa */
-            margin-top: -60px;
+            position: relative; 
+            z-index: 100; /* QUAN TRỌNG: Đẩy avatar lên trên */
+            margin-top: -60px; /* Căn chỉnh lại vị trí */
             border: 4px solid #111;
             background: #222;
-        }
-        /* Container của avatar cũng cần position để đảm bảo stack context đúng */
-        #friend-modal-info-container {
-            position: relative;
-            z-index: 4000;
-            padding: 20px; 
-            text-align: center; 
-            margin-top: -70px;
         }
     </style>
 </head>
@@ -156,15 +129,6 @@
                     <div class="logs-container" id="terminalLogs"></div>
                 </div>
             </div>
-        </div>
-
-        <div id="community-view" class="view-section">
-            <div class="feed-input-container">
-                <textarea id="postInput" class="feed-textarea" placeholder="Share your trading insights..."></textarea>
-                <button class="post-btn" id="submitPostBtn">POST</button>
-                <div style="clear:both;"></div>
-            </div>
-            <div id="feedStream"></div>
         </div>
 
         <div id="profile-view" class="view-section">
@@ -241,7 +205,7 @@
                 <div class="modal-header"><span>FRIEND PROFILE</span><i class="fas fa-times close-modal" id="closeFriendModal" style="cursor:pointer;"></i></div>
                 <div class="modal-body" style="padding: 0;">
                     <div id="friend-modal-cover" style="height: 150px; width: 100%; background: #333 center/cover no-repeat; border-bottom: 2px solid #0ecb81;"></div>
-                    <div id="friend-modal-info-container">
+                    <div style="padding: 20px; text-align: center;">
                         <img id="friend-modal-avatar" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
                         <h2 id="friend-modal-name" style="color: #fff; margin: 10px 0 5px;"></h2>
                         <div id="friend-modal-role" style="color: #3b82f6; font-size: 0.9rem;"></div>
@@ -255,35 +219,7 @@
             </div>
         </div>
 
-        <div id="chatSystemOverlay" class="chat-overlay">
-            <div class="chat-window">
-                <div class="chat-sidebar">
-                    <div class="chat-header"><span>MESSAGES</span><i class="fas fa-satellite-dish"></i></div>
-                    <div class="friend-list">
-                        <div class="friend-item active">
-                            <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=200&auto=format&fit=crop" class="friend-avatar lume-avatar-glow">
-                            <div class="friend-info"><h4>Lume (AI Assistant)</h4><p>Online</p></div><div class="status-online"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="chat-main">
-                    <div class="chat-title-bar">
-                        <span id="currentChatUser" style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-robot" style="color: #3b82f6;"></i> Lume (AI Assistant)</span>
-                        <i class="fas fa-times close-chat-btn" id="closeChatBtn"></i>
-                    </div>
-                    <div class="chat-messages" id="chatContainer">
-                        <div class="message msg-in">Hello! I am <b>Lume</b>. I can analyze the market for you. How was your day?<div class="msg-time">System</div></div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" class="chat-input" id="msgInput" placeholder="Chat with Lume...">
-                        <button class="send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
