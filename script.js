@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// === CẤU HÌNH ===
+// === CẤU HÌNH === //
 const firebaseConfig = {
   apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
   authDomain: "stablecast-login.firebaseapp.com",
