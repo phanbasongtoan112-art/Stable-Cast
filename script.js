@@ -29,14 +29,14 @@ let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
     { id: 2, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate is spiking again. Difficulty adjustment incoming.", connected: false }
 ];
 
-// --- DỮ LIỆU BẠN BÈ (CẬP NHẬT THÊM COVER & DESC) ---
+// --- DỮ LIỆU BẠN BÈ ---
 const friendList = [
-    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", cover: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=500&q=60", desc: "Expert in Node.js & Microservices.", mutual: 12 },
-    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=60", desc: "Building the next gen trading algos.", mutual: 8 },
-    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=60", desc: "Converting data into profit.", mutual: 15 },
-    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=500&q=60", desc: "Keeping the terminal secure.", mutual: 5 },
-    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", cover: "https://images.unsplash.com/photo-1550439062-609e1531270e?auto=format&fit=crop&w=500&q=60", desc: "Pixel perfect interfaces.", mutual: 20 },
-    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", cover: "https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop&w=500&q=60", desc: "UI/UX Specialist for Trading Apps.", mutual: 32 }
+    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", cover: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80", desc: "Expert in Node.js & Microservices.", mutual: 12 },
+    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80", desc: "Building the next gen trading algos.", mutual: 8 },
+    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80", desc: "Converting data into profit.", mutual: 15 },
+    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80", desc: "Keeping the terminal secure.", mutual: 5 },
+    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", cover: "https://images.unsplash.com/photo-1550439062-609e1531270e?auto=format&fit=crop&w=600&q=80", desc: "Pixel perfect interfaces.", mutual: 20 },
+    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", cover: "https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop&w=600&q=80", desc: "UI/UX Specialist for Trading Apps.", mutual: 32 }
 ];
 
 // ============================================================
@@ -63,7 +63,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Helper: Nếu chuỗi rỗng -> Trả về "None"
 function checkEmpty(val) {
     if (!val || val.trim() === "") return "None";
     return val;
@@ -85,7 +84,6 @@ function loadProfileData() {
     updateProfileInfo(data);
 }
 
-// --- HÀM RENDER BẠN BÈ & CLICK EVENT ---
 function renderFriendList() {
     const container = document.getElementById('friendGridContainer');
     if(!container) return;
@@ -94,11 +92,9 @@ function renderFriendList() {
     friendList.forEach((friend, index) => {
         const div = document.createElement('div');
         div.className = "friend-card";
-        div.style.cursor = "pointer"; // Thêm con trỏ để biết bấm được
+        div.style.cursor = "pointer";
         
-        // Thêm sự kiện click để mở profile bạn bè
         div.onclick = (e) => {
-            // Nếu bấm vào nút Add Friend thì không mở modal
             if(e.target.closest('.friend-add-btn')) return;
             openFriendModal(index);
         };
@@ -119,12 +115,10 @@ function renderFriendList() {
     if(countEl) countEl.innerText = `(${friendList.length})`;
 }
 
-// --- HÀM MỞ MODAL XEM PROFILE BẠN BÈ (MỚI) ---
 function openFriendModal(index) {
     const friend = friendList[index];
     const modal = document.getElementById('viewFriendModal');
     
-    // Cập nhật dữ liệu vào modal
     document.getElementById('friend-modal-cover').style.backgroundImage = `url('${friend.cover}')`;
     document.getElementById('friend-modal-avatar').src = friend.avatar;
     document.getElementById('friend-modal-name').innerText = friend.name;
@@ -168,18 +162,21 @@ if(btnCommunity) btnCommunity.addEventListener('click', () => switchView('commun
 if(btnProfile) btnProfile.addEventListener('click', () => switchView('profile'));
 
 // ============================================================
-// 2. EDIT PROFILE (CẬP NHẬT LOGIC ẢNH BÌA)
+// 2. EDIT PROFILE & CROPPER LOGIC (CẬP NHẬT MỚI)
 // ============================================================
 const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
 const closeEditModal = document.getElementById('closeEditModal');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
-const editAvatarInput = document.getElementById('editAvatarInput');
-const editCoverInput = document.getElementById('editCoverInput'); // Thêm input cover
+const closeFriendModal = document.getElementById('closeFriendModal');
 
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
         if(editProfileModal) editProfileModal.style.display = 'flex';
+        // Reset cropper area
+        document.getElementById('cropper-container').style.display = 'none';
+        document.getElementById('edit-form-container').style.display = 'block';
+        
         const setVal = (id, targetId) => {
             const el = document.getElementById(id);
             const target = document.getElementById(targetId);
@@ -196,17 +193,100 @@ if(editProfileBtn) {
 }
 
 if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileModal.style.display = 'none');
-
-// Logic đóng modal xem bạn bè
-const closeFriendModal = document.getElementById('closeFriendModal');
 if(closeFriendModal) closeFriendModal.addEventListener('click', () => document.getElementById('viewFriendModal').style.display = 'none');
 
+// --- CROPPER VARIABLES ---
+let cropper;
+let currentCropType = ''; // 'avatar' or 'cover'
+const cropperImage = document.getElementById('cropper-image');
+const editAvatarInput = document.getElementById('editAvatarInput');
+const editCoverInput = document.getElementById('editCoverInput');
+
+// Temp storage for cropped results
+let tempAvatar = null;
+let tempCover = null;
+
+// Hàm khởi tạo crop
+function initCropper(file, type) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        cropperImage.src = e.target.result;
+        document.getElementById('edit-form-container').style.display = 'none';
+        document.getElementById('cropper-container').style.display = 'flex';
+        
+        currentCropType = type;
+        
+        if(cropper) cropper.destroy();
+        
+        // Tỷ lệ khung hình: 1:1 cho avatar, 3:1 cho cover
+        const aspectRatio = type === 'avatar' ? 1 : 3/1;
+        
+        cropper = new Cropper(cropperImage, {
+            aspectRatio: aspectRatio,
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 1,
+            background: false,
+            modal: true,
+            guides: true,
+            highlight: false,
+            cropBoxMovable: false,
+            cropBoxResizable: false,
+            toggleDragModeOnDblclick: false,
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+if(editAvatarInput) editAvatarInput.addEventListener('change', (e) => {
+    if(e.target.files && e.target.files[0]) initCropper(e.target.files[0], 'avatar');
+});
+
+if(editCoverInput) editCoverInput.addEventListener('change', (e) => {
+    if(e.target.files && e.target.files[0]) initCropper(e.target.files[0], 'cover');
+});
+
+// Nút xác nhận cắt
+document.getElementById('crop-confirm-btn').addEventListener('click', () => {
+    if(!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+        width: currentCropType === 'avatar' ? 300 : 900, // Optimize size
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+    });
+    
+    const result = canvas.toDataURL();
+    
+    if(currentCropType === 'avatar') {
+        tempAvatar = result;
+        // Hiển thị preview nhỏ (nếu muốn, hiện tại ta chỉ lưu biến temp)
+        alert("Avatar Cropped! Click 'Save Changes' to finish.");
+    } else {
+        tempCover = result;
+        alert("Cover Cropped! Click 'Save Changes' to finish.");
+    }
+    
+    // Reset view
+    document.getElementById('cropper-container').style.display = 'none';
+    document.getElementById('edit-form-container').style.display = 'block';
+    cropper.destroy();
+    cropper = null;
+});
+
+// Nút hủy cắt
+document.getElementById('crop-cancel-btn').addEventListener('click', () => {
+    document.getElementById('cropper-container').style.display = 'none';
+    document.getElementById('edit-form-container').style.display = 'block';
+    if(cropper) { cropper.destroy(); cropper = null; }
+    // Reset input
+    editAvatarInput.value = '';
+    editCoverInput.value = '';
+});
+
+// Save logic cập nhật
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
-        const getVal = (id) => {
-            const el = document.getElementById(id);
-            return el ? checkEmpty(el.value) : "None";
-        };
+        const getVal = (id) => document.getElementById(id) ? checkEmpty(document.getElementById(id).value) : "None";
 
         const data = {
             name: getVal('editNameInput'),
@@ -216,43 +296,15 @@ if(saveProfileBtn) {
             org: getVal('editOrgInput'),
             loc: getVal('editLocInput'),
             desc: getVal('editDescInput'),
-            avatar: null,
-            cover: null
+            // Ưu tiên lấy ảnh vừa crop, nếu không thì lấy ảnh cũ
+            avatar: tempAvatar || document.getElementById('profile-avatar-img').src,
+            cover: tempCover || document.querySelector('.profile-cover').style.backgroundImage.replace(/^url\(['"](.+)['"]\)/, '$1')
         };
 
-        // Hàm helper đọc file
-        const readFile = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.readAsDataURL(file);
-            });
-        };
-
-        // Xử lý song song Avatar và Cover
-        const tasks = [];
-        
-        if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
-            tasks.push(readFile(editAvatarInput.files[0]).then(res => data.avatar = res));
-        } else {
-            const img = document.getElementById('profile-avatar-img');
-            data.avatar = img ? img.src : null;
-        }
-
-        if (editCoverInput && editCoverInput.files && editCoverInput.files[0]) {
-            tasks.push(readFile(editCoverInput.files[0]).then(res => data.cover = res));
-        } else {
-            // Lấy ảnh bìa hiện tại từ style background-image
-            const coverEl = document.querySelector('.profile-cover');
-            let currentCover = coverEl.style.backgroundImage;
-            // Làm sạch chuỗi url("...")
-            if(currentCover) currentCover = currentCover.replace(/^url\(['"](.+)['"]\)/, '$1');
-            data.cover = currentCover;
-        }
-
-        Promise.all(tasks).then(() => {
-            saveAndUpdate(data);
-        });
+        saveAndUpdate(data);
+        // Reset temp
+        tempAvatar = null;
+        tempCover = null;
     });
 }
 
@@ -265,8 +317,8 @@ function saveAndUpdate(data) {
     localStorage.setItem('stableCastOrg', data.org);
     localStorage.setItem('stableCastLoc', data.loc);
     localStorage.setItem('stableCastDesc', data.desc);
-    if(data.avatar) localStorage.setItem('stableCastAvatar', data.avatar);
-    if(data.cover) localStorage.setItem('stableCastCover', data.cover);
+    localStorage.setItem('stableCastAvatar', data.avatar);
+    localStorage.setItem('stableCastCover', data.cover);
 
     if(editProfileModal) editProfileModal.style.display = 'none';
     alert("Profile Updated Successfully!");
@@ -290,7 +342,6 @@ function updateProfileInfo(data) {
         const img = document.getElementById('profile-avatar-img');
         if(img) img.src = data.avatar;
     }
-    // Cập nhật ảnh bìa
     if(data.cover) {
         const coverEl = document.querySelector('.profile-cover');
         if(coverEl) coverEl.style.backgroundImage = `url('${data.cover}')`;
