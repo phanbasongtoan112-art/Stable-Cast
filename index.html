@@ -79,6 +79,18 @@
         .stat-num { font-size: 1.5rem; color: #0ecb81; font-weight: bold; }
         .stat-label { font-size: 0.8rem; color: #848e9c; }
 
+        /* --- STYLES CHO PHẦN BẠN BÈ MỚI --- */
+        .friends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .friend-card { background: #131722; border: 1px solid #2b3139; padding: 15px; border-radius: 4px; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .friend-card:hover { border-color: #0ecb81; }
+        .friend-card-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #2b3139; }
+        .friend-card-info { flex: 1; }
+        .friend-card-name { font-weight: bold; color: #fff; font-size: 0.95rem; }
+        .friend-card-role { color: #3b82f6; font-size: 0.75rem; margin-top: 2px; }
+        .friend-card-mutual { color: #888; font-size: 0.75rem; margin-top: 2px; }
+        .friend-check-btn { background: #1f2937; color: #fff; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .friend-check-btn:hover { border-color: #0ecb81; color: #0ecb81; }
+
         /* COMMUNITY FEED (X STYLE) */
         #community-view { max-width: 800px; margin: 0 auto; }
         .feed-input-container { background: #0b0e11; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
@@ -145,7 +157,6 @@
             <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
                 <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
             </div>
-            <p id="loginMsg"></p>
         </div>
         <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
     </div>
@@ -223,6 +234,14 @@
                         <div class="stat-box"><div class="stat-num" style="color: #3b82f6;">98%</div><div class="stat-label">Reputation</div></div>
                     </div>
                 </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <h3><i class="fas fa-user-friends" style="color: #0ecb81; margin-right: 10px;"></i> Friends <span id="friendCountDisplay" style="color: #888; font-size: 0.9rem;">(0)</span></h3>
+                    <button style="background: none; border: 1px solid #333; color: #888; padding: 5px 15px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Find Friends</button>
+                </div>
+                <div class="friends-grid" id="friendGridContainer">
+                    </div>
             </div>
         </div>
 
