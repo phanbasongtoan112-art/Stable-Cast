@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// === CẤU HÌNH (Dán lại nếu bạn đổi Key) ===
+// === CẤU HÌNH (GIỮ NGUYÊN) ===
 const firebaseConfig = {
   apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
   authDomain: "stablecast-login.firebaseapp.com",
@@ -29,7 +29,7 @@ let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
     { id: 2, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate is spiking again. Difficulty adjustment incoming.", connected: false }
 ];
 
-// --- DỮ LIỆU BẠN BÈ MỚI ---
+// --- DỮ LIỆU BẠN BÈ ---
 const friendList = [
     { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", mutual: 12 },
     { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", mutual: 8 },
@@ -42,11 +42,9 @@ const friendList = [
 // ============================================================
 // 0. AUTO-LOGIN & INIT
 // ============================================================
-// Chạy khi trang load xong
 window.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('stableCastUser');
     if (savedUser) {
-        // Ẩn login ngay lập tức
         const loginOverlay = document.getElementById('loginOverlay');
         if(loginOverlay) loginOverlay.style.display = 'none';
         
@@ -57,16 +55,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
         loadProfileData();
-        renderFriendList(); // <--- GỌI HÀM RENDER BẠN BÈ
+        renderFriendList();
         startTimeTracking();
         renderFeed();
         
-        // Khởi động chart sau 1 chút để DOM ổn định
         setTimeout(() => { initSystem(); }, 500);
     }
 });
 
-// Helper: Nếu chuỗi rỗng -> Trả về "None"
 function checkEmpty(val) {
     if (!val || val.trim() === "") return "None";
     return val;
@@ -87,7 +83,7 @@ function loadProfileData() {
     updateProfileInfo(data);
 }
 
-// --- HÀM RENDER BẠN BÈ MỚI ---
+// --- HÀM RENDER BẠN BÈ (CẬP NHẬT NÚT ADD FRIEND) ---
 function renderFriendList() {
     const container = document.getElementById('friendGridContainer');
     if(!container) return;
@@ -96,6 +92,7 @@ function renderFriendList() {
     friendList.forEach(friend => {
         const div = document.createElement('div');
         div.className = "friend-card";
+        // Thay đổi nút từ "Friends" (check) sang "Add Friend" (plus)
         div.innerHTML = `
             <img src="${friend.avatar}" class="friend-card-img">
             <div class="friend-card-info">
@@ -103,20 +100,13 @@ function renderFriendList() {
                 <div class="friend-card-role">${friend.role}</div>
                 <div class="friend-card-mutual">${friend.mutual} mutual friends</div>
             </div>
-            <button class="friend-check-btn"><i class="fas fa-check"></i> Friends</button>
+            <button class="friend-add-btn"><i class="fas fa-user-plus"></i> Add Friend</button>
         `;
         container.appendChild(div);
     });
     
-    // Cập nhật số lượng bạn bè hiển thị
     const countEl = document.getElementById('friendCountDisplay');
     if(countEl) countEl.innerText = `(${friendList.length})`;
-    
-    // Cập nhật thống kê social
-    const statFriendEl = document.getElementById('stat-friends');
-    if(statFriendEl && (statFriendEl.innerText === "0" || statFriendEl.innerText === "")) {
-        statFriendEl.innerText = friendList.length;
-    }
 }
 
 // ============================================================
@@ -152,7 +142,7 @@ if(btnCommunity) btnCommunity.addEventListener('click', () => switchView('commun
 if(btnProfile) btnProfile.addEventListener('click', () => switchView('profile'));
 
 // ============================================================
-// 2. EDIT PROFILE (Handling "None")
+// 2. EDIT PROFILE
 // ============================================================
 const editProfileBtn = document.getElementById('editProfileBtn');
 const editProfileModal = document.getElementById('editProfileModal');
@@ -163,7 +153,6 @@ const editAvatarInput = document.getElementById('editAvatarInput');
 if(editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
         if(editProfileModal) editProfileModal.style.display = 'flex';
-        // Pre-fill inputs safely
         const setVal = (id, targetId) => {
             const el = document.getElementById(id);
             const target = document.getElementById(targetId);
@@ -183,7 +172,6 @@ if(closeEditModal) closeEditModal.addEventListener('click', () => editProfileMod
 
 if(saveProfileBtn) {
     saveProfileBtn.addEventListener('click', () => {
-        // Collect Data with checkEmpty
         const getVal = (id) => {
             const el = document.getElementById(id);
             return el ? checkEmpty(el.value) : "None";
@@ -200,7 +188,6 @@ if(saveProfileBtn) {
             avatar: null
         };
 
-        // Handle Avatar
         if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -295,7 +282,6 @@ function renderFeed() {
     });
 }
 
-// Global function for onclick
 window.connectUser = function(postId) {
     const postIndex = communityPosts.findIndex(p => p.id === postId);
     if (postIndex > -1 && !communityPosts[postIndex].connected) {
@@ -373,7 +359,6 @@ if(sendMsgBtn) {
         if(text) {
             addMessage(text, 'msg-out');
             msgInput.value = '';
-            // Bot typing effect
             setTimeout(() => {
                 const reply = generateLumeResponse(text);
                 addMessage(reply, 'msg-in');
@@ -433,6 +418,18 @@ function initSystem() {
         }
         currentPrice = price;
 
+        // --- TÍNH TOÁN SL/TP (CẬP NHẬT MỚI) ---
+        // Stop Loss: -1% giá hiện tại
+        // Take Profit: +1.5% giá hiện tại
+        const slPrice = price * 0.99; 
+        const tpPrice = price * 1.015;
+
+        const slEl = document.getElementById('stopLoss');
+        const tpEl = document.getElementById('takeProfit');
+        if(slEl) slEl.innerText = `$${slPrice.toFixed(2)}`;
+        if(tpEl) tpEl.innerText = `$${tpPrice.toFixed(2)}`;
+        // ------------------------------------
+
         const timeNow = new Date().toLocaleTimeString();
         if (timeLabels.length > 50) { timeLabels.shift(); priceHistory.shift(); if(forecastHistory.length > 50) forecastHistory.shift(); }
         timeLabels.push(timeNow);
@@ -443,7 +440,6 @@ function initSystem() {
     // AI Simulation
     aiInterval = setInterval(() => {
         if(currentPrice === 0) return;
-        // Mock prediction logic since we don't have backend
         const fakePrice = currentPrice + (Math.random() * 40 - 15);
         predictedPriceGlobal = fakePrice;
         
@@ -459,13 +455,11 @@ function initSystem() {
     }, 2000);
 }
 
-// Login Button Logic
 const mainBtn = document.getElementById('mainAuthBtn');
 if(mainBtn) {
     mainBtn.addEventListener('click', () => {
-        // Simplified Login for Demo
         const user = document.getElementById('email').value || "Guest";
         localStorage.setItem('stableCastUser', user);
-        location.reload(); // Reload to trigger auto-login
+        location.reload();
     });
 }
