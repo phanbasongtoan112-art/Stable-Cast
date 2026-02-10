@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// === CẤU HÌNH === //
+// === CẤU HÌNH ===
 const firebaseConfig = {
   apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
   authDomain: "stablecast-login.firebaseapp.com",
@@ -276,8 +276,7 @@ function initCropper(file, type) {
         
         const aspectRatio = type === 'avatar' ? 1 : 3.5; // Tỉ lệ 3.5 cho ảnh bìa
         
-        // Sử dụng window.Cropper để đảm bảo library đã load
-        cropper = new window.Cropper(cropperImage, {
+        cropper = new Cropper(cropperImage, {
             aspectRatio: aspectRatio,
             viewMode: 1,
             autoCropArea: 1,
