@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* === RESET & BASE === */
+        /* === RESET & BASE (GIỮ NGUYÊN) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
         body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
         ::-webkit-scrollbar { width: 8px; }
@@ -18,7 +18,7 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
 
-        /* === LOGIN === */
+        /* === LOGIN (GIỮ NGUYÊN) === */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
@@ -32,19 +32,23 @@
         .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
         #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
 
-        /* === MAIN UI === */
+        /* === MAIN UI (CẬP NHẬT HEADER) === */
         .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; } /* Container mới cho nav và nút thông báo */
         .nav-tabs { display: flex; gap: 15px; background: #111; padding: 5px; border-radius: 30px; border: 1px solid #333; }
         .nav-btn { background: none; border: none; color: #848e9c; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 20px; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
+        /* Style mới cho nút thông báo */
+        .nav-icon-btn { background: #111; border: 1px solid #333; color: #848e9c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .nav-icon-btn:hover { color: #0ecb81; border-color: #0ecb81; }
 
-        /* VIEWS */
+        /* VIEWS (GIỮ NGUYÊN) */
         .view-section { display: none; }
         .view-section.active-view { display: block; }
 
-        /* DASHBOARD */
+        /* DASHBOARD (GIỮ NGUYÊN) */
         .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
         .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
         .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
@@ -59,7 +63,7 @@
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-time { color: #555; margin-right: 10px; }
 
-        /* PROFILE */
+        /* PROFILE (GIỮ NGUYÊN) */
         .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
         .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; position: relative; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
         .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; box-shadow: 0 0 20px rgba(14, 203, 129, 0.3); }
@@ -79,7 +83,7 @@
         .stat-num { font-size: 1.5rem; color: #0ecb81; font-weight: bold; }
         .stat-label { font-size: 0.8rem; color: #848e9c; }
 
-        /* --- STYLES CHO PHẦN BẠN BÈ MỚI --- */
+        /* --- STYLES CHO PHẦN BẠN BÈ MỚI (CẬP NHẬT TÊN CLASS) --- */
         .friends-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
         .friend-card { background: #131722; border: 1px solid #2b3139; padding: 15px; border-radius: 4px; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
         .friend-card:hover { border-color: #0ecb81; }
@@ -88,10 +92,11 @@
         .friend-card-name { font-weight: bold; color: #fff; font-size: 0.95rem; }
         .friend-card-role { color: #3b82f6; font-size: 0.75rem; margin-top: 2px; }
         .friend-card-mutual { color: #888; font-size: 0.75rem; margin-top: 2px; }
-        .friend-check-btn { background: #1f2937; color: #fff; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .friend-check-btn:hover { border-color: #0ecb81; color: #0ecb81; }
+        /* Đổi tên class từ friend-check-btn thành friend-add-btn và cập nhật style */
+        .friend-add-btn { background: #1f2937; color: #fff; border: 1px solid #333; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .friend-add-btn:hover { border-color: #3b82f6; color: #3b82f6; background: #1a1a1a; } /* Hover màu xanh dương cho hành động thêm */
 
-        /* COMMUNITY FEED (X STYLE) */
+        /* COMMUNITY FEED (GIỮ NGUYÊN) */
         #community-view { max-width: 800px; margin: 0 auto; }
         .feed-input-container { background: #0b0e11; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         .feed-textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 4px; resize: none; outline: none; min-height: 80px; font-size: 1rem; }
@@ -105,7 +110,7 @@
         .connect-btn { border: 1px solid #3b82f6; color: #3b82f6; background: none; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; }
         .connect-btn:hover { background: #3b82f6; color: #fff; }
 
-        /* MODAL EDIT */
+        /* MODAL EDIT (GIỮ NGUYÊN) */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-box { background: #111; border: 1px solid #333; padding: 0; width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 20px; background: #131722; border-bottom: 1px solid #333; font-weight: bold; color: #fff; display: flex; justify-content: space-between; }
@@ -116,7 +121,7 @@
         .form-textarea { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; outline: none; border-radius: 4px; height: 80px; resize: none; }
         .save-btn { width: 100%; padding: 15px; background: #0ecb81; color: #000; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
         
-        /* CHAT */
+        /* CHAT (GIỮ NGUYÊN) */
         .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; display: none; align-items: center; justify-content: center; }
         .chat-window { width: 950px; height: 650px; background: #0b0e11; border: 1px solid #333; display: flex; border-radius: 8px; overflow: hidden; }
         .chat-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
@@ -164,10 +169,13 @@
     <div class="main-app-container">
         <header>
             <div class="brand"><span style="color: #3b82f6;">Stable</span><span style="color: #0ecb81;">Cast</span><span style="font-size: 0.9rem; color:#555; font-weight:normal; margin-left: 10px;">| TEAM 1 - ADY201m</span></div>
-            <div class="nav-tabs">
-                <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
-                <button class="nav-btn" id="btn-community"><i class="fas fa-users"></i> COMMUNITY</button>
-                <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
+            <div class="header-actions">
+                <div class="nav-tabs">
+                    <button class="nav-btn active" id="btn-terminal"><i class="fas fa-chart-line"></i> TERMINAL</button>
+                    <button class="nav-btn" id="btn-community"><i class="fas fa-users"></i> COMMUNITY</button>
+                    <button class="nav-btn" id="btn-profile"><i class="fas fa-user-astronaut"></i> PROFILE</button>
+                </div>
+                <button class="nav-icon-btn" id="btn-notifications"><i class="fas fa-bell"></i></button>
             </div>
         </header>
 
