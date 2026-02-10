@@ -29,6 +29,16 @@ let communityPosts = JSON.parse(localStorage.getItem('stableCastPosts')) || [
     { id: 2, name: "Bob Miner", handle: "@miner_bob", avatar: "https://i.pravatar.cc/150?img=11", time: "4h ago", text: "Hashrate is spiking again. Difficulty adjustment incoming.", connected: false }
 ];
 
+// --- DỮ LIỆU BẠN BÈ MỚI ---
+const friendList = [
+    { name: "Nguyễn Quốc Đạt", role: "Backend Dev", avatar: "https://i.pravatar.cc/150?u=1", mutual: 12 },
+    { name: "Trần Thái Sơn", role: "AI Researcher", avatar: "https://i.pravatar.cc/150?u=2", mutual: 8 },
+    { name: "Lê Minh Quân", role: "Data Analyst", avatar: "https://i.pravatar.cc/150?u=3", mutual: 15 },
+    { name: "Phạm Gia Huy", role: "Security Ops", avatar: "https://i.pravatar.cc/150?u=4", mutual: 5 },
+    { name: "Nguyễn Văn Tân", role: "Frontend Dev", avatar: "https://i.pravatar.cc/150?u=5", mutual: 20 },
+    { name: "Đỗ Thu Hiền", role: "Designer", avatar: "https://i.pravatar.cc/150?u=9", mutual: 32 }
+];
+
 // ============================================================
 // 0. AUTO-LOGIN & INIT
 // ============================================================
@@ -47,6 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
         loadProfileData();
+        renderFriendList(); // <--- GỌI HÀM RENDER BẠN BÈ
         startTimeTracking();
         renderFeed();
         
@@ -74,6 +85,38 @@ function loadProfileData() {
         friends: localStorage.getItem('stableCastFriends') || "0"
     };
     updateProfileInfo(data);
+}
+
+// --- HÀM RENDER BẠN BÈ MỚI ---
+function renderFriendList() {
+    const container = document.getElementById('friendGridContainer');
+    if(!container) return;
+    container.innerHTML = "";
+
+    friendList.forEach(friend => {
+        const div = document.createElement('div');
+        div.className = "friend-card";
+        div.innerHTML = `
+            <img src="${friend.avatar}" class="friend-card-img">
+            <div class="friend-card-info">
+                <div class="friend-card-name">${friend.name}</div>
+                <div class="friend-card-role">${friend.role}</div>
+                <div class="friend-card-mutual">${friend.mutual} mutual friends</div>
+            </div>
+            <button class="friend-check-btn"><i class="fas fa-check"></i> Friends</button>
+        `;
+        container.appendChild(div);
+    });
+    
+    // Cập nhật số lượng bạn bè hiển thị
+    const countEl = document.getElementById('friendCountDisplay');
+    if(countEl) countEl.innerText = `(${friendList.length})`;
+    
+    // Cập nhật thống kê social
+    const statFriendEl = document.getElementById('stat-friends');
+    if(statFriendEl && (statFriendEl.innerText === "0" || statFriendEl.innerText === "")) {
+        statFriendEl.innerText = friendList.length;
+    }
 }
 
 // ============================================================
