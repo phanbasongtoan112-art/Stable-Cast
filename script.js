@@ -230,8 +230,8 @@ function initCropper(file, type) {
             modal: true,
             guides: true,
             highlight: false,
-            cropBoxMovable: false,
-            cropBoxResizable: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
             toggleDragModeOnDblclick: false,
         });
     };
@@ -259,7 +259,6 @@ document.getElementById('crop-confirm-btn').addEventListener('click', () => {
     
     if(currentCropType === 'avatar') {
         tempAvatar = result;
-        // Hiển thị preview nhỏ (nếu muốn, hiện tại ta chỉ lưu biến temp)
         alert("Avatar Cropped! Click 'Save Changes' to finish.");
     } else {
         tempCover = result;
