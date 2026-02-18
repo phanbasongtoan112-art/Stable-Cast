@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast | PRO QUANTUM TERMINAL</title>
+    <title>StableCast | TEAM 1 - ADY201m</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,107 +11,143 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CONFIG CAO CẤP --- */
+        /* --- CONFIG --- */
         :root {
             --bg-color: #050505;
             --panel-bg: #0b0c10;
             --border-color: #1f2937;
             --text-main: #e5e7eb;
             --text-muted: #6b7280;
-            --up-color: #10b981; /* Green */
-            --down-color: #ef4444; /* Red */
+            --up-color: #0ecb81; /* Binance Green */
+            --down-color: #f6465d; /* Binance Red */
             --accent-color: #3b82f6; /* Blue */
-            --gold-color: #f59e0b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
-        /* --- LOGIN (GIỮ NGUYÊN) --- */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { width: 450px; padding: 40px; background: #0a0a0a; border: 1px solid #333; text-align: center; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; outline: none; }
-        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: var(--up-color); color: #000; font-weight: bold; border: none; cursor: pointer; }
+        /* =========================================
+           1. LOGIN SCREEN (CLASSIC STYLE - RESTORED)
+           ========================================= */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         
-        /* --- MAIN LAYOUT --- */
+        .login-box { 
+            width: 420px; padding: 40px; background: #111; border: 1px solid #333; 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); text-align: center; 
+        }
+        
+        .login-box h2 { 
+            color: #fff; margin-bottom: 30px; letter-spacing: 2px; 
+            border-bottom: 2px solid var(--up-color); display: inline-block; padding-bottom: 10px; 
+            font-family: 'JetBrains Mono', monospace; /* Giữ font hệ thống cho phần Login */
+        }
+        
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; color: #848e9c; font-size: 0.75rem; margin-bottom: 5px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: var(--up-color); font-size: 1rem; outline: none; transition: border 0.3s; font-family: 'JetBrains Mono', monospace;}
+        .input-group input:focus { border-color: var(--up-color); }
+        
+        /* Nút Login Xanh chuẩn cũ */
+        button#mainAuthBtn { 
+            width: 100%; padding: 12px; margin-top: 10px; 
+            background: var(--up-color); color: #000; font-weight: bold; 
+            border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; 
+            font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+        }
+        button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
+        
+        .toggle-auth { margin-top: 20px; font-size: 0.75rem; color: #888; cursor: pointer; text-decoration: underline; }
+        #loginMsg { margin-top: 20px; font-size: 0.85rem; min-height: 20px; }
+        .secure-text { margin-top: 20px; color: #444; font-size: 0.7rem; letter-spacing: 1px; }
+
+        /* =========================================
+           2. MAIN INTERFACE (PRO STYLE)
+           ========================================= */
         .main-app { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 1s; }
         
-        /* HEADER */
+        /* Header */
         header { height: 60px; background: var(--panel-bg); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
         .brand { font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; font-weight: bold; letter-spacing: 1px; color: #fff; }
         .brand span { color: var(--accent-color); }
         .market-ticker { display: flex; gap: 20px; font-size: 0.85rem; }
         .ticker-item { display: flex; gap: 8px; }
-        .status-dot { width: 8px; height: 8px; background: var(--up-color); border-radius: 50%; box-shadow: 0 0 10px var(--up-color); }
 
-        /* DASHBOARD GRID */
+        /* Grid */
         .grid-container { flex: 1; display: grid; grid-template-columns: 280px 1fr 320px; gap: 1px; background: var(--border-color); overflow: hidden; }
         .panel { background: var(--bg-color); padding: 15px; overflow-y: auto; display: flex; flex-direction: column; }
-        
-        /* --- LEFT PANEL: ORDER BOOK & INFO --- */
         .panel-header { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
-        
-        .order-book { font-size: 0.75rem; }
-        .ob-row { display: flex; justify-content: space-between; margin-bottom: 2px; padding: 2px 0; }
-        .bg-red-soft { background: rgba(239, 68, 68, 0.1); }
-        .bg-green-soft { background: rgba(16, 185, 129, 0.1); }
-        
-        /* --- CENTER PANEL: CHARTS --- */
+
+        /* Order Book */
+        .ob-row { display: flex; justify-content: space-between; margin-bottom: 2px; padding: 2px 0; font-size: 0.75rem; }
+        .bg-red-soft { background: rgba(246, 70, 93, 0.1); }
+        .bg-green-soft { background: rgba(14, 203, 129, 0.1); }
+
+        /* Chart Area */
         .chart-wrapper { flex: 2; position: relative; min-height: 0; }
         .indicator-wrapper { flex: 1; position: relative; min-height: 0; border-top: 1px solid var(--border-color); padding-top: 10px; }
-        
-        .price-overlay { position: absolute; top: 20px; left: 20px; z-index: 10; }
-        .main-price { font-size: 3rem; font-weight: bold; color: var(--up-color); font-family: 'Rajdhani', sans-serif; }
-        .price-change { font-size: 1rem; margin-left: 10px; }
+        .price-overlay { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
+        .main-price { font-size: 3.5rem; font-weight: bold; color: var(--up-color); font-family: 'Rajdhani', sans-serif; line-height: 1; }
+        .price-change { font-size: 1rem; margin-left: 5px; font-family: 'JetBrains Mono', monospace; }
 
-        /* --- RIGHT PANEL: AI BRAIN --- */
+        /* Right Panel */
         .ai-confidence { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border-color); }
-        .conf-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--border-color); margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        .conf-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--border-color); margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .conf-value { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
-        .conf-label { font-size: 0.7rem; color: var(--text-muted); }
         
         .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; }
         .news-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #222; }
         .news-title { font-size: 0.85rem; font-weight: bold; color: #fff; margin-bottom: 4px; line-height: 1.3; }
-        .news-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .news-meta { font-size: 0.65rem; color: var(--text-muted); display: flex; justify-content: space-between; }
         .sentiment-tag { padding: 2px 6px; border-radius: 2px; font-size: 0.65rem; font-weight: bold; }
-        .sent-pos { background: rgba(16, 185, 129, 0.2); color: var(--up-color); }
-        .sent-neg { background: rgba(239, 68, 68, 0.2); color: var(--down-color); }
+        .sent-pos { background: rgba(14, 203, 129, 0.2); color: var(--up-color); }
+        .sent-neg { background: rgba(246, 70, 93, 0.2); color: var(--down-color); }
 
-        .signal-box { background: #111; padding: 15px; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 15px; text-align: center; }
-        .signal-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; }
-        
-        /* Animations */
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
-        .live-dot { animation: pulse 2s infinite; }
+        /* Footer Disclaimer */
+        .project-footer {
+            background: #080808; border-top: 1px solid #222; padding: 10px 20px; text-align: center;
+            font-size: 0.7rem; color: #555; line-height: 1.4;
+        }
+        .highlight-text { color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h2 style="font-family: 'Rajdhani'; letter-spacing: 3px; color: var(--accent-color);">QUANTUM ACCESS</h2>
-            <div class="input-group"><label>OPERATOR ID</label><input type="text" id="email" placeholder="ADMIN"></div>
-            <div class="input-group"><label>SECURE KEY</label><input type="password" id="password" placeholder="••••••"></div>
-            <div id="loginMsg" style="color:var(--down-color); font-size:0.8rem; height:20px; margin-bottom:10px;"></div>
-            <button id="mainAuthBtn">INITIALIZE TERMINAL</button>
-            <div class="toggle-auth" id="toggleAuthBtn" style="margin-top:15px; font-size:0.7rem; color:#666; cursor:pointer;">REQUEST NEW ID</div>
+            <h2 id="authTitle">SYSTEM LOGIN</h2>
+            
+            <div class="input-group">
+                <label>EMAIL / OPERATOR ID</label>
+                <input type="text" id="email" placeholder="ENTER ID">
+            </div>
+            
+            <div class="input-group">
+                <label>PASSCODE</label>
+                <input type="password" id="password" placeholder="••••••">
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
+                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
+            </div>
+            
+            <div id="loginMsg" style="color:var(--down-color);"></div>
+            
+            <button id="mainAuthBtn">LOGIN</button>
+            <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
         </div>
+        <div class="secure-text">SECURE CONNECTION V2.0</div>
     </div>
 
     <div class="main-app" id="mainApp">
         <header>
-            <div class="brand"><i class="fas fa-cube"></i> STABLE<span>CAST</span> <sup style="font-size:0.6rem; color:#666;">PRO v4.0</sup></div>
+            <div class="brand"><i class="fas fa-cube"></i> STABLE<span>CAST</span> <sup style="font-size:0.6rem; color:#888; border:1px solid #333; padding:2px 5px; border-radius:3px;">TEAM 1 - ADY201m</sup></div>
             <div class="market-ticker">
                 <div class="ticker-item"><span style="color:#666;">BTC Vol:</span> <b>$42.5B</b></div>
                 <div class="ticker-item"><span style="color:#666;">Dominance:</span> <b>52.1%</b></div>
-                <div class="ticker-item"><span style="color:#666;">Gas:</span> <b>15 Gwei</b></div>
                 <div class="ticker-item" style="color:var(--up-color);"><i class="fas fa-wifi"></i> CONNECTED</div>
             </div>
         </header>
@@ -119,10 +155,7 @@
         <div class="grid-container">
             <div class="panel">
                 <div class="panel-header"><span>Order Book (BTC/USDT)</span> <i class="fas fa-list"></i></div>
-                <div class="order-book" id="orderBook">
-                    </div>
-                
-                <div class="panel-header" style="margin-top:20px;"><span>System Stats</span> <i class="fas fa-microchip"></i></div>
+                <div id="orderBook" style="font-family:'JetBrains Mono'"></div> <div class="panel-header" style="margin-top:20px;"><span>System Specs</span> <i class="fas fa-server"></i></div>
                 <div style="font-size:0.8rem; color:#888;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Latency</span> <span style="color:var(--up-color)">12ms</span></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Model RAM</span> <span>14.2 GB</span></div>
@@ -135,7 +168,7 @@
                     <div class="price-overlay">
                         <div style="font-size:0.8rem; color:#888; font-weight:bold;">BTC/USDT PERPETUAL</div>
                         <div class="main-price" id="mainPrice">43,250.00</div>
-                        <div id="priceChange" style="font-weight:bold;">+1.2%</div>
+                        <div id="priceChange" style="color:var(--up-color); font-weight:bold;">+1.2%</div>
                     </div>
                     <canvas id="priceChart"></canvas>
                 </div>
@@ -147,295 +180,212 @@
 
             <div class="panel">
                 <div class="panel-header"><span>AI Prediction Engine</span> <i class="fas fa-brain"></i></div>
-                
                 <div class="ai-confidence">
                     <div class="conf-circle" style="border-color: var(--accent-color)">
                         <div class="conf-value" id="aiConf">88%</div>
                         <div class="conf-label">CONFIDENCE</div>
                     </div>
                 </div>
-
-                <div class="signal-box" id="signalBox">
-                    <div style="font-size:0.7rem; color:#888; margin-bottom:5px;">RECOMMENDED ACTION</div>
-                    <div class="signal-text" id="aiSignal" style="color: #fff;">HOLD</div>
+                <div id="signalBox" style="background:#111; padding:15px; border:1px solid #333; border-radius:4px; margin-top:15px; text-align:center;">
+                    <div style="font-size:0.7rem; color:#888;">RECOMMENDED ACTION</div>
+                    <div id="aiSignal" style="font-size:1.5rem; font-weight:bold; letter-spacing:2px; color:#fff;">HOLD</div>
                 </div>
-
-                <div class="panel-header" style="margin-top:20px;"><span>Global Sentiment Analysis</span> <i class="fas fa-newspaper"></i></div>
-                <div class="news-feed" id="newsFeed">
-                    </div>
+                <div class="panel-header" style="margin-top:20px;"><span>Market Sentiment</span> <i class="fas fa-globe"></i></div>
+                <div class="news-feed" id="newsFeed"></div>
             </div>
+        </div>
+
+        <div class="project-footer">
+            <span class="highlight-text">DISCLAIMER:</span> This project is developed for educational purposes within the <span class="highlight-text">ADY201m course (FPT University)</span>. 
+            All data, market indicators, and AI predictions are simulated for demonstration only and do not hold real-world financial value. 
+            Not intended for actual trading or investment advice. &copy; 2026 Team 1.
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. SETUP LOGIN (GIỮ NGUYÊN) ---
+            // --- AUTH LOGIC (OLD STYLE) ---
             const loginOverlay = document.getElementById('loginOverlay');
             const mainApp = document.getElementById('mainApp');
             const btnLogin = document.getElementById('mainAuthBtn');
             const toggleBtn = document.getElementById('toggleAuthBtn');
+            const title = document.getElementById('authTitle');
             const msg = document.getElementById('loginMsg');
             let isRegister = false;
 
             toggleBtn.addEventListener('click', () => {
                 isRegister = !isRegister;
                 msg.textContent = "";
-                btnLogin.textContent = isRegister ? "REGISTER NEW ID" : "INITIALIZE TERMINAL";
-                toggleBtn.textContent = isRegister ? "RETURN TO LOGIN" : "REQUEST NEW ID";
+                if(isRegister) {
+                    title.textContent = "SYSTEM REGISTER";
+                    btnLogin.textContent = "REGISTER ACCESS";
+                    toggleBtn.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
+                    btnLogin.style.background = "#3b82f6"; // Xanh dương cho Register
+                    title.style.borderBottomColor = "#3b82f6";
+                } else {
+                    title.textContent = "SYSTEM LOGIN";
+                    btnLogin.textContent = "LOGIN";
+                    toggleBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
+                    btnLogin.style.background = "#0ecb81"; // Xanh lá cho Login
+                    title.style.borderBottomColor = "#0ecb81";
+                }
             });
 
             btnLogin.addEventListener('click', () => {
                 const u = document.getElementById('email').value;
                 const p = document.getElementById('password').value;
-                if(!u || !p) { msg.textContent = "MISSING CREDENTIALS"; return; }
                 
-                // Vào thẳng app luôn cho nhanh để demo
-                msg.style.color = "#10b981";
-                msg.textContent = "ACCESS GRANTED. LOADING MODULES...";
+                // Guest Mode (Empty Login)
+                if(!u && !p && !isRegister) {
+                    enterApp(); return;
+                }
+
+                if(!u || !p) { msg.textContent = "Please enter credentials."; return; }
                 
+                if(isRegister) {
+                    msg.style.color = "#3b82f6";
+                    msg.textContent = "Registration Success! Please Login.";
+                    setTimeout(() => toggleBtn.click(), 1000);
+                } else {
+                    // Chấp nhận mọi user/pass để demo
+                    enterApp();
+                }
+            });
+
+            function enterApp() {
+                msg.style.color = "#0ecb81";
+                msg.textContent = "AUTHENTICATION SUCCESSFUL...";
                 setTimeout(() => {
                     loginOverlay.style.opacity = 0;
                     setTimeout(() => {
                         loginOverlay.style.display = 'none';
                         mainApp.style.display = 'flex';
                         setTimeout(() => mainApp.style.opacity = 1, 100);
-                        startProfessionalSimulation(); // Bắt đầu chạy hệ thống Pro
+                        startCoreEngine(); // Kích hoạt hệ thống
                     }, 500);
-                }, 1000);
-            });
+                }, 800);
+            }
 
-            // --- 2. HỆ THỐNG GIẢ LẬP CHUYÊN NGHIỆP (CORE ENGINE) ---
-            function startProfessionalSimulation() {
-                
-                // A. KHỞI TẠO DỮ LIỆU
+            // --- CORE ENGINE (SIMULATION) ---
+            function startCoreEngine() {
+                // 1. Init Data
                 let price = 43250.00;
-                const historySize = 100;
-                let prices = Array.from({length: historySize}, () => {
+                let history = Array.from({length: 100}, () => {
                     price += (Math.random() - 0.5) * 100;
                     return price;
                 });
-                let labels = Array.from({length: historySize}, (_,i) => i);
+                let labels = Array.from({length: 100}, (_,i) => i);
 
-                // B. CẤU HÌNH BIỂU ĐỒ (Chart.js)
-                const ctxPrice = document.getElementById('priceChart').getContext('2d');
-                const priceChart = new Chart(ctxPrice, {
+                // 2. Charts
+                const ctxP = document.getElementById('priceChart').getContext('2d');
+                const pChart = new Chart(ctxP, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Price',
-                            data: prices,
-                            borderColor: '#10b981',
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            fill: true,
+                            label: 'Price', data: history, borderColor: '#0ecb81', borderWidth: 2, pointRadius: 0, fill: true,
                             backgroundColor: (ctx) => {
                                 const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400);
-                                grad.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-                                grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                                grad.addColorStop(0, 'rgba(14, 203, 129, 0.2)'); grad.addColorStop(1, 'rgba(14, 203, 129, 0)');
                                 return grad;
-                            },
-                            tension: 0.4
+                            }
                         }, {
-                            label: 'EMA 20', // Đường trung bình động
-                            data: calculateEMA(prices, 20),
-                            borderColor: '#f59e0b',
-                            borderWidth: 1,
-                            pointRadius: 0,
-                            tension: 0.4
+                            label: 'EMA', data: calcEMA(history, 20), borderColor: '#f59e0b', borderWidth: 1, pointRadius: 0
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: false,
-                        plugins: { legend: {display: false} },
-                        scales: { x: {display: false}, y: {position:'right', grid:{color:'#1f2937'}} }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', grid:{color:'#1f2937'}}} }
                 });
 
-                const ctxInd = document.getElementById('indicatorChart').getContext('2d');
-                const indChart = new Chart(ctxInd, {
+                const ctxI = document.getElementById('indicatorChart').getContext('2d');
+                const iChart = new Chart(ctxI, {
                     type: 'line',
                     data: {
                         labels: labels,
-                        datasets: [{
-                            label: 'RSI',
-                            data: calculateRSI(prices),
-                            borderColor: '#3b82f6',
-                            borderWidth: 1.5,
-                            pointRadius: 0,
-                            tension: 0.1
-                        }]
+                        datasets: [{ label: 'RSI', data: calcRSI(history), borderColor: '#3b82f6', borderWidth: 1.5, pointRadius: 0 }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: false,
-                        plugins: { legend: {display: false} },
-                        scales: { x: {display: false}, y: {position:'right', min: 0, max: 100, grid:{color:'#1f2937'}} }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', min:0, max:100, grid:{color:'#1f2937'}}} }
                 });
 
-                // C. VÒNG LẶP CHÍNH (MAIN LOOP - 1s/lần)
+                // 3. Loop (1s)
                 setInterval(() => {
-                    // 1. Tạo biến động giá (Random Walk có xu hướng)
-                    const lastPrice = prices[prices.length-1];
-                    const volatility = (Math.random() - 0.5) * 80;
-                    let newPrice = lastPrice + volatility;
+                    const last = history[history.length-1];
+                    const change = (Math.random() - 0.5) * 80;
+                    let next = last + change;
                     
-                    // Logic chống trôi giá quá xa
-                    if(newPrice < 40000) newPrice += 50;
-                    if(newPrice > 46000) newPrice -= 50;
-
-                    // Cập nhật mảng dữ liệu
-                    prices.shift(); prices.push(newPrice);
+                    history.shift(); history.push(next);
                     labels.shift(); labels.push(labels[labels.length-1]+1);
 
-                    // 2. Tính toán lại Indicators (Logic thật)
-                    const rsiData = calculateRSI(prices);
-                    const emaData = calculateEMA(prices, 20);
-                    const currentRSI = rsiData[rsiData.length-1];
+                    // Update Charts
+                    pChart.data.datasets[0].data = history;
+                    pChart.data.datasets[1].data = calcEMA(history, 20);
+                    iChart.data.datasets[0].data = calcRSI(history);
+                    pChart.update(); iChart.update();
 
-                    // 3. Cập nhật Biểu đồ
-                    priceChart.data.datasets[0].data = prices;
-                    priceChart.data.datasets[1].data = emaData;
-                    indChart.data.datasets[0].data = rsiData;
-                    priceChart.update();
-                    indChart.update();
+                    // Update DOM
+                    const elP = document.getElementById('mainPrice');
+                    elP.innerText = next.toFixed(2);
+                    elP.style.color = change >= 0 ? '#0ecb81' : '#f6465d';
+                    
+                    const elC = document.getElementById('priceChange');
+                    elC.innerText = (change >= 0 ? "+" : "") + (change/next*100).toFixed(2) + "%";
+                    elC.style.color = change >= 0 ? '#0ecb81' : '#f6465d';
 
-                    // 4. AI INFERENCE (Suy luận dựa trên chỉ số thật)
-                    // Nếu RSI > 70 (Quá mua) -> Dự đoán GIẢM
-                    // Nếu RSI < 30 (Quá bán) -> Dự đoán TĂNG
-                    updateAIDecision(currentRSI, volatility);
-
-                    // 5. Cập nhật DOM
-                    updateDOM(newPrice, volatility);
-                    updateOrderBook(newPrice);
+                    updateAI(calcRSI(history).pop(), change);
+                    updateOrderBook(next);
 
                 }, 1000);
 
-                // D. CẬP NHẬT TIN TỨC (Mỗi 5 giây)
-                setInterval(updateNewsFeed, 5000);
-                updateNewsFeed(); // Gọi lần đầu
+                // News Loop
+                setInterval(addNews, 5000);
+                addNews();
             }
 
-            // --- CÁC HÀM HỖ TRỢ (HELPER FUNCTIONS) ---
-
-            // Hàm tính RSI đơn giản hóa
-            function calculateRSI(prices, period = 14) {
-                let rsis = Array(period).fill(50); 
-                for(let i = period; i < prices.length; i++) {
-                    const change = prices[i] - prices[i-1];
-                    // Fake RSI logic for simulation smoothness
-                    let rsi = 50 + (change * 0.5); 
-                    if(rsi > 90) rsi = 90; if(rsi < 10) rsi = 10;
-                    rsis.push(rsi);
+            // --- HELPERS ---
+            function calcEMA(data, period) {
+                let k = 2/(period+1), ema=data[0], res=[];
+                data.forEach(p => { ema = p*k + ema*(1-k); res.push(ema); });
+                return res;
+            }
+            function calcRSI(data) {
+                let res = Array(14).fill(50);
+                for(let i=14; i<data.length; i++) {
+                    let delta = data[i] - data[i-1];
+                    let rsi = 50 + delta * 0.5; // Simplified RSI
+                    if(rsi>90) rsi=90; if(rsi<10) rsi=10;
+                    res.push(rsi);
                 }
-                return rsis;
+                return res;
             }
-
-            // Hàm tính EMA (Exponential Moving Average)
-            function calculateEMA(prices, period) {
-                let emas = [];
-                let k = 2 / (period + 1);
-                let ema = prices[0];
-                for(let p of prices) {
-                    ema = p * k + ema * (1 - k);
-                    emas.push(ema);
-                }
-                return emas;
+            function updateOrderBook(p) {
+                let h = "";
+                for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:#f6465d">${(p+i*2+Math.random()).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
+                h += `<div style="text-align:center; color:#fff; font-weight:bold; margin:3px 0;">${p.toFixed(2)}</div>`;
+                for(let i=1; i<=5; i++) h += `<div class="ob-row bg-green-soft"><span style="color:#0ecb81">${(p-i*2-Math.random()).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
+                document.getElementById('orderBook').innerHTML = h;
             }
-
-            function updateAIDecision(rsi, volatility) {
-                const signalBox = document.getElementById('aiSignal');
-                const confBox = document.getElementById('aiConf');
-                const circle = document.querySelector('.conf-circle');
-
-                let signal = "HOLD";
-                let color = "#888";
-                let confidence = 80 + Math.random() * 15;
-
-                if (rsi > 65) {
-                    signal = "STRONG SELL";
-                    color = "#ef4444";
-                    confidence = 92 + Math.random()*5;
-                } else if (rsi < 35) {
-                    signal = "STRONG BUY";
-                    color = "#10b981";
-                    confidence = 91 + Math.random()*6;
-                } else if (volatility > 20) {
-                    signal = "BUY";
-                    color = "#10b981";
-                } else if (volatility < -20) {
-                    signal = "SELL";
-                    color = "#ef4444";
-                }
-
-                signalBox.textContent = signal;
-                signalBox.style.color = color;
-                document.getElementById('signalBox').style.borderColor = color;
-                confBox.textContent = confidence.toFixed(1) + "%";
-                circle.style.borderColor = color;
-            }
-
-            function updateDOM(price, change) {
-                const el = document.getElementById('mainPrice');
-                el.innerText = price.toFixed(2);
-                el.style.color = change >= 0 ? '#10b981' : '#ef4444';
+            function updateAI(rsi, chg) {
+                let sig="HOLD", col="#888", conf = 85 + Math.random()*10;
+                if(rsi > 70) { sig="STRONG SELL"; col="#f6465d"; conf+=3; }
+                else if(rsi < 30) { sig="STRONG BUY"; col="#0ecb81"; conf+=3; }
+                else if(chg > 20) { sig="BUY"; col="#0ecb81"; }
                 
-                const per = document.getElementById('priceChange');
-                per.innerText = (change >= 0 ? "+" : "") + (change/price*100).toFixed(2) + "%";
-                per.style.color = change >= 0 ? '#10b981' : '#ef4444';
+                document.getElementById('aiSignal').innerText = sig;
+                document.getElementById('aiSignal').style.color = col;
+                document.getElementById('signalBox').style.borderColor = col;
+                document.getElementById('aiConf').innerText = conf.toFixed(1) + "%";
+                document.querySelector('.conf-circle').style.borderColor = col;
             }
-
-            function updateOrderBook(price) {
-                const container = document.getElementById('orderBook');
-                let html = "";
-                // Tạo Sổ lệnh giả (Asks - Bán - Đỏ)
-                for(let i=5; i>0; i--) {
-                    const p = (price + i * 5 + Math.random()*2).toFixed(2);
-                    const q = (Math.random() * 2).toFixed(4);
-                    html += `<div class="ob-row bg-red-soft"><span style="color:#ef4444">${p}</span> <span style="color:#888">${q}</span></div>`;
-                }
-                // Giá hiện tại
-                html += `<div style="text-align:center; font-weight:bold; margin:5px 0; color:#fff;">${price.toFixed(2)}</div>`;
-                // Tạo Sổ lệnh giả (Bids - Mua - Xanh)
-                for(let i=1; i<=5; i++) {
-                    const p = (price - i * 5 - Math.random()*2).toFixed(2);
-                    const q = (Math.random() * 2).toFixed(4);
-                    html += `<div class="ob-row bg-green-soft"><span style="color:#10b981">${p}</span> <span style="color:#888">${q}</span></div>`;
-                }
-                container.innerHTML = html;
-            }
-
-            const newsDb = [
-                {title: "SEC approves Bitcoin ETF applications", sentiment: "pos"},
-                {title: "Whale alert: 5,000 BTC moved to Binance", sentiment: "neg"},
-                {title: "Fed signals interest rate cuts in 2026", sentiment: "pos"},
-                {title: "StableCast AI predicts market breakout", sentiment: "pos"},
-                {title: "Ethereum gas fees hit 6-month low", sentiment: "pos"},
-                {title: "Regulatory concerns rise in EU markets", sentiment: "neg"},
-                {title: "Tech analysis: Golden Cross confirmed", sentiment: "pos"}
+            const newsDB = [
+                {t:"StableCast AI detects anomaly in volume", s:"pos"}, {t:"Bitcoin approaches resistance level", s:"neg"},
+                {t:"ETH gas fees drop significantly", s:"pos"}, {t:"Market volatility expected to increase", s:"neg"},
+                {t:"Team 1 Model optimization complete", s:"pos"}
             ];
-
-            function updateNewsFeed() {
+            function addNews() {
+                const n = newsDB[Math.floor(Math.random()*newsDB.length)];
+                const h = `<div class="news-item"><div class="news-title">${n.t}</div><div class="news-meta"><span>Just now</span><span class="sentiment-tag ${n.s==='pos'?'sent-pos':'sent-neg'}">${n.s==='pos'?'BULLISH':'BEARISH'}</span></div></div>`;
                 const feed = document.getElementById('newsFeed');
-                const randomNews = newsDb[Math.floor(Math.random() * newsDb.length)];
-                
-                const div = document.createElement('div');
-                div.className = 'news-item';
-                div.innerHTML = `
-                    <div class="news-title">${randomNews.title}</div>
-                    <div class="news-meta">
-                        <span>Just now</span>
-                        <span class="sentiment-tag ${randomNews.sentiment === 'pos' ? 'sent-pos' : 'sent-neg'}">
-                            ${randomNews.sentiment === 'pos' ? 'BULLISH' : 'BEARISH'}
-                        </span>
-                    </div>
-                `;
-                feed.prepend(div);
+                feed.insertAdjacentHTML('afterbegin', h);
                 if(feed.children.length > 5) feed.lastChild.remove();
             }
         });
