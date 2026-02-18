@@ -1,211 +1,255 @@
-/* script.js */
+/* script.js - BASIC AUTHENTICATION ONLY */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // =========================================================================
-    // 1. CẤU HÌNH GOOGLE (QUAN TRỌNG: ĐIỀN CLIENT ID CỦA BẠN VÀO ĐÂY)
-    // =========================================================================
-    // Ví dụ: "123456789-abcdef.apps.googleusercontent.com"
-    const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"; 
-
-    // Các phần tử DOM (Giữ nguyên từ HTML của bạn)
+    // --- 1. KHAI BÁO CÁC PHẦN TỬ DOM (Dựa trên HTML của bạn) ---
     const loginOverlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
+    
+    // Form & Buttons
     const authTitle = document.getElementById('authTitle');
     const emailInput = document.getElementById('email');
     const passInput = document.getElementById('password');
     const mainAuthBtn = document.getElementById('mainAuthBtn');
     const toggleAuthBtn = document.getElementById('toggleAuthBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
-    const loginMsg = document.getElementById('loginMsg'); // Div hiển thị lỗi
-
-    let isRegisterMode = false;
-    let tokenClient;
-
-    // =========================================================================
-    // 2. LOGIC GOOGLE POPUP (NÚT BẤM CỦA BẠN)
-    // =========================================================================
     
-    // Khởi tạo Client OAuth ngay khi vào trang (nếu ClientID hợp lệ)
-    if (typeof google !== 'undefined' && CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID,
-            scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-            callback: (response) => {
-                if (response.access_token) {
-                    fetchGoogleProfile(response.access_token);
-                } else {
-                    showMsg("Google Access Denied.", "error");
-                }
-            },
-        });
+    // Tạo div hiển thị thông báo lỗi (nếu chưa có trong HTML)
+    let loginMsg = document.getElementById('loginMsg');
+    if (!loginMsg) {
+        loginMsg = document.createElement('div');
+        loginMsg.id = 'loginMsg';
+        loginMsg.style.marginTop = '15px';
+        loginMsg.style.minHeight = '20px';
+        loginMsg.style.fontSize = '0.9rem';
+        document.querySelector('.login-box').appendChild(loginMsg);
     }
 
-    // Sự kiện bấm nút Google
-    googleLoginBtn.addEventListener('click', () => {
-        if (CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
-            alert("Vui lòng điền GOOGLE CLIENT ID vào file script.js dòng số 8!");
-            return;
-        }
-        // Lệnh này sẽ mở cửa sổ POPUP chọn tài khoản
-        tokenClient.requestAccessToken();
-    });
+    // Biến trạng thái: false = Đang ở màn Login, true = Đang ở màn Register
+    let isRegisterMode = false;
 
-    // Hàm lấy thông tin sau khi đăng nhập Google thành công
-    function fetchGoogleProfile(token) {
-        googleLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> VERIFYING...';
-        
-        // Gọi API Google lấy Info
-        fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            // Đăng nhập thành công -> Vào App
-            performLogin({
-                name: data.name,
-                email: data.email,
-                id: data.sub.substring(0, 10), // Lấy 1 phần ID
-                avatar: data.picture,
-                role: "Google User"
-            });
-        })
-        .catch(err => {
-            console.error(err);
-            showMsg("Lỗi lấy dữ liệu Google.", "error");
-            googleLoginBtn.innerHTML = '<i class="fab fa-google"></i> ACCESS WITH GOOGLE';
-        });
-    }
-
-
-    // =========================================================================
-    // 3. LOGIC ĐĂNG NHẬP / ĐĂNG KÝ THƯỜNG (NHƯ CŨ)
-    // =========================================================================
-
+    // --- 2. XỬ LÝ CHUYỂN ĐỔI GIỮA LOGIN VÀ REGISTER ---
     toggleAuthBtn.addEventListener('click', () => {
         isRegisterMode = !isRegisterMode;
-        loginMsg.textContent = "";
+        loginMsg.textContent = ""; // Xóa thông báo lỗi cũ
 
         if (isRegisterMode) {
+            // Chuyển sang giao diện Đăng ký
             authTitle.textContent = "SYSTEM REGISTER";
             mainAuthBtn.textContent = "REGISTER ACCESS";
             toggleAuthBtn.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
             emailInput.placeholder = "ENTER NEW ID / EMAIL";
-            authTitle.style.borderBottomColor = "#3b82f6";
+            authTitle.style.borderBottomColor = "#3b82f6"; // Đổi màu xanh dương
+            mainAuthBtn.style.background = "#3b82f6";
         } else {
+            // Chuyển về giao diện Đăng nhập
             authTitle.textContent = "SYSTEM LOGIN";
             mainAuthBtn.textContent = "LOGIN";
             toggleAuthBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
             emailInput.placeholder = "ENTER ID";
-            authTitle.style.borderBottomColor = "#0ecb81";
+            authTitle.style.borderBottomColor = "#0ecb81"; // Đổi về màu xanh lá
+            mainAuthBtn.style.background = "#0ecb81";
         }
     });
 
-    mainAuthBtn.addEventListener('click', () => {
+    // --- 3. XỬ LÝ SỰ KIỆN KHI BẤM NÚT LOGIN/REGISTER ---
+    mainAuthBtn.addEventListener('click', handleMainAuth);
+
+    // Hỗ trợ bấm phím Enter để login
+    passInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleMainAuth();
+    });
+
+    function handleMainAuth() {
         const email = emailInput.value.trim();
         const password = passInput.value.trim();
 
-        // 1. Guest Mode (Không nhập gì)
+        // >>> TRƯỜNG HỢP 1: GUEST LOGIN (Để trống cả 2 ô) <<<
         if (!email && !password && !isRegisterMode) {
-            performLogin({ name: "GUEST OPERATOR", id: "GUEST", email: "guest@stablecast.io", role: "Visitor" });
+            loginSuccess({
+                name: "GUEST OPERATOR",
+                id: "GUEST-MODE",
+                email: "guest@stablecast.io",
+                role: "Visitor"
+            });
             return;
         }
 
-        if (!email || !password) { showMsg("Please enter Credentials.", "error"); return; }
+        // Validate cơ bản
+        if (!email || !password) {
+            showError("Please enter ID and Passcode.");
+            return;
+        }
 
-        // 2. Register
+        // >>> TRƯỜNG HỢP 2: ĐĂNG KÝ TÀI KHOẢN <<<
         if (isRegisterMode) {
+            // Kiểm tra xem ID này đã tồn tại trong bộ nhớ trình duyệt chưa
             if (localStorage.getItem('user_' + email)) {
-                showMsg("ID already exists!", "error");
+                showError("ID already exists. Please choose another.");
             } else {
-                const newUser = { email, password, name: "Operator " + Math.floor(Math.random()*1000), id: "OP-"+Date.now() };
+                // Tạo user mới
+                const newUser = {
+                    email: email,
+                    password: password,
+                    name: "Operator " + Math.floor(Math.random() * 1000), // Tên ngẫu nhiên
+                    id: "OP-" + Date.now().toString().slice(-6), // ID ngẫu nhiên
+                    role: "Trader"
+                };
+                
+                // Lưu vào LocalStorage
                 localStorage.setItem('user_' + email, JSON.stringify(newUser));
-                showMsg("Registered! Login now.", "success");
-                setTimeout(() => { toggleAuthBtn.click(); emailInput.value = email; passInput.value = ""; }, 1000);
+                
+                showSuccess("Register Success! Switching to Login...");
+                
+                // Tự động chuyển về màn hình login sau 1 giây
+                setTimeout(() => {
+                    toggleAuthBtn.click(); // Giả lập bấm nút chuyển tab
+                    emailInput.value = email; // Điền sẵn email
+                    passInput.value = "";
+                }, 1000);
             }
         } 
-        // 3. Login thường
+        // >>> TRƯỜNG HỢP 3: ĐĂNG NHẬP <<<
         else {
+            // 3.1 Check tài khoản ADMIN cứng (Test nhanh)
             if (email === "admin" && password === "123") {
-                performLogin({ name: "ADMINISTRATOR", id: "DE200247", email: "toanpbs@fpt.edu.vn", role: "Lead Dev" });
+                loginSuccess({
+                    name: "ADMINISTRATOR",
+                    id: "DE200247",
+                    email: "toanpbs@fpt.edu.vn",
+                    role: "Lead Developer"
+                });
                 return;
             }
-            const stored = localStorage.getItem('user_' + email);
-            if (stored && JSON.parse(stored).password === password) {
-                performLogin(JSON.parse(stored));
+
+            // 3.2 Check tài khoản đã đăng ký (trong LocalStorage)
+            const storedUser = localStorage.getItem('user_' + email);
+            if (storedUser) {
+                const userObj = JSON.parse(storedUser);
+                if (userObj.password === password) {
+                    loginSuccess(userObj);
+                } else {
+                    showError("Incorrect Passcode.");
+                }
             } else {
-                showMsg("Invalid Credentials.", "error");
+                showError("User ID not found.");
             }
         }
-    });
-
-    // Enter để login
-    passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') mainAuthBtn.click(); });
-
-
-    // =========================================================================
-    // 4. CÁC HÀM UI & LOGIC SAU KHI LOGIN
-    // =========================================================================
-
-    function showMsg(text, type) {
-        loginMsg.textContent = text;
-        loginMsg.style.color = type === 'success' ? '#0ecb81' : '#f6465d';
     }
 
-    function performLogin(userData) {
-        loginMsg.style.color = "#0ecb81";
-        loginMsg.textContent = "AUTHENTICATION SUCCESSFUL...";
+    // --- 4. HÀM XỬ LÝ KHI ĐĂNG NHẬP THÀNH CÔNG ---
+    function loginSuccess(userData) {
+        showSuccess("AUTHENTICATION SUCCESSFUL...");
         
+        // Hiệu ứng chuyển cảnh
         setTimeout(() => {
+            loginOverlay.style.transition = "opacity 0.5s ease";
             loginOverlay.style.opacity = "0";
+            
             setTimeout(() => {
                 loginOverlay.style.display = "none";
                 mainApp.style.display = "block";
-                setTimeout(() => mainApp.style.opacity = "1", 50);
                 
-                // Cập nhật Profile
-                document.getElementById('profile-name-txt').textContent = userData.name;
-                document.getElementById('profile-id-txt').textContent = userData.id;
-                document.getElementById('profile-email-txt').textContent = userData.email;
-                if(userData.role) document.getElementById('profile-role-txt').textContent = userData.role;
-                if(userData.avatar) document.getElementById('profile-avatar-img').src = userData.avatar;
+                // Fade-in App chính
+                setTimeout(() => { mainApp.style.opacity = "1"; }, 50);
+
+                // Cập nhật thông tin lên giao diện Profile
+                updateProfileUI(userData);
                 
-                initDashboard();
+                // Khởi động các chức năng bên trong (Biểu đồ, Tab...)
+                initAppFunctions();
             }, 500);
         }, 800);
     }
 
-    function initDashboard() {
-        // Tab logic
+    // Cập nhật giao diện Profile
+    function updateProfileUI(user) {
+        document.getElementById('profile-name-txt').textContent = user.name;
+        document.getElementById('profile-id-txt').textContent = user.id;
+        document.getElementById('profile-email-txt').textContent = user.email;
+        if(user.role) document.getElementById('profile-role-txt').textContent = user.role + " | StableCast";
+        
+        // Nếu user có avatar riêng (ví dụ admin) thì set, ko thì giữ mặc định
+        if(user.avatar) document.getElementById('profile-avatar-img').src = user.avatar;
+    }
+
+    // --- 5. CÁC HÀM TIỆN ÍCH HIỂN THỊ THÔNG BÁO ---
+    function showError(msg) {
+        loginMsg.textContent = msg;
+        loginMsg.style.color = "#f6465d"; // Màu đỏ
+    }
+
+    function showSuccess(msg) {
+        loginMsg.textContent = msg;
+        loginMsg.style.color = "#0ecb81"; // Màu xanh
+    }
+
+    // --- 6. VÔ HIỆU HÓA NÚT GOOGLE (THEO YÊU CẦU) ---
+    if(googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            alert("Tính năng đăng nhập Google đang bảo trì. Vui lòng sử dụng đăng nhập thông thường.");
+        });
+    }
+
+    // =========================================================
+    // PHẦN LOGIC CỦA ỨNG DỤNG SAU KHI ĐĂNG NHẬP (TAB, CHART...)
+    // =========================================================
+    function initAppFunctions() {
+        
+        // 1. Logic chuyển Tab (Terminal / Community / Profile)
         const navBtns = document.querySelectorAll('.nav-btn');
         const views = document.querySelectorAll('.view-section');
+
         navBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 navBtns.forEach(b => b.classList.remove('active'));
                 views.forEach(v => v.classList.remove('active-view'));
+                
                 btn.classList.add('active');
+                
                 if(btn.id === 'btn-terminal') document.getElementById('dashboard-view').classList.add('active-view');
                 if(btn.id === 'btn-community') document.getElementById('community-view').classList.add('active-view');
                 if(btn.id === 'btn-profile') document.getElementById('profile-view').classList.add('active-view');
             });
         });
 
-        // Chart logic
+        // 2. Vẽ Biểu đồ Chart.js
         const ctx = document.getElementById('mainChart');
         if (ctx) {
+            // Tạo dữ liệu giả lập cho biểu đồ
+            const labels = Array.from({length: 20}, (_, i) => i + 1);
+            const data = Array.from({length: 20}, () => 40000 + Math.random() * 2000);
+
             new Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: Array.from({length:30},(_,i)=>i),
+                    labels: labels,
                     datasets: [{
-                        data: Array.from({length:30},()=>40000+Math.random()*2000),
-                        borderColor: '#0ecb81', borderWidth: 2, pointRadius: 0, tension: 0.4
+                        label: 'BTC/USDT',
+                        data: data,
+                        borderColor: '#0ecb81',
+                        backgroundColor: 'rgba(14, 203, 129, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        fill: true
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: {legend: false}, scales: {x:{display:false},y:{display:false}} }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false }, 
+                        y: { display: false }
+                    },
+                    animation: { duration: 1500 }
+                }
             });
+
+            // Cập nhật các con số ngẫu nhiên cho sinh động
             document.getElementById('btcPrice').innerText = "42,350.00";
-            document.getElementById('predPrice').innerText = "42,800.00";
+            document.getElementById('predPrice').innerText = "42,800.50";
             document.getElementById('stopLoss').innerText = "41,500";
             document.getElementById('takeProfit').innerText = "43,200";
         }
