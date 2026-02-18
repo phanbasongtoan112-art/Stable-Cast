@@ -3,12 +3,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================================================
-    // 1. CẤU HÌNH GOOGLE (BẮT BUỘC PHẢI THAY MÃ CLIENT ID CỦA BẠN VÀO DƯỚI)
+    // 1. CẤU HÌNH GOOGLE (QUAN TRỌNG: ĐIỀN CLIENT ID CỦA BẠN VÀO ĐÂY)
     // =========================================================================
-    // Ví dụ: "123456789-abcdefghijk.apps.googleusercontent.com"
-    const YOUR_GOOGLE_CLIENT_ID = "YOUR_CLIENT_ID_HERE"; 
+    // Ví dụ: "123456789-abcdef.apps.googleusercontent.com"
+    const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"; 
 
-    // --- KHAI BÁO CÁC PHẦN TỬ DOM ---
+    // Các phần tử DOM (Giữ nguyên từ HTML của bạn)
     const loginOverlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
     const authTitle = document.getElementById('authTitle');
@@ -17,81 +17,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainAuthBtn = document.getElementById('mainAuthBtn');
     const toggleAuthBtn = document.getElementById('toggleAuthBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
-    const loginMsg = document.getElementById('loginMsg'); 
+    const loginMsg = document.getElementById('loginMsg'); // Div hiển thị lỗi
 
     let isRegisterMode = false;
-    let tokenClient; // Biến lưu client Google
+    let tokenClient;
 
     // =========================================================================
-    // 2. TỰ ĐỘNG TẢI THƯ VIỆN GOOGLE (DO KHÔNG ĐƯỢC SỬA HTML)
+    // 2. LOGIC GOOGLE POPUP (NÚT BẤM CỦA BẠN)
     // =========================================================================
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = initGoogleClient; // Tải xong thì khởi tạo
-    document.body.appendChild(script);
-
-    // Hàm khởi tạo Google Client
-    function initGoogleClient() {
-        if (typeof google === 'undefined') return;
-
-        // Cấu hình OAuth 2.0 Token Client (Dùng cho nút bấm custom)
+    
+    // Khởi tạo Client OAuth ngay khi vào trang (nếu ClientID hợp lệ)
+    if (typeof google !== 'undefined' && CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
         tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: YOUR_GOOGLE_CLIENT_ID,
+            client_id: CLIENT_ID,
             scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
             callback: (response) => {
                 if (response.access_token) {
-                    // Đăng nhập thành công -> Gọi API lấy thông tin User
-                    fetchGoogleUserInfo(response.access_token);
+                    fetchGoogleProfile(response.access_token);
                 } else {
-                    showMsg("Google Login Failed.", "error");
+                    showMsg("Google Access Denied.", "error");
                 }
             },
         });
-
-        // Gán sự kiện click cho nút Google sau khi thư viện tải xong
-        googleLoginBtn.onclick = () => {
-            if (YOUR_GOOGLE_CLIENT_ID === "YOUR_CLIENT_ID_HERE") {
-                alert("Bạn chưa nhập GOOGLE CLIENT ID vào file script.js!");
-                return;
-            }
-            // Mở Popup chọn tài khoản Google
-            tokenClient.requestAccessToken();
-        };
     }
 
-    // Hàm lấy thông tin User từ Google bằng Access Token
-    function fetchGoogleUserInfo(accessToken) {
+    // Sự kiện bấm nút Google
+    googleLoginBtn.addEventListener('click', () => {
+        if (CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
+            alert("Vui lòng điền GOOGLE CLIENT ID vào file script.js dòng số 8!");
+            return;
+        }
+        // Lệnh này sẽ mở cửa sổ POPUP chọn tài khoản
+        tokenClient.requestAccessToken();
+    });
+
+    // Hàm lấy thông tin sau khi đăng nhập Google thành công
+    function fetchGoogleProfile(token) {
         googleLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> VERIFYING...';
         
+        // Gọi API Google lấy Info
         fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
+            headers: { 'Authorization': `Bearer ${token}` }
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            // Dữ liệu Google trả về thật: data.name, data.picture, data.email
-            const user = {
+            // Đăng nhập thành công -> Vào App
+            performLogin({
                 name: data.name,
                 email: data.email,
+                id: data.sub.substring(0, 10), // Lấy 1 phần ID
                 avatar: data.picture,
-                id: data.sub,
-                role: "Google Verified"
-            };
-            performLogin(user); // Đăng nhập vào app
+                role: "Google User"
+            });
         })
         .catch(err => {
             console.error(err);
-            showMsg("Error fetching Google data.", "error");
+            showMsg("Lỗi lấy dữ liệu Google.", "error");
             googleLoginBtn.innerHTML = '<i class="fab fa-google"></i> ACCESS WITH GOOGLE';
         });
     }
 
 
     // =========================================================================
-    // 3. LOGIC ĐĂNG NHẬP / ĐĂNG KÝ THƯỜNG (GIỮ NGUYÊN NHƯ CŨ)
+    // 3. LOGIC ĐĂNG NHẬP / ĐĂNG KÝ THƯỜNG (NHƯ CŨ)
     // =========================================================================
 
     toggleAuthBtn.addEventListener('click', () => {
@@ -117,27 +105,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = emailInput.value.trim();
         const password = passInput.value.trim();
 
-        // Guest Mode
+        // 1. Guest Mode (Không nhập gì)
         if (!email && !password && !isRegisterMode) {
-            performLogin({ name: "GUEST OPERATOR", id: "GUEST", email: "guest@stablecast.io" });
+            performLogin({ name: "GUEST OPERATOR", id: "GUEST", email: "guest@stablecast.io", role: "Visitor" });
             return;
         }
+
         if (!email || !password) { showMsg("Please enter Credentials.", "error"); return; }
 
+        // 2. Register
         if (isRegisterMode) {
-            // Register
             if (localStorage.getItem('user_' + email)) {
-                showMsg("ID exists!", "error");
+                showMsg("ID already exists!", "error");
             } else {
                 const newUser = { email, password, name: "Operator " + Math.floor(Math.random()*1000), id: "OP-"+Date.now() };
                 localStorage.setItem('user_' + email, JSON.stringify(newUser));
                 showMsg("Registered! Login now.", "success");
                 setTimeout(() => { toggleAuthBtn.click(); emailInput.value = email; passInput.value = ""; }, 1000);
             }
-        } else {
-            // Login
+        } 
+        // 3. Login thường
+        else {
             if (email === "admin" && password === "123") {
-                performLogin({ name: "ADMINISTRATOR", id: "ADMIN", email: "admin@sys.com" });
+                performLogin({ name: "ADMINISTRATOR", id: "DE200247", email: "toanpbs@fpt.edu.vn", role: "Lead Dev" });
                 return;
             }
             const stored = localStorage.getItem('user_' + email);
@@ -149,11 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Enter để login
     passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') mainAuthBtn.click(); });
 
 
     // =========================================================================
-    // 4. CÁC HÀM HỖ TRỢ GIAO DIỆN
+    // 4. CÁC HÀM UI & LOGIC SAU KHI LOGIN
     // =========================================================================
 
     function showMsg(text, type) {
@@ -172,10 +163,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 mainApp.style.display = "block";
                 setTimeout(() => mainApp.style.opacity = "1", 50);
                 
-                // Cập nhật Profile thật từ Google hoặc Guest
+                // Cập nhật Profile
                 document.getElementById('profile-name-txt').textContent = userData.name;
                 document.getElementById('profile-id-txt').textContent = userData.id;
                 document.getElementById('profile-email-txt').textContent = userData.email;
+                if(userData.role) document.getElementById('profile-role-txt').textContent = userData.role;
                 if(userData.avatar) document.getElementById('profile-avatar-img').src = userData.avatar;
                 
                 initDashboard();
@@ -184,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initDashboard() {
-        // Tab switching
+        // Tab logic
         const navBtns = document.querySelectorAll('.nav-btn');
         const views = document.querySelectorAll('.view-section');
         navBtns.forEach(btn => {
@@ -198,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Chart Init
+        // Chart logic
         const ctx = document.getElementById('mainChart');
         if (ctx) {
             new Chart(ctx.getContext('2d'), {
