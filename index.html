@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast</title>
+    <title>StableCast | AI TRADING TERMINAL</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,91 +11,114 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- GLOBAL STYLES --- */
+        /* --- GLOBAL CONFIG --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
-        body { background-color: #050505; color: #c5c6c7; height: 100vh; overflow: hidden; }
-        
-        /* SCROLLBAR */
+        body { background-color: #0b0c10; color: #c5c6c7; height: 100vh; overflow: hidden; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-        /* --- LOGIN SCREEN (Giữ nguyên logic cũ) --- */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { width: 400px; padding: 40px; background: #0a0a0a; border: 1px solid #222; text-align: center; box-shadow: 0 0 50px rgba(14, 203, 129, 0.1); }
+        /* =========================================
+           1. GIAO DIỆN ĐĂNG NHẬP (STYLE CŨ - RESTORED)
+           ========================================= */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
         .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #0ecb81; outline: none; transition: 0.3s; }
+        .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: border 0.3s; }
         .input-group input:focus { border-color: #0ecb81; }
-        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
-        button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 20px rgba(14, 203, 129, 0.4); }
-        #loginMsg { margin-top: 15px; font-size: 0.8rem; min-height: 20px; }
+        
+        /* Nút Login Xanh chuẩn cũ */
+        button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+        button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
+        
+        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        button#googleLoginBtn:hover { background: #222; }
 
-        /* --- MAIN APP LAYOUT --- */
+        .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
+        #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
+
+        /* =========================================
+           2. GIAO DIỆN CHÍNH (STYLE MỚI - AI CENTRIC)
+           ========================================= */
         .main-app-container { display: none; opacity: 0; transition: opacity 0.8s ease; height: 100vh; display: flex; flex-direction: column; }
         
-        /* HEADER */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #0a0a0a; border-bottom: 1px solid #222; }
+        /* Header gọn gàng */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #0b0e11; border-bottom: 1px solid #222; }
         .brand { font-size: 1.5rem; font-weight: bold; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
-        .model-status { font-size: 0.8rem; color: #0ecb81; border: 1px solid #0ecb81; padding: 4px 10px; border-radius: 4px; background: rgba(14, 203, 129, 0.1); }
-        .user-info { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #888; }
+        .model-tag { font-size: 0.7rem; background: #1f2937; padding: 4px 8px; border-radius: 4px; color: #ccc; }
+        .status-badge { font-size: 0.8rem; color: #0ecb81; border: 1px solid #0ecb81; padding: 4px 12px; border-radius: 20px; background: rgba(14, 203, 129, 0.1); }
 
-        /* GRID LAYOUT - TẬP TRUNG VÀO DATA */
-        .app-content { flex: 1; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 20px; height: calc(100vh - 70px); }
+        /* Layout Grid */
+        .app-content { flex: 1; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 20px; height: calc(100vh - 70px); overflow: hidden; }
         
-        /* CHART SECTION */
-        .chart-section { background: #0b0e11; border: 1px solid #222; padding: 20px; display: flex; flex-direction: column; border-radius: 4px; }
-        .chart-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: flex-end; }
-        .big-price { font-size: 3.5rem; font-weight: bold; color: #0ecb81; line-height: 1; }
-        .chart-canvas-wrapper { flex: 1; position: relative; width: 100%; }
+        /* Chart Section (Trái) */
+        .chart-section { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; display: flex; flex-direction: column; border-radius: 6px; }
+        .chart-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+        .price-large { font-size: 3.5rem; font-weight: bold; color: #0ecb81; line-height: 1; }
+        .chart-wrapper { flex: 1; width: 100%; position: relative; }
 
-        /* AI SIDEBAR */
-        .ai-sidebar { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        /* AI Sidebar (Phải) */
+        .ai-sidebar { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 5px; }
+        .ai-card { background: #0b0e11; border: 1px solid #2b3139; padding: 20px; border-radius: 6px; }
+        .card-title { color: #848e9c; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 8px; }
         
-        .ai-card { background: #0b0e11; border: 1px solid #222; padding: 20px; border-radius: 4px; }
-        .ai-card-title { color: #848e9c; font-size: 0.8rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        
-        /* Prediction Box */
-        .pred-val { font-size: 2.2rem; color: #3b82f6; font-weight: bold; margin-bottom: 5px; }
-        .confidence-bar { height: 4px; background: #222; width: 100%; margin-top: 10px; position: relative; }
-        .confidence-fill { height: 100%; background: #3b82f6; width: 98%; box-shadow: 0 0 10px #3b82f6; transition: width 0.5s; }
+        /* Confidence Meter */
+        .conf-val { font-size: 2.5rem; font-weight: bold; color: #3b82f6; }
+        .conf-bar-bg { height: 6px; background: #222; width: 100%; margin-top: 10px; border-radius: 3px; }
+        .conf-bar-fill { height: 100%; background: #3b82f6; width: 0%; border-radius: 3px; transition: width 1s ease; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
 
-        /* AI Logs (Terminal style) */
-        .ai-logs { height: 200px; overflow-y: auto; font-size: 0.75rem; color: #555; font-family: 'Courier New', monospace; background: #000; padding: 10px; border: 1px solid #222; }
-        .log-line { margin-bottom: 4px; }
-        .log-green { color: #0ecb81; }
-        .log-blue { color: #3b82f6; }
+        /* Tech Specs List */
+        .spec-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; }
+        .spec-k { color: #666; } .spec-v { color: #ccc; font-weight: bold; }
 
-        /* Tech Specs */
-        .spec-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
-        .spec-label { color: #666; }
-        .spec-val { color: #ccc; font-weight: bold; }
-
+        /* AI Logs Console */
+        .ai-logs { height: 250px; background: #000; border: 1px solid #222; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #888; overflow-y: auto; }
+        .log-ln { margin-bottom: 4px; }
+        .tx-green { color: #0ecb81; } .tx-blue { color: #3b82f6; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h2 id="authTitle">AI TERMINAL LOGIN</h2>
-            <div class="input-group"><label>OPERATOR ID</label><input type="text" id="email" placeholder="ADMIN / GUEST"></div>
-            <div class="input-group"><label>ACCESS CODE</label><input type="password" id="password" placeholder="••••••"></div>
+            <h2 id="authTitle">SYSTEM LOGIN</h2>
+            <div class="input-group">
+                <label>EMAIL / OPERATOR ID</label>
+                <input type="text" id="email" placeholder="ENTER ID">
+            </div>
+            <div class="input-group">
+                <label>PASSCODE</label>
+                <input type="password" id="password" placeholder="••••••">
+            </div>
+            <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
+                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
+            </div>
+            
             <div id="loginMsg" style="color:#f6465d;"></div>
-            <button id="mainAuthBtn">INITIALIZE SYSTEM</button>
-            <div class="toggle-auth" id="toggleAuthBtn" style="margin-top:20px; font-size:0.7rem; color:#555;">SECURE V3.0 // TEAM 1 - FPT</div>
+            
+            <button id="mainAuthBtn">LOGIN</button>
+            <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
+            
+            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
+            </div>
         </div>
+        <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
     </div>
 
     <div class="main-app-container" id="mainApp">
         <header>
             <div class="brand">
-                <i class="fas fa-brain" style="color: #3b82f6;"></i> 
+                <i class="fas fa-brain" style="color: #3b82f6;"></i>
                 <span>Stable<span style="color:#0ecb81">Cast</span></span>
-                <span style="font-size: 0.7rem; background:#222; padding: 2px 6px; border-radius: 4px;">MODEL: LSTM-XGB-V4</span>
+                <span class="model-tag">MODEL: LSTM-XGB-V4</span>
             </div>
-            <div class="user-info">
-                <div class="model-status"><i class="fas fa-circle" style="font-size:6px; vertical-align:middle; margin-right:5px;"></i> ONLINE</div>
-                <span id="operatorName">OPERATOR</span>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="status-badge"><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i> ONLINE</div>
+                <span id="userDisplay" style="font-size: 0.9rem; color: #ccc;">GUEST_OBSERVER</span>
             </div>
         </header>
 
@@ -104,40 +127,40 @@
                 <div class="chart-header">
                     <div>
                         <div style="color: #888; font-size: 0.9rem; margin-bottom: 5px;">BTC/USDT REAL-TIME PRICE</div>
-                        <div class="big-price" id="btcPrice">LOADING...</div>
+                        <div class="price-large" id="btcPrice">43,230.45</div>
                     </div>
                     <div style="text-align: right;">
                         <div style="color: #3b82f6; font-size: 0.9rem;">AI FORECAST (NEXT 1H)</div>
-                        <div style="font-size: 1.5rem; color: #fff; font-weight:bold;" id="predPrice">---</div>
+                        <div style="font-size: 1.8rem; color: #fff; font-weight:bold;" id="predPrice">43,350.45</div>
                     </div>
                 </div>
-                <div class="chart-canvas-wrapper">
+                <div class="chart-wrapper">
                     <canvas id="mainChart"></canvas>
                 </div>
             </div>
 
             <div class="ai-sidebar">
                 <div class="ai-card">
-                    <div class="ai-card-title"><i class="fas fa-robot"></i> Model Confidence</div>
-                    <div class="pred-val" id="confidenceTxt">98.4%</div>
-                    <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">Probability of Trend Accuracy</div>
-                    <div class="confidence-bar"><div class="confidence-fill" id="confBar"></div></div>
+                    <div class="card-title"><i class="fas fa-robot"></i> MODEL CONFIDENCE</div>
+                    <div class="conf-val" id="confText">99.5%</div>
+                    <div style="font-size: 0.8rem; color: #666;">Probability of Trend Accuracy</div>
+                    <div class="conf-bar-bg"><div class="conf-bar-fill" id="confBar" style="width: 99%;"></div></div>
                 </div>
 
                 <div class="ai-card">
-                    <div class="ai-card-title"><i class="fas fa-microchip"></i> Model Architecture</div>
-                    <div class="spec-row"><span class="spec-label">Core Model:</span><span class="spec-val" style="color:#3b82f6">Bi-LSTM + Attention</span></div>
-                    <div class="spec-row"><span class="spec-label">Optimizer:</span><span class="spec-val">AdamW (lr=0.001)</span></div>
-                    <div class="spec-row"><span class="spec-label">Loss Fn:</span><span class="spec-val">MSE + Huber</span></div>
-                    <div class="spec-row"><span class="spec-label">Data Feed:</span><span class="spec-val" style="color:#0ecb81">Binance WSS (100ms)</span></div>
-                    <div class="spec-row"><span class="spec-label">Features:</span><span class="spec-val">OHLCV, RSI, MACD, BB</span></div>
+                    <div class="card-title"><i class="fas fa-microchip"></i> MODEL ARCHITECTURE</div>
+                    <div class="spec-item"><span class="spec-k">Core Model:</span><span class="spec-v" style="color:#3b82f6">Bi-LSTM + Attention</span></div>
+                    <div class="spec-item"><span class="spec-k">Optimizer:</span><span class="spec-v">AdamW (lr=0.001)</span></div>
+                    <div class="spec-item"><span class="spec-k">Loss Fn:</span><span class="spec-v">MSE + Huber</span></div>
+                    <div class="spec-item"><span class="spec-k">Data Feed:</span><span class="spec-v" style="color:#0ecb81">Binance WSS (100ms)</span></div>
+                    <div class="spec-item"><span class="spec-k">Features:</span><span class="spec-v">OHLCV, RSI, MACD, BB</span></div>
                 </div>
 
-                <div class="ai-card" style="flex:1; display:flex; flex-direction:column;">
-                    <div class="ai-card-title"><i class="fas fa-terminal"></i> Inference Logs</div>
+                <div class="ai-card" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="card-title"><i class="fas fa-terminal"></i> INFERENCE LOGS</div>
                     <div class="ai-logs" id="aiLogs">
-                        <div class="log-line">[SYSTEM] Initializing Neural Network...</div>
-                        <div class="log-line">[SYSTEM] Loading weights from v4.2.ckpt...</div>
+                        <div class="log-ln">[SYSTEM] Initializing Neural Network...</div>
+                        <div class="log-ln">[SYSTEM] Connection established.</div>
                     </div>
                 </div>
             </div>
@@ -146,90 +169,117 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- LOGIN LOGIC ---
+            console.log("System Initialized");
+
+            // --- VARIABLES ---
             const loginOverlay = document.getElementById('loginOverlay');
             const mainApp = document.getElementById('mainApp');
-            const btnLogin = document.getElementById('mainAuthBtn');
-            const toggleBtn = document.getElementById('toggleAuthBtn');
+            const loginMsg = document.getElementById('loginMsg');
+            const mainAuthBtn = document.getElementById('mainAuthBtn');
+            const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+            const googleLoginBtn = document.getElementById('googleLoginBtn');
             const emailInput = document.getElementById('email');
             const passInput = document.getElementById('password');
-            const msg = document.getElementById('loginMsg');
-            let isRegister = false;
+            const authTitle = document.getElementById('authTitle');
+            
+            let isRegisterMode = false;
 
-            // Toggle Register
-            toggleBtn.addEventListener('click', () => {
-                isRegister = !isRegister;
-                msg.textContent = "";
-                if(isRegister) {
-                    document.getElementById('authTitle').textContent = "NEW MODEL TRAINING";
-                    btnLogin.textContent = "REGISTER ID";
-                    toggleBtn.textContent = "RETURN TO LOGIN";
-                    emailInput.placeholder = "NEW OPERATOR ID";
+            // --- 1. LOGIN LOGIC (GIỮ NGUYÊN CŨ) ---
+            toggleAuthBtn.addEventListener('click', () => {
+                isRegisterMode = !isRegisterMode;
+                loginMsg.textContent = "";
+                if (isRegisterMode) {
+                    authTitle.textContent = "SYSTEM REGISTER";
+                    mainAuthBtn.textContent = "REGISTER ACCESS";
+                    toggleAuthBtn.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
+                    emailInput.placeholder = "ENTER NEW ID";
+                    authTitle.style.borderBottomColor = "#3b82f6";
+                    mainAuthBtn.style.background = "#3b82f6";
                 } else {
-                    document.getElementById('authTitle').textContent = "AI TERMINAL LOGIN";
-                    btnLogin.textContent = "INITIALIZE SYSTEM";
-                    toggleBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
-                    emailInput.placeholder = "ADMIN / GUEST";
+                    authTitle.textContent = "SYSTEM LOGIN";
+                    mainAuthBtn.textContent = "LOGIN";
+                    toggleAuthBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
+                    emailInput.placeholder = "ENTER ID";
+                    authTitle.style.borderBottomColor = "#0ecb81";
+                    mainAuthBtn.style.background = "#0ecb81";
                 }
             });
 
-            // Handle Auth
-            btnLogin.addEventListener('click', () => {
-                const user = emailInput.value.trim();
-                const pass = passInput.value.trim();
+            mainAuthBtn.addEventListener('click', handleLogin);
+            passInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleLogin(); });
+
+            function handleLogin() {
+                const email = emailInput.value.trim();
+                const password = passInput.value.trim();
 
                 // Guest
-                if(!user && !pass && !isRegister) {
+                if (!email && !password && !isRegisterMode) {
                     enterApp("GUEST_OBSERVER");
                     return;
                 }
 
-                if(isRegister) {
-                    if(!user || !pass) { msg.textContent = "MISSING DATA"; return; }
-                    localStorage.setItem('user_'+user, JSON.stringify({pass}));
-                    msg.textContent = "ID REGISTERED. PLEASE LOGIN.";
-                    msg.style.color = "#0ecb81";
-                    setTimeout(() => toggleBtn.click(), 1000);
-                } else {
-                    if(user === "admin" && pass === "123") {
-                        enterApp("ADMIN_ROOT");
+                // Register
+                if (isRegisterMode) {
+                    if (!email || !password) { showMsg("Please enter ID & Password", "red"); return; }
+                    localStorage.setItem('user_' + email, JSON.stringify({ email, password }));
+                    showMsg("Registered! Please Login.", "green");
+                    setTimeout(() => toggleAuthBtn.click(), 1000);
+                } 
+                // Login
+                else {
+                    if (email === "admin" && password === "123") {
+                        enterApp("ADMINISTRATOR");
                         return;
                     }
-                    const stored = localStorage.getItem('user_'+user);
-                    if(stored && JSON.parse(stored).pass === pass) {
-                        enterApp(user.toUpperCase());
+                    const stored = localStorage.getItem('user_' + email);
+                    if (stored && JSON.parse(stored).password === password) {
+                        enterApp("OPERATOR: " + email.toUpperCase());
                     } else {
-                        msg.textContent = "ACCESS DENIED";
+                        showMsg("Invalid ID or Password", "red");
                     }
                 }
+            }
+
+            // Google Button (Fake Action)
+            googleLoginBtn.addEventListener('click', () => {
+                googleLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CONNECTING...';
+                setTimeout(() => enterApp("GOOGLE_USER_VERIFIED"), 1500);
             });
 
-            function enterApp(name) {
-                msg.style.color = "#0ecb81";
-                msg.textContent = "AUTHENTICATING...";
+            function showMsg(text, color) {
+                loginMsg.textContent = text;
+                loginMsg.style.color = color === "red" ? "#f6465d" : "#0ecb81";
+            }
+
+            // --- 2. APP TRANSITION & CHART LOGIC ---
+            function enterApp(username) {
+                showMsg("ACCESS GRANTED...", "green");
                 setTimeout(() => {
-                    loginOverlay.style.display = 'none';
-                    mainApp.style.display = 'flex'; // Flex to make grid work
-                    setTimeout(() => mainApp.style.opacity = 1, 50);
-                    document.getElementById('operatorName').textContent = name;
-                    startAI();
+                    loginOverlay.style.opacity = 0;
+                    setTimeout(() => {
+                        loginOverlay.style.display = 'none';
+                        mainApp.style.display = 'flex';
+                        setTimeout(() => mainApp.style.opacity = 1, 50);
+                        
+                        document.getElementById('userDisplay').textContent = username;
+                        startLiveChart(); // Kích hoạt biểu đồ
+                    }, 500);
                 }, 800);
             }
 
-            // --- AI & CHART LOGIC ---
-            function startAI() {
-                // 1. Setup Chart
-                const ctx = document.getElementById('mainChart').getContext('2d');
-                let price = 42800.00;
-                // Generate initial history
-                let dataPoints = Array.from({length: 60}, () => {
+            function startLiveChart() {
+                const ctx = document.getElementById('mainChart');
+                if(!ctx) return;
+
+                // Init Data
+                let price = 43230.45;
+                const dataPoints = Array.from({length: 60}, () => {
                     price += (Math.random() - 0.5) * 40;
                     return price;
                 });
-                let labels = Array.from({length: 60}, (_,i) => i);
+                const labels = Array.from({length: 60}, (_,i) => i);
 
-                const chart = new Chart(ctx, {
+                const myChart = new Chart(ctx.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: labels,
@@ -241,21 +291,21 @@
                             pointRadius: 0,
                             tension: 0.4,
                             fill: true,
-                            backgroundColor: (context) => {
-                                const bg = context.chart.ctx.createLinearGradient(0,0,0,400);
-                                bg.addColorStop(0, 'rgba(14, 203, 129, 0.15)');
-                                bg.addColorStop(1, 'rgba(14, 203, 129, 0)');
-                                return bg;
+                            backgroundColor: (c) => {
+                                const grad = c.chart.ctx.createLinearGradient(0,0,0,400);
+                                grad.addColorStop(0, 'rgba(14, 203, 129, 0.2)');
+                                grad.addColorStop(1, 'rgba(14, 203, 129, 0)');
+                                return grad;
                             }
-                        },
-                        {
-                            label: 'AI Prediction',
-                            data: dataPoints.map(v => v + (Math.random() * 50)), // Fake AI line
+                        }, {
+                            label: 'AI Forecast',
+                            data: dataPoints.map(p => p + (Math.random() * 60)),
                             borderColor: '#3b82f6',
                             borderWidth: 1,
                             borderDash: [4, 4],
                             pointRadius: 0,
-                            tension: 0.4
+                            tension: 0.4,
+                            fill: false
                         }]
                     },
                     options: {
@@ -263,62 +313,54 @@
                         maintainAspectRatio: false,
                         animation: false,
                         plugins: { legend: false },
-                        scales: {
-                            x: { display: false },
-                            y: { position: 'right', grid: { color: '#1a1a1a' }, ticks: { color: '#555', font: {family:'JetBrains Mono'} } }
-                        }
+                        scales: { x: {display:false}, y: {position:'right', grid:{color:'#1a1a1a'}, ticks:{color:'#555'}} }
                     }
                 });
 
-                // 2. Real-time Simulation Loop
-                const logContainer = document.getElementById('aiLogs');
-                const actions = ["Updating weights...", "Fetching Binance API...", "Calculating RSI...", "Normalizing Tensors...", "Optimizing Loss Function...", "Analyzing Order Book Depth..."];
-                
+                // Simulation Loop
+                const logBox = document.getElementById('aiLogs');
+                const logActions = ["Updating Tensor Weights...", "Analyzing Market Depth...", "Fetching Binance API...", "Optimizing Loss Function...", "Predicting Next Candle..."];
+
                 setInterval(() => {
-                    // Update Prices
-                    const lastPrice = dataPoints[dataPoints.length-1];
+                    // Update Price
+                    const lastPrice = dataPoints[dataPoints.length - 1];
                     const change = (Math.random() - 0.5) * 60;
                     const newPrice = lastPrice + change;
                     
-                    dataPoints.shift();
-                    dataPoints.push(newPrice);
+                    dataPoints.shift(); dataPoints.push(newPrice);
                     
-                    // Update AI Line
-                    const aiData = chart.data.datasets[1].data;
-                    aiData.shift();
-                    aiData.push(newPrice + (Math.random() * 100 - 30));
+                    const aiData = myChart.data.datasets[1].data;
+                    aiData.shift(); aiData.push(newPrice + (Math.random() * 120 - 40));
 
-                    chart.update();
+                    myChart.update();
 
-                    // UI Updates
+                    // Update UI Numbers
                     const elPrice = document.getElementById('btcPrice');
                     elPrice.innerText = newPrice.toFixed(2);
                     elPrice.style.color = change >= 0 ? '#0ecb81' : '#f6465d';
                     
                     document.getElementById('predPrice').innerText = (newPrice + 120).toFixed(2);
 
-                    // Randomize Confidence
-                    if(Math.random() > 0.7) {
-                        const conf = (97 + Math.random() * 2.5).toFixed(1);
-                        document.getElementById('confidenceTxt').innerText = conf + "%";
+                    // Random Confidence
+                    if(Math.random() > 0.8) {
+                        const conf = (98 + Math.random()).toFixed(1);
+                        document.getElementById('confText').innerText = conf + "%";
                         document.getElementById('confBar').style.width = conf + "%";
                     }
 
-                    // Add Fake Logs
+                    // Logs
                     if(Math.random() > 0.6) {
-                        const log = document.createElement('div');
-                        log.className = "log-line";
+                        const div = document.createElement('div');
+                        div.className = 'log-ln';
                         const time = new Date().toLocaleTimeString();
-                        const action = actions[Math.floor(Math.random() * actions.length)];
-                        log.innerHTML = `<span style="color:#444">[${time}]</span> <span class="log-blue">INFO:</span> ${action}`;
-                        logContainer.appendChild(log);
-                        logContainer.scrollTop = logContainer.scrollHeight;
+                        const action = logActions[Math.floor(Math.random()*logActions.length)];
+                        div.innerHTML = `<span style="color:#444">[${time}]</span> <span class="tx-blue">INFO:</span> ${action}`;
+                        logBox.appendChild(div);
+                        logBox.scrollTop = logBox.scrollHeight;
                     }
-
                 }, 1000);
             }
         });
     </script>
 </body>
 </html>
-
