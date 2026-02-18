@@ -7,12 +7,11 @@
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS CHUẨN - KHÔNG SỬA */
+        /* --- CSS GIAO DIỆN --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
         body { background-color: #0b0c10; color: #c5c6c7; overflow-y: auto; min-height: 100vh; padding-bottom: 40px; }
         ::-webkit-scrollbar { width: 8px; }
@@ -20,7 +19,7 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #0ecb81; }
 
-        /* Login Screen */
+        /* Màn hình đăng nhập */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #0ecb81; display: inline-block; padding-bottom: 10px; }
@@ -28,12 +27,17 @@
         .input-group label { display: block; color: #848e9c; font-size: 0.8rem; margin-bottom: 5px; }
         .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0ecb81; font-size: 1rem; outline: none; transition: border 0.3s; }
         .input-group input:focus { border-color: #0ecb81; }
+        
         button#mainAuthBtn { width: 100%; padding: 12px; margin-top: 10px; background: #0ecb81; color: #000; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
         button#mainAuthBtn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(14, 203, 129, 0.4); }
+        
+        button#googleLoginBtn { width: 100%; padding: 12px; margin-top: 15px; background: #1a1a1a; color: #fff; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        button#googleLoginBtn:hover { background: #222; }
+
         .toggle-auth { margin-top: 20px; font-size: 0.8rem; color: #888; cursor: pointer; text-decoration: underline; }
         #loginMsg { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
 
-        /* Main App */
+        /* Giao diện chính */
         .main-app-container { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; max-width: 1500px; margin: 0 auto; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; }
         .brand { font-size: 1.8rem; font-weight: bold; letter-spacing: -1px; }
@@ -43,11 +47,9 @@
         .nav-btn.active { background: #0ecb81; color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(14,203,129,0.3); }
         .nav-icon-btn { background: #111; border: 1px solid #333; color: #848e9c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; position: relative; }
 
-        /* Sections */
         .view-section { display: none; }
         .view-section.active-view { display: block; }
 
-        /* Dashboard */
         .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; min-height: 550px; height: auto; margin-bottom: 30px; }
         .card { background: #0b0e11; border: 1px solid #2b3139; padding: 25px; border-radius: 4px; }
         .price-display { font-size: 3rem; font-weight: bold; color: #0ecb81; margin: 15px 0; letter-spacing: -1px; }
@@ -58,18 +60,14 @@
         .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 8px; font-size: 0.9rem; }
         .info-label { color: #848e9c; }
         .info-val { color: #fff; font-weight: bold; }
-        .logs-container { margin-top: 30px; background: #000; border: 1px solid #333; height: 180px; overflow-y: auto; padding: 15px; font-size: 0.85rem; color: #3b82f6; font-family: 'Courier New', monospace; }
-        .log-entry { margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .log-time { color: #555; margin-right: 10px; }
-
-        /* Profile & Community */
-        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; border-bottom: 2px solid #0ecb81; }
+        
+        .profile-cover { height: 200px; width: 100%; background: url('https://png.pngtree.com/background/20210714/original/pngtree-abstract-technology-background-technical-presentation-picture-image_1252549.jpg') no-repeat center center; background-size: cover; border-radius: 8px 8px 0 0; position: relative; border-bottom: 2px solid #0ecb81; }
         .profile-header-card { background: #0b0e11; border: 1px solid #2b3139; border-top: none; border-radius: 0 0 8px 8px; padding: 20px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
         .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #0b0e11; margin-top: -90px; background: #222; object-fit: cover; }
-        .profile-content { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .profile-name { font-size: 1.8rem; font-weight: bold; color: #fff; margin-top: 15px; }
+        .profile-role { color: #3b82f6; font-size: 0.9rem; margin-bottom: 15px; letter-spacing: 1px; }
         
         .footer-info { text-align: center; margin-top: 25px; color: #555; font-size: 0.8rem; border-top: 1px solid #222; padding-top: 15px; }
-        .footer-author { color: #0ecb81; font-weight: bold; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -77,16 +75,30 @@
     <div id="loginOverlay">
         <div class="login-box">
             <h2 id="authTitle">SYSTEM LOGIN</h2>
-            <div class="input-group"><label>EMAIL / OPERATOR ID</label><input type="text" id="email" placeholder="ENTER ID"></div>
-            <div class="input-group"><label>PASSCODE</label><input type="password" id="password" placeholder="••••••"></div>
+            
+            <div class="input-group">
+                <label>EMAIL / OPERATOR ID</label>
+                <input type="text" id="email" placeholder="ENTER ID">
+            </div>
+            
+            <div class="input-group">
+                <label>PASSCODE</label>
+                <input type="password" id="password" placeholder="••••••">
+            </div>
+            
             <div style="text-align: left; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" id="rememberMe" checked style="width: auto; cursor: pointer;">
                 <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888;">Remember Me</label>
             </div>
-            <div id="loginMsg" style="color: #f6465d; font-size: 0.9rem; margin-bottom: 10px; min-height: 20px;"></div>
+            
+            <div id="loginMsg" style="margin-bottom: 15px; min-height: 20px;"></div>
             
             <button id="mainAuthBtn">LOGIN</button>
             <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REGISTER ACCESS</div>
+            
+            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                <button id="googleLoginBtn"><i class="fab fa-google" style="color: #fff; margin-right: 5px;"></i> ACCESS WITH GOOGLE</button>
+            </div>
         </div>
         <div style="margin-top: 20px; color: #444; font-size: 0.8rem;">SECURE CONNECTION V2.0</div>
     </div>
@@ -117,19 +129,12 @@
                         <div class="pred-price" id="predPrice">---</div>
                         <div style="color: #555; font-size: 0.8rem; margin-top: 5px;">Confidence Interval: 98.2%</div>
                     </div>
-                    <div class="card" style="margin-bottom: 20px;">
-                        <div class="info-row"><span class="info-label">Stop Loss (ATR)</span><span class="info-val" id="stopLoss" style="color: #f6465d;">---</span></div>
-                        <div class="info-row" style="border: none; margin-bottom: 0;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color: #0ecb81;">---</span></div>
-                    </div>
-                    <div class="card"><div class="specs-title"><i class="fas fa-microchip"></i> SYSTEM SPECIFICATIONS</div>
-                        <div class="info-row"><span class="info-label">Architecture</span><span class="spec-val-highlight">Hybrid (LSTM + XGB)</span></div>
-                        <div class="info-row"><span class="info-label">Input Shape</span><span class="spec-val-highlight">(Batch, 60, 13)</span></div>
-                        <div class="info-row"><span class="info-label">Optimization</span><span class="spec-val-highlight">Adam (Lr=0.001)</span></div>
-                        <div class="info-row" style="border:none; margin-bottom: 0;"><span class="info-label">Data Source</span><span class="spec-val-highlight">Binance WebSocket</span></div>
+                    <div class="card">
+                        <div class="info-row"><span class="info-label">Stop Loss</span><span class="info-val" id="stopLoss" style="color: #f6465d;">41,500</span></div>
+                        <div class="info-row" style="border: none;"><span class="info-label">Take Profit</span><span class="info-val" id="takeProfit" style="color: #0ecb81;">43,200</span></div>
                     </div>
                 </div>
             </div>
-            <div class="logs-container" id="terminalLogs"><div class="log-entry"><span class="log-time">[SYSTEM]</span> Ready to connect...</div></div>
         </div>
 
         <div id="profile-view" class="view-section">
@@ -139,22 +144,155 @@
                 <div class="profile-name" id="profile-name-txt">OPERATOR</div>
                 <div class="profile-role" id="profile-role-txt">Trader</div>
             </div>
-            <div class="profile-content">
-                <div class="info-card">
-                    <h3>Contact Info</h3>
-                    <div class="detail-row"><div class="detail-text" id="profile-id-txt">---</div></div>
-                    <div class="detail-row"><div class="detail-text" id="profile-email-txt">---</div></div>
-                </div>
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <div class="info-row"><span class="info-label">ID:</span> <span id="profile-id-txt" style="color:#fff">---</span></div>
+                <div class="info-row" style="border:none"><span class="info-label">Email:</span> <span id="profile-email-txt" style="color:#fff">---</span></div>
             </div>
         </div>
-        
+
         <div id="community-view" class="view-section">
-            <div class="card" style="text-align: center; padding: 50px;"><h3>COMMUNITY FEED COMING SOON</h3></div>
+            <div class="card" style="text-align: center; padding: 50px; color: #888;">COMMUNITY FEATURE COMING SOON</div>
         </div>
 
         <div class="footer-info">© 2026 StableCast Project. FPT University.<br>Developer: <span class="footer-author">Phan Bá Song Toàn - DE200247</span></div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("System Ready...");
+
+            // 1. KHAI BÁO BIẾN
+            const loginOverlay = document.getElementById('loginOverlay');
+            const mainApp = document.querySelector('.main-app-container');
+            const loginMsg = document.getElementById('loginMsg');
+            const authTitle = document.getElementById('authTitle');
+            const mainAuthBtn = document.getElementById('mainAuthBtn');
+            const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+            const emailInput = document.getElementById('email');
+            const passInput = document.getElementById('password');
+            let isRegisterMode = false;
+
+            // 2. CHUYỂN ĐỔI LOGIN / REGISTER
+            toggleAuthBtn.addEventListener('click', () => {
+                isRegisterMode = !isRegisterMode;
+                loginMsg.textContent = "";
+                if (isRegisterMode) {
+                    authTitle.textContent = "REGISTER SYSTEM";
+                    mainAuthBtn.textContent = "REGISTER NOW";
+                    toggleAuthBtn.textContent = "Back to Login";
+                    mainAuthBtn.style.background = "#3b82f6";
+                    authTitle.style.borderBottomColor = "#3b82f6";
+                } else {
+                    authTitle.textContent = "SYSTEM LOGIN";
+                    mainAuthBtn.textContent = "LOGIN";
+                    toggleAuthBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
+                    mainAuthBtn.style.background = "#0ecb81";
+                    authTitle.style.borderBottomColor = "#0ecb81";
+                }
+            });
+
+            // 3. XỬ LÝ LOGIN (Đã fix lỗi)
+            mainAuthBtn.addEventListener('click', () => {
+                const email = emailInput.value.trim();
+                const password = passInput.value.trim();
+
+                // CASE 1: KHÁCH (Không nhập gì)
+                if (!email && !password && !isRegisterMode) {
+                    performLogin({ name: "GUEST OPERATOR", id: "GUEST", email: "guest@stablecast.io" });
+                    return;
+                }
+
+                // CASE 2: ĐĂNG KÝ
+                if (isRegisterMode) {
+                    if (!email || !password) { showMsg("Enter Email & Password!", "red"); return; }
+                    localStorage.setItem('user_' + email, JSON.stringify({ email, password, name: "New Operator", id: "OP-"+Date.now() }));
+                    showMsg("Success! Please Login.", "green");
+                    setTimeout(() => toggleAuthBtn.click(), 1000);
+                } 
+                // CASE 3: ĐĂNG NHẬP
+                else {
+                    if (email === "admin" && password === "123") {
+                        performLogin({ name: "ADMINISTRATOR", id: "ADMIN", email: "admin@sys.com" });
+                        return;
+                    }
+                    const stored = localStorage.getItem('user_' + email);
+                    if (stored && JSON.parse(stored).password === password) {
+                        performLogin(JSON.parse(stored));
+                    } else {
+                        showMsg("Invalid ID or Password!", "red");
+                    }
+                }
+            });
+
+            // 4. HÀM CHUYỂN VÀO APP
+            function performLogin(user) {
+                showMsg("LOGIN SUCCESSFUL...", "#0ecb81");
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                    mainApp.style.display = 'block';
+                    setTimeout(() => mainApp.style.opacity = '1', 50);
+                    
+                    // Điền thông tin
+                    document.getElementById('profile-name-txt').textContent = user.name;
+                    document.getElementById('profile-id-txt').textContent = user.id;
+                    document.getElementById('profile-email-txt').textContent = user.email;
+                    
+                    // Chạy biểu đồ
+                    initChart();
+                }, 800);
+            }
+
+            function showMsg(text, color) {
+                loginMsg.textContent = text;
+                loginMsg.style.color = color === "red" ? "#f6465d" : "#0ecb81";
+            }
+
+            // 5. BIỂU ĐỒ ĐỘNG
+            function initChart() {
+                const ctx = document.getElementById('mainChart');
+                if(!ctx) return;
+                
+                let price = 42350.00;
+                const dataPoints = Array.from({length: 40}, () => { price += (Math.random()-0.5)*50; return price; });
+                
+                const myChart = new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length:40}, (_,i)=>i),
+                        datasets: [{
+                            data: dataPoints,
+                            borderColor: '#0ecb81', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true,
+                            backgroundColor: (c) => {
+                                const grad = c.chart.ctx.createLinearGradient(0,0,0,300);
+                                grad.addColorStop(0, 'rgba(14,203,129,0.2)'); grad.addColorStop(1, 'rgba(14,203,129,0)');
+                                return grad;
+                            }
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend:false}, scales: {x:{display:false}, y:{position:'right', grid:{color:'#222'}}} }
+                });
+
+                setInterval(() => {
+                    const newPrice = dataPoints[dataPoints.length-1] + (Math.random()-0.5)*60;
+                    dataPoints.shift(); dataPoints.push(newPrice);
+                    myChart.update();
+                    document.getElementById('btcPrice').innerText = newPrice.toFixed(2);
+                    document.getElementById('predPrice').innerText = (newPrice + 50).toFixed(2);
+                }, 1000);
+            }
+
+            // 6. CHUYỂN TAB
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+                    btn.classList.add('active');
+                    const viewId = btn.id.replace('btn-', '') + '-view';
+                    const view = document.getElementById(viewId);
+                    if(view) view.classList.add('active-view');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
