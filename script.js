@@ -1,12 +1,16 @@
-/* script.js - BASIC AUTHENTICATION ONLY */
+/* script.js - BASIC AUTH & LIVE CHART */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. KHAI BÁO CÁC PHẦN TỬ DOM (Dựa trên HTML của bạn) ---
+    // --- 1. KHAI BÁO BIẾN CHUNG ---
     const loginOverlay = document.getElementById('loginOverlay');
     const mainApp = document.querySelector('.main-app-container');
-    
-    // Form & Buttons
+    const btcPriceEl = document.getElementById('btcPrice');
+    const predPriceEl = document.getElementById('predPrice');
+    let chartInstance = null; // Biến giữ biểu đồ để cập nhật
+    let priceInterval = null; // Biến giữ timer cập nhật giá
+
+    // Form & Auth Elements
     const authTitle = document.getElementById('authTitle');
     const emailInput = document.getElementById('email');
     const passInput = document.getElementById('password');
@@ -14,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAuthBtn = document.getElementById('toggleAuthBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     
-    // Tạo div hiển thị thông báo lỗi (nếu chưa có trong HTML)
+    // Tạo div thông báo lỗi nếu chưa có
     let loginMsg = document.getElementById('loginMsg');
     if (!loginMsg) {
         loginMsg = document.createElement('div');
@@ -25,233 +29,245 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.login-box').appendChild(loginMsg);
     }
 
-    // Biến trạng thái: false = Đang ở màn Login, true = Đang ở màn Register
     let isRegisterMode = false;
 
-    // --- 2. XỬ LÝ CHUYỂN ĐỔI GIỮA LOGIN VÀ REGISTER ---
+    // --- 2. XỬ LÝ AUTHENTICATION (LOGIN/REGISTER) ---
+    
     toggleAuthBtn.addEventListener('click', () => {
         isRegisterMode = !isRegisterMode;
-        loginMsg.textContent = ""; // Xóa thông báo lỗi cũ
-
+        loginMsg.textContent = "";
         if (isRegisterMode) {
-            // Chuyển sang giao diện Đăng ký
             authTitle.textContent = "SYSTEM REGISTER";
             mainAuthBtn.textContent = "REGISTER ACCESS";
             toggleAuthBtn.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
-            emailInput.placeholder = "ENTER NEW ID / EMAIL";
-            authTitle.style.borderBottomColor = "#3b82f6"; // Đổi màu xanh dương
+            emailInput.placeholder = "ENTER NEW ID";
+            authTitle.style.borderBottomColor = "#3b82f6";
             mainAuthBtn.style.background = "#3b82f6";
         } else {
-            // Chuyển về giao diện Đăng nhập
             authTitle.textContent = "SYSTEM LOGIN";
             mainAuthBtn.textContent = "LOGIN";
             toggleAuthBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
             emailInput.placeholder = "ENTER ID";
-            authTitle.style.borderBottomColor = "#0ecb81"; // Đổi về màu xanh lá
+            authTitle.style.borderBottomColor = "#0ecb81";
             mainAuthBtn.style.background = "#0ecb81";
         }
     });
 
-    // --- 3. XỬ LÝ SỰ KIỆN KHI BẤM NÚT LOGIN/REGISTER ---
     mainAuthBtn.addEventListener('click', handleMainAuth);
-
-    // Hỗ trợ bấm phím Enter để login
-    passInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleMainAuth();
-    });
+    passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleMainAuth(); });
 
     function handleMainAuth() {
         const email = emailInput.value.trim();
         const password = passInput.value.trim();
 
-        // >>> TRƯỜNG HỢP 1: GUEST LOGIN (Để trống cả 2 ô) <<<
+        // Guest Login
         if (!email && !password && !isRegisterMode) {
-            loginSuccess({
-                name: "GUEST OPERATOR",
-                id: "GUEST-MODE",
-                email: "guest@stablecast.io",
-                role: "Visitor"
-            });
+            loginSuccess({ name: "GUEST OPERATOR", id: "GUEST", email: "guest@stablecast.io", role: "Visitor" });
             return;
         }
 
-        // Validate cơ bản
-        if (!email || !password) {
-            showError("Please enter ID and Passcode.");
-            return;
-        }
+        if (!email || !password) { showError("Please enter credentials."); return; }
 
-        // >>> TRƯỜNG HỢP 2: ĐĂNG KÝ TÀI KHOẢN <<<
         if (isRegisterMode) {
-            // Kiểm tra xem ID này đã tồn tại trong bộ nhớ trình duyệt chưa
+            // Register
             if (localStorage.getItem('user_' + email)) {
-                showError("ID already exists. Please choose another.");
+                showError("ID exists.");
             } else {
-                // Tạo user mới
-                const newUser = {
-                    email: email,
-                    password: password,
-                    name: "Operator " + Math.floor(Math.random() * 1000), // Tên ngẫu nhiên
-                    id: "OP-" + Date.now().toString().slice(-6), // ID ngẫu nhiên
-                    role: "Trader"
-                };
-                
-                // Lưu vào LocalStorage
+                const newUser = { email, password, name: "Operator " + Math.floor(Math.random()*1000), id: "OP-"+Date.now() };
                 localStorage.setItem('user_' + email, JSON.stringify(newUser));
-                
-                showSuccess("Register Success! Switching to Login...");
-                
-                // Tự động chuyển về màn hình login sau 1 giây
-                setTimeout(() => {
-                    toggleAuthBtn.click(); // Giả lập bấm nút chuyển tab
-                    emailInput.value = email; // Điền sẵn email
-                    passInput.value = "";
-                }, 1000);
+                showSuccess("Registered! Logging in...");
+                setTimeout(() => { toggleAuthBtn.click(); emailInput.value = email; passInput.value = ""; }, 1000);
             }
-        } 
-        // >>> TRƯỜNG HỢP 3: ĐĂNG NHẬP <<<
-        else {
-            // 3.1 Check tài khoản ADMIN cứng (Test nhanh)
+        } else {
+            // Login
             if (email === "admin" && password === "123") {
-                loginSuccess({
-                    name: "ADMINISTRATOR",
-                    id: "DE200247",
-                    email: "toanpbs@fpt.edu.vn",
-                    role: "Lead Developer"
-                });
+                loginSuccess({ name: "ADMINISTRATOR", id: "ADMIN", email: "admin@sys.com", role: "Admin" });
                 return;
             }
-
-            // 3.2 Check tài khoản đã đăng ký (trong LocalStorage)
-            const storedUser = localStorage.getItem('user_' + email);
-            if (storedUser) {
-                const userObj = JSON.parse(storedUser);
-                if (userObj.password === password) {
-                    loginSuccess(userObj);
-                } else {
-                    showError("Incorrect Passcode.");
-                }
+            const stored = localStorage.getItem('user_' + email);
+            if (stored && JSON.parse(stored).password === password) {
+                loginSuccess(JSON.parse(stored));
             } else {
-                showError("User ID not found.");
+                showError("Invalid credentials.");
             }
         }
     }
 
-    // --- 4. HÀM XỬ LÝ KHI ĐĂNG NHẬP THÀNH CÔNG ---
     function loginSuccess(userData) {
         showSuccess("AUTHENTICATION SUCCESSFUL...");
-        
-        // Hiệu ứng chuyển cảnh
         setTimeout(() => {
-            loginOverlay.style.transition = "opacity 0.5s ease";
             loginOverlay.style.opacity = "0";
-            
             setTimeout(() => {
                 loginOverlay.style.display = "none";
                 mainApp.style.display = "block";
+                setTimeout(() => mainApp.style.opacity = "1", 50);
                 
-                // Fade-in App chính
-                setTimeout(() => { mainApp.style.opacity = "1"; }, 50);
-
-                // Cập nhật thông tin lên giao diện Profile
-                updateProfileUI(userData);
+                // Update Profile UI
+                document.getElementById('profile-name-txt').textContent = userData.name;
+                document.getElementById('profile-id-txt').textContent = userData.id;
                 
-                // Khởi động các chức năng bên trong (Biểu đồ, Tab...)
-                initAppFunctions();
+                // === KÍCH HOẠT BIỂU ĐỒ ===
+                initLiveChart(); 
+                
             }, 500);
         }, 800);
     }
 
-    // Cập nhật giao diện Profile
-    function updateProfileUI(user) {
-        document.getElementById('profile-name-txt').textContent = user.name;
-        document.getElementById('profile-id-txt').textContent = user.id;
-        document.getElementById('profile-email-txt').textContent = user.email;
-        if(user.role) document.getElementById('profile-role-txt').textContent = user.role + " | StableCast";
-        
-        // Nếu user có avatar riêng (ví dụ admin) thì set, ko thì giữ mặc định
-        if(user.avatar) document.getElementById('profile-avatar-img').src = user.avatar;
-    }
+    function showError(msg) { loginMsg.textContent = msg; loginMsg.style.color = "#f6465d"; }
+    function showSuccess(msg) { loginMsg.textContent = msg; loginMsg.style.color = "#0ecb81"; }
+    
+    if(googleLoginBtn) googleLoginBtn.addEventListener('click', () => alert("Feature maintenance."));
 
-    // --- 5. CÁC HÀM TIỆN ÍCH HIỂN THỊ THÔNG BÁO ---
-    function showError(msg) {
-        loginMsg.textContent = msg;
-        loginMsg.style.color = "#f6465d"; // Màu đỏ
-    }
 
-    function showSuccess(msg) {
-        loginMsg.textContent = msg;
-        loginMsg.style.color = "#0ecb81"; // Màu xanh
-    }
+    // =========================================================================
+    // 3. LOGIC BIỂU ĐỒ ĐỘNG (LIVE CHART) & GIẢ LẬP GIÁ BTC
+    // =========================================================================
 
-    // --- 6. VÔ HIỆU HÓA NÚT GOOGLE (THEO YÊU CẦU) ---
-    if(googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            alert("Tính năng đăng nhập Google đang bảo trì. Vui lòng sử dụng đăng nhập thông thường.");
-        });
-    }
-
-    // =========================================================
-    // PHẦN LOGIC CỦA ỨNG DỤNG SAU KHI ĐĂNG NHẬP (TAB, CHART...)
-    // =========================================================
-    function initAppFunctions() {
-        
-        // 1. Logic chuyển Tab (Terminal / Community / Profile)
-        const navBtns = document.querySelectorAll('.nav-btn');
-        const views = document.querySelectorAll('.view-section');
-
-        navBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                navBtns.forEach(b => b.classList.remove('active'));
-                views.forEach(v => v.classList.remove('active-view'));
-                
-                btn.classList.add('active');
-                
-                if(btn.id === 'btn-terminal') document.getElementById('dashboard-view').classList.add('active-view');
-                if(btn.id === 'btn-community') document.getElementById('community-view').classList.add('active-view');
-                if(btn.id === 'btn-profile') document.getElementById('profile-view').classList.add('active-view');
-            });
-        });
-
-        // 2. Vẽ Biểu đồ Chart.js
+    function initLiveChart() {
         const ctx = document.getElementById('mainChart');
-        if (ctx) {
-            // Tạo dữ liệu giả lập cho biểu đồ
-            const labels = Array.from({length: 20}, (_, i) => i + 1);
-            const data = Array.from({length: 20}, () => 40000 + Math.random() * 2000);
+        if (!ctx) return;
 
-            new Chart(ctx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'BTC/USDT',
-                        data: data,
-                        borderColor: '#0ecb81',
-                        backgroundColor: 'rgba(14, 203, 129, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { display: false }, 
-                        y: { display: false }
-                    },
-                    animation: { duration: 1500 }
-                }
-            });
+        // Dữ liệu khởi tạo (20 điểm giá)
+        let dataPoints = [];
+        let labels = [];
+        let currentPrice = 42350.00; // Giá bắt đầu
 
-            // Cập nhật các con số ngẫu nhiên cho sinh động
-            document.getElementById('btcPrice').innerText = "42,350.00";
-            document.getElementById('predPrice').innerText = "42,800.50";
-            document.getElementById('stopLoss').innerText = "41,500";
-            document.getElementById('takeProfit').innerText = "43,200";
+        for (let i = 0; i < 30; i++) {
+            labels.push(i);
+            // Tạo dao động ngẫu nhiên
+            currentPrice = currentPrice + (Math.random() - 0.5) * 50; 
+            dataPoints.push(currentPrice);
         }
+
+        // Cấu hình Chart.js
+        chartInstance = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'BTC/USDT',
+                    data: dataPoints,
+                    borderColor: '#0ecb81',       // Màu xanh lá chuẩn trading
+                    backgroundColor: (context) => {
+                        const ctx = context.chart.ctx;
+                        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(14, 203, 129, 0.2)'); // Xanh mờ ở trên
+                        gradient.addColorStop(1, 'rgba(14, 203, 129, 0)');   // Trong suốt ở dưới
+                        return gradient;
+                    },
+                    borderWidth: 2,
+                    pointRadius: 0,               // Ẩn các dấu chấm tròn
+                    pointHoverRadius: 4,
+                    tension: 0.4,                 // Độ cong mềm mại của đường
+                    fill: true
+                },
+                {
+                    label: 'AI Forecast',         // Đường dự đoán AI (Nét đứt)
+                    data: dataPoints.map(p => p + (Math.random() - 0.5) * 100 + 50),
+                    borderColor: '#3b82f6',       // Màu xanh dương
+                    borderWidth: 2,
+                    borderDash: [5, 5],           // Nét đứt
+                    pointRadius: 0,
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },   // Ẩn chú thích
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#848e9c',
+                        bodyColor: '#fff',
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: { display: false },        // Ẩn trục X
+                    y: { 
+                        display: true,            // Hiện trục Y (Giá)
+                        position: 'right',        // Đặt bên phải giống sàn
+                        grid: {
+                            color: '#1e2329'      // Màu lưới mờ
+                        },
+                        ticks: {
+                            color: '#848e9c',     // Màu chữ trục Y
+                            font: { family: 'JetBrains Mono', size: 10 }
+                        }
+                    }
+                },
+                animation: false,                 // Tắt animation mặc định để update mượt hơn
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+
+        // Bắt đầu vòng lặp cập nhật giá (Mỗi 1 giây)
+        startPriceSimulation(currentPrice);
     }
+
+    function startPriceSimulation(startPrice) {
+        let currentPrice = startPrice;
+        
+        // Hủy interval cũ nếu có
+        if (priceInterval) clearInterval(priceInterval);
+
+        priceInterval = setInterval(() => {
+            if (!chartInstance) return;
+
+            // 1. Tạo biến động giá ngẫu nhiên (-30 đến +30 USD)
+            const change = (Math.random() - 0.5) * 60;
+            currentPrice += change;
+
+            // 2. Cập nhật số hiển thị lớn
+            if (btcPriceEl) {
+                btcPriceEl.innerText = currentPrice.toFixed(2);
+                // Đổi màu xanh/đỏ tùy theo tăng/giảm
+                btcPriceEl.style.color = change >= 0 ? '#0ecb81' : '#f6465d';
+            }
+            
+            // 3. Cập nhật giá dự đoán AI (lệch nhẹ so với giá thật)
+            const aiPrice = currentPrice + (Math.random() * 100); 
+            if (predPriceEl) predPriceEl.innerText = aiPrice.toFixed(2);
+
+            // 4. Cập nhật dữ liệu biểu đồ
+            const chartData = chartInstance.data.datasets[0].data;
+            const aiData = chartInstance.data.datasets[1].data;
+
+            // Xóa điểm cũ nhất, thêm điểm mới nhất (Hiệu ứng cuộn)
+            chartData.shift();
+            chartData.push(currentPrice);
+            
+            aiData.shift();
+            aiData.push(aiPrice);
+
+            // Vẽ lại biểu đồ
+            chartInstance.update();
+
+        }, 1000); // Cập nhật mỗi 1000ms (1 giây)
+    }
+
+    // --- 4. LOGIC CHUYỂN TAB ---
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const views = document.querySelectorAll('.view-section');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            navBtns.forEach(b => b.classList.remove('active'));
+            views.forEach(v => v.classList.remove('active-view'));
+            btn.classList.add('active');
+            
+            if(btn.id === 'btn-terminal') document.getElementById('dashboard-view').classList.add('active-view');
+            if(btn.id === 'btn-community') document.getElementById('community-view').classList.add('active-view');
+            if(btn.id === 'btn-profile') document.getElementById('profile-view').classList.add('active-view');
+        });
+    });
 });
