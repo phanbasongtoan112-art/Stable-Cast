@@ -94,7 +94,7 @@
         .toggle-auth { margin-top: 25px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
         .toggle-auth:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         #loginMsg { margin-top: 20px; font-size: 0.85rem; font-weight: 600; min-height: 20px; }
-        .secure-text { margin-top: 25px; color: #555; font-size: 0.7rem; letter-spacing: 2px; }
+        .secure-text { margin-top: 25px; color: #555; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
 
         /* =========================================
            3. MAIN APP (CÁC BẢNG ĐIỀU KHIỂN NỔI 3D)
@@ -218,29 +218,29 @@
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h2 id="authTitle">SYSTEM LOGIN</h2>
+            <h2 id="authTitle">LOGIN</h2>
             <div class="input-group">
-                <label>EMAIL / OPERATOR ID</label>
-                <input type="text" id="email" placeholder="ENTER ID">
+                <label>USER NAME</label>
+                <input type="text" id="email" placeholder="USERNAME">
             </div>
             <div class="input-group">
-                <label>PASSCODE</label>
+                <label>PASSWORD</label>
                 <input type="password" id="password" placeholder="••••••">
             </div>
             <div style="text-align: left; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
                 <input type="checkbox" id="rememberMe" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--up-color);">
-                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888; font-weight: normal; margin:0; letter-spacing: 0;">Remember Secure Token</label>
+                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888; font-weight: normal; margin:0; letter-spacing: 0;">Remember Me</label>
             </div>
             <div id="loginMsg"></div>
-            <button id="mainAuthBtn">INITIALIZE</button>
-            <div class="toggle-auth" id="toggleAuthBtn">NEW OPERATOR? REQUEST ACCESS</div>
+            <button id="mainAuthBtn">LOGIN</button>
+            <div class="toggle-auth" id="toggleAuthBtn">FORGOT PASSWORD?</div>
         </div>
-        <div class="secure-text"><i class="fas fa-shield-alt"></i> ENCRYPTED CONNECTION V5.0</div>
+        <div class="secure-text"><i class="fas fa-shield-alt"></i> PROJECT BY TEAM 1</div>
     </div>
 
     <div class="main-app" id="mainApp">
         <header>
-            <div class="brand"><i class="fas fa-cube" style="color: var(--accent-color);"></i> STABLE<span>CAST</span> <sup>PRO</sup></div>
+            <div class="brand"><i class="fas fa-cube" style="color: var(--accent-color);"></i> STABLE<span>CAST</span> <sup>TEAM 1 - ADY201m</sup></div>
             <div class="market-ticker" id="tickerStatus" style="color:var(--up-color); font-weight: 600;"><i class="fas fa-circle-notch fa-spin"></i> SYNCING...</div>
         </header>
 
@@ -331,17 +331,17 @@
                 isRegister = !isRegister;
                 msg.textContent = "";
                 if(isRegister) {
-                    title.textContent = "SYSTEM REGISTER";
-                    btnLogin.textContent = "REQUEST ACCESS";
-                    toggleBtn.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
+                    title.textContent = "REGISTER";
+                    btnLogin.textContent = "REGISTER";
+                    toggleBtn.textContent = "LOGIN";
                     btnLogin.style.background = "linear-gradient(90deg, #3b82f6, #2563eb)";
                     btnLogin.style.boxShadow = "0 4px 15px rgba(59, 130, 246, 0.4)";
                     title.style.borderBottomColor = "#3b82f6";
                     title.style.textShadow = "0 0 10px rgba(59, 130, 246, 0.4)";
                 } else {
-                    title.textContent = "SYSTEM LOGIN";
-                    btnLogin.textContent = "INITIALIZE";
-                    toggleBtn.textContent = "NEW OPERATOR? REQUEST ACCESS";
+                    title.textContent = "LOGIN";
+                    btnLogin.textContent = "LOGIN";
+                    toggleBtn.textContent = "FORGOT PASSWORD?";
                     btnLogin.style.background = "linear-gradient(90deg, #00d283, #009960)";
                     btnLogin.style.boxShadow = "0 4px 15px rgba(0, 210, 131, 0.4)";
                     title.style.borderBottomColor = "#00d283";
@@ -355,14 +355,14 @@
                 if(!u && !p && !isRegister) { enterApp(); return; }
                 if(!u || !p) { msg.style.color = "var(--down-color)"; msg.textContent = "Credentials required."; return; }
                 if(isRegister) {
-                    msg.style.color = "#3b82f6"; msg.textContent = "Access Granted. Please Login.";
+                    msg.style.color = "#3b82f6"; msg.textContent = "Registration Success! Please Login.";
                     setTimeout(() => toggleBtn.click(), 1000);
                 } else { enterApp(); }
             });
 
             function enterApp() {
                 msg.style.color = "var(--up-color)";
-                msg.textContent = "DECRYPTING NODE... STANDBY.";
+                msg.textContent = "CONNECTING... STANDBY.";
                 setTimeout(() => {
                     loginOverlay.style.opacity = 0;
                     setTimeout(() => {
@@ -531,10 +531,10 @@
                     
                     if(changePercent >= 0) {
                         elP.style.color = "var(--up-color)";
-                        elP.style.textShadow = "0 0 25px rgba(0, 210, 131, 0.5)";
+                        elP.style.textShadow = "0 0 20px rgba(0, 210, 131, 0.4)";
                     } else {
                         elP.style.color = "var(--down-color)";
-                        elP.style.textShadow = "0 0 25px rgba(255, 59, 94, 0.5)";
+                        elP.style.textShadow = "0 0 20px rgba(255, 59, 94, 0.4)";
                     }
                     
                     const elC = document.getElementById('priceChange');
@@ -628,19 +628,19 @@
                 const sigBox = document.getElementById('signalBox');
                 document.getElementById('aiSignal').innerText = sig;
                 document.getElementById('aiSignal').style.color = col;
-                document.getElementById('aiSignal').style.textShadow = `0 0 20px ${col}${hexOpacity}`;
+                document.getElementById('aiSignal').style.textShadow = `0 0 15px ${col}${hexOpacity}`;
                 
                 sigBox.style.borderColor = col;
-                sigBox.style.boxShadow = `inset 0 0 25px ${col}33`;
+                sigBox.style.boxShadow = `inset 0 0 20px ${col}22`;
                 
                 document.getElementById('aiConf').innerText = conf.toFixed(1) + "%";
                 const circle = document.querySelector('.conf-circle');
                 circle.style.borderColor = col;
-                circle.style.boxShadow = `0 0 30px ${col}55, inset 0 0 20px ${col}33`;
+                circle.style.boxShadow = `0 0 25px ${col}44, inset 0 0 15px ${col}22`;
 
                 document.getElementById('aiPredPrice').innerText = predPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 document.getElementById('aiPredPrice').style.color = col;
-                document.getElementById('aiPredPrice').style.textShadow = `0 0 20px ${col}55`;
+                document.getElementById('aiPredPrice').style.textShadow = `0 0 15px ${col}44`;
 
                 document.getElementById('slVal').innerText = sl.toLocaleString('en-US', {minimumFractionDigits: 2});
                 document.getElementById('tpVal').innerText = tp.toLocaleString('en-US', {minimumFractionDigits: 2});
