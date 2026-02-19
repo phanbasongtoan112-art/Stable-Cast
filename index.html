@@ -25,7 +25,6 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* Mặc định trên PC: Khóa cuộn trang (overflow: hidden), full màn hình */
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
@@ -91,38 +90,15 @@
         .project-footer { background: #080808; border-top: 1px solid #222; padding: 10px 20px; text-align: center; font-size: 0.7rem; color: #555; line-height: 1.4; }
         .highlight-text { color: #888; font-weight: bold; }
 
-        /* =========================================
-           3. RESPONSIVE CHO ĐIỆN THOẠI (KHÔNG ẢNH HƯỞNG MÁY TÍNH)
-           ========================================= */
+        /* --- RESPONSIVE CHO ĐIỆN THOẠI --- */
         @media (max-width: 1024px) {
-            body { 
-                height: auto; 
-                overflow-y: auto; /* Mở khóa cuộn trang trên đt */
-            }
-            .main-app { 
-                height: auto; 
-            }
-            header {
-                flex-direction: column; /* Xếp Header dọc */
-                height: auto;
-                padding: 15px;
-                gap: 10px;
-                text-align: center;
-            }
-            .grid-container {
-                grid-template-columns: 1fr; /* CHUYỂN TỪ 3 CỘT THÀNH 1 CỘT DỌC */
-                gap: 10px;
-                overflow: visible;
-            }
-            .chart-wrapper {
-                min-height: 350px; /* Cấp không gian cho biểu đồ vẽ */
-            }
-            .indicator-wrapper {
-                min-height: 150px;
-            }
-            .main-price {
-                font-size: 2.5rem; /* Thu nhỏ chữ giá một chút */
-            }
+            body { height: auto; overflow-y: auto; }
+            .main-app { height: auto; }
+            header { flex-direction: column; height: auto; padding: 15px; gap: 10px; text-align: center; }
+            .grid-container { grid-template-columns: 1fr; gap: 10px; overflow: visible; }
+            .chart-wrapper { min-height: 350px; }
+            .indicator-wrapper { min-height: 150px; }
+            .main-price { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -231,7 +207,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- AUTH LOGIC ---
             const loginOverlay = document.getElementById('loginOverlay');
             const mainApp = document.getElementById('mainApp');
             const btnLogin = document.getElementById('mainAuthBtn');
@@ -278,28 +253,37 @@
                         loginOverlay.style.display = 'none';
                         mainApp.style.display = 'flex';
                         setTimeout(() => mainApp.style.opacity = 1, 100);
-                        initNewsEngine();
+                        initNewsEngine(); 
                         startCoreEngine();
                     }, 500);
                 }, 800);
             }
 
-            // --- NEWS ENGINE CHỐNG TRỐNG ---
+            // --- ĐỒNG BỘ TIN TỨC ĐA NỀN TẢNG (100% HIỂN THỊ) ---
             let globalNewsArray = [
-                { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "#" },
-                { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "#" },
-                { title: "Whale activity spikes as $500M USDT moves to Binance", source: "CryptoQuant", time: "12 mins ago", sentiment: "neg", url: "#" },
-                { title: "New AI models show unprecedented accuracy in crypto forecasting", source: "Forbes", time: "1 hr ago", sentiment: "pos", url: "#" },
-                { title: "Market volatility expected to increase ahead of Fed meeting", source: "Bloomberg", time: "2 hrs ago", sentiment: "neg", url: "#" }
+                { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "https://cointelegraph.com" },
+                { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "https://coindesk.com" },
+                { title: "Whale activity spikes as $500M USDT moves to Binance", source: "CryptoQuant", time: "12 mins ago", sentiment: "neg", url: "https://cryptoquant.com" },
+                { title: "New AI models show unprecedented accuracy in crypto forecasting", source: "Forbes", time: "1 hr ago", sentiment: "pos", url: "https://forbes.com" },
+                { title: "Market volatility expected to increase ahead of Fed meeting", source: "Bloomberg", time: "2 hrs ago", sentiment: "neg", url: "https://bloomberg.com" }
             ];
+
+            let lastTimeIndex = -1;
 
             function renderNews() {
                 const feed = document.getElementById('newsFeed');
-                if(!feed) return;
+                if(!feed || globalNewsArray.length === 0) return;
                 
+                // Thuật toán đồng bộ bằng đồng hồ thế giới (Cứ mỗi 6 giây xoay 1 lần trên mọi thiết bị)
+                let timeIndex = Math.floor(Date.now() / 6000);
+                if(timeIndex === lastTimeIndex) return; // Tránh vẽ lại UI liên tục gây giật
+                lastTimeIndex = timeIndex;
+
                 let html = '';
+                let startIndex = timeIndex % globalNewsArray.length;
+
                 for(let i = 0; i < Math.min(4, globalNewsArray.length); i++) {
-                    const item = globalNewsArray[i];
+                    const item = globalNewsArray[(startIndex + i) % globalNewsArray.length];
                     const label = item.sentiment === 'pos' ? "BULLISH" : "BEARISH";
                     const sentClass = item.sentiment === 'pos' ? "sent-pos" : "sent-neg";
                     html += `
@@ -316,12 +300,8 @@
             }
 
             function initNewsEngine() {
-                renderNews();
-                setInterval(() => {
-                    const first = globalNewsArray.shift();
-                    globalNewsArray.push(first);
-                    renderNews();
-                }, 5000);
+                renderNews(); // Render ngay lập tức
+                setInterval(renderNews, 1000); // Kiểm tra đồng hồ mỗi giây
 
                 fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN')
                     .then(res => res.json())
@@ -343,12 +323,13 @@
                                     url: article.url
                                 };
                             });
+                            lastTimeIndex = -1; // Ép vẽ lại
                             renderNews();
                         }
-                    }).catch(e => console.log("Using fallback news."));
+                    }).catch(e => console.log("Using local fallback news."));
             }
 
-            // --- CORE ENGINE (BINANCE API & WEBSOCKET) ---
+            // --- CORE ENGINE (ĐỒNG BỘ AI ĐA NỀN TẢNG) ---
             async function startCoreEngine() {
                 let history = [];
                 let aiHistory = []; 
@@ -359,12 +340,14 @@
                     const data = await res.json();
                     history = data.map(d => parseFloat(d[4]));
                     labels = data.map((_, i) => i);
-                    aiHistory = history.map(p => p + (Math.random() - 0.5) * (p * 0.0015)); 
+                    
+                    // Tạo đường AI bám theo lịch sử bằng thuật toán xác định
+                    aiHistory = history.map(p => p + (Math.sin(p) - 0.5) * (p * 0.0015)); 
                     document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-check-circle"></i> BINANCE LIVE STREAM';
                 } catch (e) {
                     let price = 43250.00;
-                    history = Array.from({length: 100}, () => { price += (Math.random() - 0.5) * 100; return price; });
-                    aiHistory = history.map(p => p + (Math.random() - 0.5) * 50);
+                    history = Array.from({length: 100}, (_, i) => { price += Math.sin(i) * 100; return price; });
+                    aiHistory = history.map(p => p + Math.cos(p) * 50);
                     labels = Array.from({length: 100}, (_,i) => i);
                 }
 
@@ -410,6 +393,7 @@
                     const macdArray = calcMACD(history);
                     const currentMACD = macdArray[macdArray.length - 1];
 
+                    // Hàm AI truyền giá thật vào để ra kết quả đồng nhất mọi máy
                     const predPrice = updateAI(currentRSI, currentMACD, changePercent, currentPrice);
                     
                     aiHistory.shift(); aiHistory.push(predPrice);
@@ -462,35 +446,46 @@
                 return res;
             }
 
+            // --- ĐỒNG BỘ SỔ LỆNH ĐA NỀN TẢNG ---
             function updateOrderBook(p) {
                 let h = "";
-                for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:#f6465d">${(p+i*1.5).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
+                for(let i=5; i>0; i--) {
+                    let fakeQty = Math.abs(Math.sin(p * i)) * 2; // Sinh số ngẫu nhiên đồng nhất từ Giá
+                    h += `<div class="ob-row bg-red-soft"><span style="color:#f6465d">${(p+i*1.5).toFixed(2)}</span> <span style="color:#888">${fakeQty.toFixed(3)}</span></div>`;
+                }
                 h += `<div style="text-align:center; color:#fff; font-weight:bold; margin:3px 0;">${p.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>`;
-                for(let i=1; i<=5; i++) h += `<div class="ob-row bg-green-soft"><span style="color:#0ecb81">${(p-i*1.5).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
+                for(let i=1; i<=5; i++) {
+                    let fakeQty = Math.abs(Math.cos(p * i)) * 2;
+                    h += `<div class="ob-row bg-green-soft"><span style="color:#0ecb81">${(p-i*1.5).toFixed(2)}</span> <span style="color:#888">${fakeQty.toFixed(3)}</span></div>`;
+                }
                 document.getElementById('orderBook').innerHTML = h;
             }
 
-            // --- CẬP NHẬT AI & THÔNG SỐ ---
+            // --- CẬP NHẬT AI (ĐỒNG BỘ 100%) ---
             function updateAI(rsi, macd, chg, price) {
                 let sig = "HOLD", col = "#888";
                 
-                let conf = 45 + Math.random() * 15; 
-                let predOffset = (Math.random() - 0.5) * (price * 0.001);
+                // Thuật toán giả ngẫu nhiên dựa vào giá thật (Giống nhau trên mọi máy)
+                let pseudoRand1 = Math.abs(Math.sin(price * 100)); // Trả về số từ 0 -> 1
+                let pseudoRand2 = Math.abs(Math.cos(price * 100));
+
+                let conf = 45 + pseudoRand1 * 15; 
+                let predOffset = (pseudoRand2 - 0.5) * (price * 0.001);
 
                 if (rsi > 65 || (macd < 0 && chg < -0.5)) {
                     sig = "SELL"; col = "#f6465d";
-                    conf = 65 + Math.random() * 15;
-                    predOffset = -(price * (0.005 + Math.random() * 0.005));
+                    conf = 65 + pseudoRand1 * 15;
+                    predOffset = -(price * (0.005 + pseudoRand2 * 0.005));
                     if(rsi > 75) { sig = "STRONG SELL"; conf += 5; }
                 } 
                 else if (rsi < 35 || (macd > 0 && chg > 0.5)) {
                     sig = "BUY"; col = "#0ecb81";
-                    conf = 65 + Math.random() * 15;
-                    predOffset = (price * (0.005 + Math.random() * 0.005));
+                    conf = 65 + pseudoRand1 * 15;
+                    predOffset = (price * (0.005 + pseudoRand2 * 0.005));
                     if(rsi < 25) { sig = "STRONG BUY"; conf += 5; }
                 }
 
-                if(conf > 88.5) conf = 88.5 - Math.random();
+                if(conf > 88.5) conf = 88.5 - pseudoRand1;
 
                 const predPrice = price + predOffset;
 
