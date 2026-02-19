@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast</title>
+    <title>StableCast | TEAM 1 - ADY201m</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3309/3309991.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -30,7 +30,7 @@
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
         /* =========================================
-           1. LOGIN SCREEN (CLASSIC STYLE - RESTORED)
+           1. LOGIN SCREEN (GIAO DIỆN CŨ - XANH LÁ)
            ========================================= */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         
@@ -42,7 +42,7 @@
         .login-box h2 { 
             color: #fff; margin-bottom: 30px; letter-spacing: 2px; 
             border-bottom: 2px solid var(--up-color); display: inline-block; padding-bottom: 10px; 
-            font-family: 'JetBrains Mono', monospace; /* Giữ font hệ thống cho phần Login */
+            font-family: 'JetBrains Mono', monospace;
         }
         
         .input-group { margin-bottom: 20px; text-align: left; }
@@ -64,7 +64,7 @@
         .secure-text { margin-top: 20px; color: #444; font-size: 0.7rem; letter-spacing: 1px; }
 
         /* =========================================
-           2. MAIN INTERFACE (PRO STYLE)
+           2. MAIN INTERFACE (3 CỘT - KHÔNG CÓ TRAINING THỦ CÔNG)
            ========================================= */
         .main-app { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 1s; }
         
@@ -92,11 +92,15 @@
         .main-price { font-size: 3.5rem; font-weight: bold; color: var(--up-color); font-family: 'Rajdhani', sans-serif; line-height: 1; }
         .price-change { font-size: 1rem; margin-left: 5px; font-family: 'JetBrains Mono', monospace; }
 
-        /* Right Panel */
+        /* Right Panel (AI Output Only) */
         .ai-confidence { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border-color); }
-        .conf-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--border-color); margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .conf-value { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
+        .conf-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--border-color); margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: border-color 0.5s; }
+        .conf-value { font-size: 2rem; font-weight: bold; color: #fff; }
+        .conf-label { font-size: 0.7rem; color: var(--text-muted); }
         
+        .signal-box { background: #111; padding: 15px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; text-align: center; transition: border-color 0.5s; }
+        .signal-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; transition: color 0.5s; }
+
         .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; }
         .news-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #222; }
         .news-title { font-size: 0.85rem; font-weight: bold; color: #fff; margin-bottom: 4px; line-height: 1.3; }
@@ -155,7 +159,9 @@
         <div class="grid-container">
             <div class="panel">
                 <div class="panel-header"><span>Order Book (BTC/USDT)</span> <i class="fas fa-list"></i></div>
-                <div id="orderBook" style="font-family:'JetBrains Mono'"></div> <div class="panel-header" style="margin-top:20px;"><span>System Specs</span> <i class="fas fa-server"></i></div>
+                <div id="orderBook" style="font-family:'JetBrains Mono'"></div> 
+                
+                <div class="panel-header" style="margin-top:20px;"><span>System Specs</span> <i class="fas fa-server"></i></div>
                 <div style="font-size:0.8rem; color:#888;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Latency</span> <span style="color:var(--up-color)">12ms</span></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Model RAM</span> <span>14.2 GB</span></div>
@@ -167,8 +173,8 @@
                 <div class="chart-wrapper">
                     <div class="price-overlay">
                         <div style="font-size:0.8rem; color:#888; font-weight:bold;">BTC/USDT PERPETUAL</div>
-                        <div class="main-price" id="mainPrice">43,250.00</div>
-                        <div id="priceChange" style="color:var(--up-color); font-weight:bold;">+1.2%</div>
+                        <div class="main-price" id="mainPrice">LOADING...</div>
+                        <div id="priceChange" style="color:var(--up-color); font-weight:bold;">0.00%</div>
                     </div>
                     <canvas id="priceChart"></canvas>
                 </div>
@@ -180,16 +186,19 @@
 
             <div class="panel">
                 <div class="panel-header"><span>AI Prediction Engine</span> <i class="fas fa-brain"></i></div>
+                
                 <div class="ai-confidence">
                     <div class="conf-circle" style="border-color: var(--accent-color)">
                         <div class="conf-value" id="aiConf">88%</div>
                         <div class="conf-label">CONFIDENCE</div>
                     </div>
                 </div>
-                <div id="signalBox" style="background:#111; padding:15px; border:1px solid #333; border-radius:4px; margin-top:15px; text-align:center;">
-                    <div style="font-size:0.7rem; color:#888;">RECOMMENDED ACTION</div>
-                    <div id="aiSignal" style="font-size:1.5rem; font-weight:bold; letter-spacing:2px; color:#fff;">HOLD</div>
+
+                <div class="signal-box" id="signalBox">
+                    <div style="font-size:0.7rem; color:#888; margin-bottom: 5px;">RECOMMENDED ACTION</div>
+                    <div class="signal-text" id="aiSignal">HOLD</div>
                 </div>
+
                 <div class="panel-header" style="margin-top:20px;"><span>Market Sentiment</span> <i class="fas fa-globe"></i></div>
                 <div class="news-feed" id="newsFeed"></div>
             </div>
@@ -205,7 +214,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- AUTH LOGIC (OLD STYLE) ---
+            // --- AUTH LOGIC (GIỮ NGUYÊN HOÀN TOÀN) ---
             const loginOverlay = document.getElementById('loginOverlay');
             const mainApp = document.getElementById('mainApp');
             const btnLogin = document.getElementById('mainAuthBtn');
@@ -221,13 +230,13 @@
                     title.textContent = "SYSTEM REGISTER";
                     btnLogin.textContent = "REGISTER ACCESS";
                     toggleBtn.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
-                    btnLogin.style.background = "#3b82f6"; // Xanh dương cho Register
+                    btnLogin.style.background = "#3b82f6"; // Blue
                     title.style.borderBottomColor = "#3b82f6";
                 } else {
                     title.textContent = "SYSTEM LOGIN";
                     btnLogin.textContent = "LOGIN";
                     toggleBtn.textContent = "NEW OPERATOR? REGISTER ACCESS";
-                    btnLogin.style.background = "#0ecb81"; // Xanh lá cho Login
+                    btnLogin.style.background = "#0ecb81"; // Green
                     title.style.borderBottomColor = "#0ecb81";
                 }
             });
@@ -237,9 +246,7 @@
                 const p = document.getElementById('password').value;
                 
                 // Guest Mode (Empty Login)
-                if(!u && !p && !isRegister) {
-                    enterApp(); return;
-                }
+                if(!u && !p && !isRegister) { enterApp(); return; }
 
                 if(!u || !p) { msg.textContent = "Please enter credentials."; return; }
                 
@@ -248,7 +255,7 @@
                     msg.textContent = "Registration Success! Please Login.";
                     setTimeout(() => toggleBtn.click(), 1000);
                 } else {
-                    // Chấp nhận mọi user/pass để demo
+                    // Accept any credentials for demo
                     enterApp();
                 }
             });
@@ -262,22 +269,30 @@
                         loginOverlay.style.display = 'none';
                         mainApp.style.display = 'flex';
                         setTimeout(() => mainApp.style.opacity = 1, 100);
-                        startCoreEngine(); // Kích hoạt hệ thống
+                        startCoreEngine(); // Kích hoạt biểu đồ thật
                     }, 500);
                 }, 800);
             }
 
-            // --- CORE ENGINE (SIMULATION) ---
-            function startCoreEngine() {
-                // 1. Init Data
-                let price = 43250.00;
-                let history = Array.from({length: 100}, () => {
-                    price += (Math.random() - 0.5) * 100;
-                    return price;
-                });
-                let labels = Array.from({length: 100}, (_,i) => i);
+            // --- CORE ENGINE (SỬ DỤNG BINANCE API THẬT) ---
+            async function startCoreEngine() {
+                let history = [];
+                let labels = [];
 
-                // 2. Charts
+                // 1. Lấy dữ liệu lịch sử từ Binance để biểu đồ không bị trắng trơn
+                try {
+                    const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100');
+                    const data = await res.json();
+                    history = data.map(d => parseFloat(d[4])); // Giá đóng cửa
+                    labels = data.map((_, i) => i);
+                } catch (e) {
+                    // Nếu lỗi API thì dùng dữ liệu dự phòng
+                    let price = 43250.00;
+                    history = Array.from({length: 100}, () => { price += (Math.random() - 0.5) * 100; return price; });
+                    labels = Array.from({length: 100}, (_,i) => i);
+                }
+
+                // 2. Khởi tạo Biểu đồ
                 const ctxP = document.getElementById('priceChart').getContext('2d');
                 const pChart = new Chart(ctxP, {
                     type: 'line',
@@ -289,7 +304,8 @@
                                 const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400);
                                 grad.addColorStop(0, 'rgba(14, 203, 129, 0.2)'); grad.addColorStop(1, 'rgba(14, 203, 129, 0)');
                                 return grad;
-                            }
+                            },
+                            tension: 0.2 // Nến thật nên giảm độ cong
                         }, {
                             label: 'EMA', data: calcEMA(history, 20), borderColor: '#f59e0b', borderWidth: 1, pointRadius: 0
                         }]
@@ -307,80 +323,96 @@
                     options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', min:0, max:100, grid:{color:'#1f2937'}}} }
                 });
 
-                // 3. Loop (1s)
-                setInterval(() => {
-                    const last = history[history.length-1];
-                    const change = (Math.random() - 0.5) * 80;
-                    let next = last + change;
-                    
-                    history.shift(); history.push(next);
-                    labels.shift(); labels.push(labels[labels.length-1]+1);
+                // 3. Kết nối WebSocket để cập nhật giá trực tiếp mỗi giây
+                const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    const currentPrice = parseFloat(data.c); // Giá hiện tại
+                    const changePercent = parseFloat(data.P); // % thay đổi 24h
 
-                    // Update Charts
+                    // Cập nhật mảng
+                    history.shift(); 
+                    history.push(currentPrice);
+
+                    // Cập nhật Biểu đồ
                     pChart.data.datasets[0].data = history;
                     pChart.data.datasets[1].data = calcEMA(history, 20);
                     iChart.data.datasets[0].data = calcRSI(history);
                     pChart.update(); iChart.update();
 
-                    // Update DOM
+                    // Cập nhật giao diện (Số lớn)
                     const elP = document.getElementById('mainPrice');
-                    elP.innerText = next.toFixed(2);
-                    elP.style.color = change >= 0 ? '#0ecb81' : '#f6465d';
+                    elP.innerText = currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    elP.style.color = changePercent >= 0 ? '#0ecb81' : '#f6465d';
                     
                     const elC = document.getElementById('priceChange');
-                    elC.innerText = (change >= 0 ? "+" : "") + (change/next*100).toFixed(2) + "%";
-                    elC.style.color = change >= 0 ? '#0ecb81' : '#f6465d';
+                    elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
+                    elC.style.color = changePercent >= 0 ? '#0ecb81' : '#f6465d';
 
-                    updateAI(calcRSI(history).pop(), change);
-                    updateOrderBook(next);
+                    // Cập nhật các bảng phụ
+                    updateAI(calcRSI(history).pop(), changePercent);
+                    updateOrderBook(currentPrice);
+                };
 
-                }, 1000);
-
-                // News Loop
+                // Cập nhật tin tức
                 setInterval(addNews, 5000);
                 addNews();
             }
 
-            // --- HELPERS ---
+            // --- HELPERS (Công thức chuẩn) ---
             function calcEMA(data, period) {
                 let k = 2/(period+1), ema=data[0], res=[];
                 data.forEach(p => { ema = p*k + ema*(1-k); res.push(ema); });
                 return res;
             }
+            
             function calcRSI(data) {
                 let res = Array(14).fill(50);
                 for(let i=14; i<data.length; i++) {
-                    let delta = data[i] - data[i-1];
-                    let rsi = 50 + delta * 0.5; // Simplified RSI
-                    if(rsi>90) rsi=90; if(rsi<10) rsi=10;
-                    res.push(rsi);
+                    let up = 0, down = 0;
+                    for(let j=i-14; j<i; j++) {
+                        let diff = data[j+1] - data[j];
+                        if(diff > 0) up += diff; else down -= diff;
+                    }
+                    if (down === 0) res.push(100);
+                    else res.push(100 - (100 / (1 + up/down)));
                 }
                 return res;
             }
+
             function updateOrderBook(p) {
                 let h = "";
-                for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:#f6465d">${(p+i*2+Math.random()).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
-                h += `<div style="text-align:center; color:#fff; font-weight:bold; margin:3px 0;">${p.toFixed(2)}</div>`;
-                for(let i=1; i<=5; i++) h += `<div class="ob-row bg-green-soft"><span style="color:#0ecb81">${(p-i*2-Math.random()).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
+                for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:#f6465d">${(p+i*1.5).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
+                h += `<div style="text-align:center; color:#fff; font-weight:bold; margin:3px 0;">${p.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>`;
+                for(let i=1; i<=5; i++) h += `<div class="ob-row bg-green-soft"><span style="color:#0ecb81">${(p-i*1.5).toFixed(2)}</span> <span style="color:#888">${(Math.random()*2).toFixed(3)}</span></div>`;
                 document.getElementById('orderBook').innerHTML = h;
             }
+
             function updateAI(rsi, chg) {
                 let sig="HOLD", col="#888", conf = 85 + Math.random()*10;
+                
+                // Thuật toán ra quyết định
                 if(rsi > 70) { sig="STRONG SELL"; col="#f6465d"; conf+=3; }
                 else if(rsi < 30) { sig="STRONG BUY"; col="#0ecb81"; conf+=3; }
-                else if(chg > 20) { sig="BUY"; col="#0ecb81"; }
+                else if(chg > 1.5) { sig="BUY"; col="#0ecb81"; }
+                else if(chg < -1.5) { sig="SELL"; col="#f6465d"; }
                 
-                document.getElementById('aiSignal').innerText = sig;
-                document.getElementById('aiSignal').style.color = col;
+                const sigBox = document.getElementById('aiSignal');
+                sigBox.innerText = sig;
+                sigBox.style.color = col;
+                
                 document.getElementById('signalBox').style.borderColor = col;
                 document.getElementById('aiConf').innerText = conf.toFixed(1) + "%";
+                document.getElementById('aiConf').style.color = col;
                 document.querySelector('.conf-circle').style.borderColor = col;
             }
+
             const newsDB = [
                 {t:"StableCast AI detects anomaly in volume", s:"pos"}, {t:"Bitcoin approaches resistance level", s:"neg"},
                 {t:"ETH gas fees drop significantly", s:"pos"}, {t:"Market volatility expected to increase", s:"neg"},
                 {t:"Team 1 Model optimization complete", s:"pos"}
             ];
+
             function addNews() {
                 const n = newsDB[Math.floor(Math.random()*newsDB.length)];
                 const h = `<div class="news-item"><div class="news-title">${n.t}</div><div class="news-meta"><span>Just now</span><span class="sentiment-tag ${n.s==='pos'?'sent-pos':'sent-neg'}">${n.s==='pos'?'BULLISH':'BEARISH'}</span></div></div>`;
@@ -392,4 +424,3 @@
     </script>
 </body>
 </html>
-
