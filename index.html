@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableCast</title>
+    <title>StableCast | TEAM 1 - ADY201m</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%233b82f6' d='M239.1 6.3l-208 78c-18.7 7-31.1 25-31.1 45v225.1c0 18.2 10.3 34.8 26.5 42.9l208 104c13.5 6.8 29.4 6.8 42.9 0l208-104c16.2-8.1 26.5-24.8 26.5-42.9V129.3c0-20-12.4-37.9-31.1-44.9l-208-78C262 2.2 250 2.2 239.1 6.3zM256 68.4l192 72v.3l-192 83.2-192-83.2v-.3l192-72zm-32 158.5v192.6l-160-80V171.8l160 55.1zm64 192.6V226.9l160-55.1v167.6l-160 80z'/></svg>" type="image/svg+xml">
     
@@ -64,7 +64,7 @@
         .secure-text { margin-top: 20px; color: #444; font-size: 0.7rem; letter-spacing: 1px; }
 
         /* =========================================
-           2. MAIN INTERFACE (3 CỘT)
+           2. MAIN INTERFACE (3 CỘT - BINANCE LIVE)
            ========================================= */
         .main-app { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 1s; }
         
@@ -95,16 +95,18 @@
         .signal-box { background: #111; padding: 15px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; text-align: center; transition: border-color 0.5s; }
         .signal-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; transition: color 0.5s; }
 
+        /* Bảng thông số kỹ thuật */
         .params-box { background: #111; padding: 12px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; }
         .param-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
         .param-label { color: #888; }
         .param-val { color: #fff; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
 
-        /* Tin tức thật */
-        .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; }
-        .news-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #222; }
-        .news-title { font-size: 0.85rem; font-weight: bold; color: #fff; margin-bottom: 4px; line-height: 1.3; }
-        .news-meta { font-size: 0.65rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        /* Tin tức thật (Scrollable) */
+        .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
+        .news-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #222; transition: opacity 0.3s; cursor: pointer; display: block; text-decoration: none; color: inherit; }
+        .news-item:hover { opacity: 0.7; }
+        .news-title { font-size: 0.85rem; font-weight: bold; color: #fff; margin-bottom: 6px; line-height: 1.3; }
+        .news-meta { font-size: 0.65rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .sentiment-tag { padding: 2px 6px; border-radius: 2px; font-size: 0.65rem; font-weight: bold; }
         .sent-pos { background: rgba(14, 203, 129, 0.2); color: var(--up-color); }
         .sent-neg { background: rgba(246, 70, 93, 0.2); color: var(--down-color); }
@@ -205,8 +207,7 @@
 
                 <div class="panel-header" style="margin-top:20px;"><span>Live Market Sentiment</span> <i class="fas fa-globe"></i></div>
                 <div class="news-feed" id="newsFeed">
-                    <div id="newsLoading" style="color:#555; font-size: 0.8rem; text-align: center; margin-top: 20px;">Fetching global sentiment...</div>
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -268,6 +269,7 @@
                         mainApp.style.display = 'flex';
                         setTimeout(() => mainApp.style.opacity = 1, 100);
                         startCoreEngine();
+                        initNewsEngine(); // Kích hoạt tin tức an toàn
                     }, 500);
                 }, 800);
             }
@@ -355,77 +357,65 @@
 
                     updateOrderBook(currentPrice);
                 };
-
-                // Kích hoạt News
-                fetchLiveNews();
-                setInterval(showNextNews, 4500); 
-                setInterval(fetchLiveNews, 300000); 
             }
 
-            // --- REAL NEWS ENGINE (KÈM DỮ LIỆU DỰ PHÒNG TRÁNH LỖI MẤT TIN) ---
-            let realNewsList = [];
-            let currentNewsIndex = 0;
-            
-            // Dữ liệu fallback nếu API bị chặn
-            const fallbackNews = [
-                {title: "Bitcoin approaches key resistance level amidst market uncertainty", source_info: {name: "CoinTelegraph"}, url: "https://cointelegraph.com"},
-                {title: "SEC delays decision on latest Ethereum ETF applications", source_info: {name: "CoinDesk"}, url: "https://coindesk.com"},
-                {title: "Whale activity spikes as $500M USDT moves to Binance", source_info: {name: "CryptoQuant"}, url: "https://cryptoquant.com"},
-                {title: "New AI models show unprecedented accuracy in crypto forecasting", source_info: {name: "Forbes"}, url: "https://forbes.com"},
-                {title: "StableCast Pro v5.0 released with advanced tensor analytics", source_info: {name: "TechCrunch"}, url: "https://techcrunch.com"}
-            ];
-
-            async function fetchLiveNews() {
-                try {
-                    const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
-                    const data = await res.json();
-                    
-                    if(data && data.Data && data.Data.length > 0) {
-                        realNewsList = data.Data; 
-                    } else {
-                        realNewsList = fallbackNews; // API trả về rỗng -> Dùng fallback
-                    }
-                } catch (e) {
-                    console.error("News API blocked by browser. Using fallback data.", e);
-                    realNewsList = fallbackNews; // Lỗi mạng/CORS -> Dùng fallback
-                }
-                showNextNews();
-            }
-
-            function showNextNews() {
-                if(realNewsList.length === 0) return;
-                const article = realNewsList[currentNewsIndex];
-                currentNewsIndex = (currentNewsIndex + 1) % realNewsList.length;
-
-                const titleLower = article.title.toLowerCase();
-                let sentiment = "pos"; let label = "BULLISH";
-                if(titleLower.match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud|delay)/)) {
-                    sentiment = "neg"; label = "BEARISH";
-                }
-
-                // Nếu là tin API thật thì có published_on, tin giả thì lấy giờ hiện tại
-                const date = article.published_on ? new Date(article.published_on * 1000) : new Date();
-                const timeString = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
-
-                const h = `
-                    <a href="${article.url}" target="_blank" style="text-decoration: none; color: inherit;">
-                        <div class="news-item" style="transition: opacity 0.3s; cursor: pointer;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">
-                            <div class="news-title">${article.title}</div>
-                            <div class="news-meta">
-                                <span>${article.source_info.name} • ${timeString}</span>
-                                <span class="sentiment-tag ${sentiment === 'pos' ? 'sent-pos' : 'sent-neg'}">${label}</span>
-                            </div>
-                        </div>
-                    </a>
-                `;
-                
+            // --- NEWS ENGINE CHỐNG LỖI MẤT TIN TỨC ---
+            function initNewsEngine() {
                 const feed = document.getElementById('newsFeed');
-                // Xóa chữ "Fetching..." ban đầu nếu có
-                const loadingTxt = document.getElementById('newsLoading');
-                if(loadingTxt) loadingTxt.remove();
+                
+                // Dữ liệu dự phòng siêu an toàn (hiển thị ngay lập tức)
+                const fallbackNews = [
+                    {title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", url: "https://cointelegraph.com", sentiment: "pos", time: "Just now"},
+                    {title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", url: "https://coindesk.com", sentiment: "neg", time: "5 mins ago"},
+                    {title: "Whale activity spikes as $500M USDT moves to Binance", source: "CryptoQuant", url: "https://cryptoquant.com", sentiment: "neg", time: "12 mins ago"},
+                    {title: "New AI models show unprecedented accuracy in crypto forecasting", source: "Forbes", url: "https://forbes.com", sentiment: "pos", time: "1 hr ago"}
+                ];
 
-                feed.insertAdjacentHTML('afterbegin', h);
-                if(feed.children.length > 5) feed.lastChild.remove();
+                // Hàm vẽ HTML cho tin tức
+                function createNewsHTML(item, isLiveAPI) {
+                    let title, source, url, label, sentClass, timeString;
+
+                    if (isLiveAPI) {
+                        title = item.title;
+                        source = item.source_info ? item.source_info.name : "Crypto News";
+                        url = item.url;
+                        const titleLower = title.toLowerCase();
+                        label = "BULLISH"; sentClass = "sent-pos";
+                        if(titleLower.match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud|delay)/)) {
+                            label = "BEARISH"; sentClass = "sent-neg";
+                        }
+                        const date = new Date(item.published_on * 1000);
+                        timeString = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+                    } else {
+                        title = item.title; source = item.source; url = item.url; timeString = item.time;
+                        label = item.sentiment === 'pos' ? "BULLISH" : "BEARISH";
+                        sentClass = item.sentiment === 'pos' ? "sent-pos" : "sent-neg";
+                    }
+
+                    return `
+                        <a href="${url}" target="_blank" class="news-item">
+                            <div class="news-title">${title}</div>
+                            <div class="news-meta">
+                                <span>${source} • ${timeString}</span>
+                                <span class="sentiment-tag ${sentClass}">${label}</span>
+                            </div>
+                        </a>
+                    `;
+                }
+
+                // Điền ngay dữ liệu giả để KHÔNG BAO GIỜ TRỐNG
+                feed.innerHTML = fallbackNews.map(n => createNewsHTML(n, false)).join('');
+
+                // Gọi API thật đè lên nếu kết nối mạng tốt
+                fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN')
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data && data.Data && data.Data.length > 0) {
+                            const topNews = data.Data.slice(0, 5); // Lấy 5 tin mới nhất
+                            feed.innerHTML = topNews.map(n => createNewsHTML(n, true)).join('');
+                        }
+                    })
+                    .catch(e => console.warn("Sử dụng tin tức dự phòng do API bị trình duyệt chặn."));
             }
 
             // --- MATH HELPERS ---
