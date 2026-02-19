@@ -94,7 +94,7 @@
         .signal-box { background: #111; padding: 15px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; text-align: center; transition: border-color 0.5s; }
         .signal-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; transition: color 0.5s; }
 
-        /* Bảng thông số kỹ thuật mới thêm */
+        /* Bảng thông số kỹ thuật */
         .params-box { background: #111; padding: 12px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; }
         .param-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
         .param-label { color: #888; }
@@ -159,7 +159,11 @@
             <div class="panel" style="padding:0;">
                 <div class="chart-wrapper">
                     <div class="price-overlay">
-                        <div style="font-size:0.8rem; color:#888; font-weight:bold;">BTC/USDT PERPETUAL</div>
+                        <div style="font-size:0.8rem; color:#888; font-weight:bold; display: flex; gap: 12px; align-items: center;">
+                            BTC/USDT PERPETUAL
+                            <span style="color: var(--up-color); font-size: 0.7rem;">■ REAL-TIME</span>
+                            <span style="color: var(--accent-color); font-size: 0.7rem;">╍ AI FORECAST</span>
+                        </div>
                         <div class="main-price" id="mainPrice">LOADING...</div>
                         <div id="priceChange" style="color:var(--up-color); font-weight:bold;">0.00%</div>
                     </div>
@@ -270,6 +274,7 @@
             // --- CORE ENGINE (BINANCE API & WEBSOCKET) ---
             async function startCoreEngine() {
                 let history = [];
+                let aiHistory = []; // Thêm mảng chứa điểm dự đoán
                 let labels = [];
 
                 // 1. Fetch History
@@ -278,27 +283,37 @@
                     const data = await res.json();
                     history = data.map(d => parseFloat(d[4]));
                     labels = data.map((_, i) => i);
+                    
+                    // Khởi tạo mảng dự đoán bám theo giá thật ban đầu
+                    aiHistory = history.map(p => p + (Math.random() - 0.5) * (p * 0.0015)); 
+                    
                     document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-check-circle"></i> BINANCE LIVE STREAM';
                 } catch (e) {
                     let price = 43250.00;
                     history = Array.from({length: 100}, () => { price += (Math.random() - 0.5) * 100; return price; });
+                    aiHistory = history.map(p => p + (Math.random() - 0.5) * 50);
                     labels = Array.from({length: 100}, (_,i) => i);
                 }
 
-                // 2. Setup Charts
+                // 2. Setup Charts (THÊM ĐƯỜNG AI)
                 const ctxP = document.getElementById('priceChart').getContext('2d');
                 const pChart = new Chart(ctxP, {
                     type: 'line',
                     data: {
                         labels: labels,
-                        datasets: [{
-                            label: 'Price', data: history, borderColor: '#0ecb81', borderWidth: 2, pointRadius: 0, fill: true,
-                            backgroundColor: (ctx) => {
-                                const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400);
-                                grad.addColorStop(0, 'rgba(14, 203, 129, 0.15)'); grad.addColorStop(1, 'rgba(14, 203, 129, 0)');
-                                return grad;
-                            }, tension: 0.2
-                        }]
+                        datasets: [
+                            {
+                                label: 'Real Price', data: history, borderColor: '#0ecb81', borderWidth: 2, pointRadius: 0, fill: true,
+                                backgroundColor: (ctx) => {
+                                    const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400);
+                                    grad.addColorStop(0, 'rgba(14, 203, 129, 0.15)'); grad.addColorStop(1, 'rgba(14, 203, 129, 0)');
+                                    return grad;
+                                }, tension: 0.2
+                            },
+                            {
+                                label: 'AI Forecast', data: aiHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, tension: 0.2
+                            }
+                        ]
                     },
                     options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', grid:{color:'#1f2937'}}} }
                 });
@@ -317,13 +332,28 @@
                     const currentPrice = parseFloat(data.c); 
                     const changePercent = parseFloat(data.P);
 
+                    // Push tạm thời để tính toán MACD, RSI chính xác
                     history.shift(); history.push(currentPrice);
-                    pChart.data.datasets[0].data = history;
                     
                     const rsiData = calcRSI(history);
-                    iChart.data.datasets[0].data = rsiData;
-                    pChart.update(); iChart.update();
+                    const currentRSI = rsiData[rsiData.length - 1];
+                    const macdArray = calcMACD(history);
+                    const currentMACD = macdArray[macdArray.length - 1];
 
+                    // AI Xử lý và trả về giá dự đoán
+                    const predPrice = updateAI(currentRSI, currentMACD, changePercent, currentPrice);
+                    
+                    aiHistory.shift(); aiHistory.push(predPrice);
+
+                    // Vẽ lại Biểu đồ
+                    pChart.data.datasets[0].data = history; // Đường thật
+                    pChart.data.datasets[1].data = aiHistory; // Đường nét đứt xanh
+                    pChart.update(); 
+                    
+                    iChart.data.datasets[0].data = rsiData;
+                    iChart.update();
+
+                    // Cập nhật DOM Giá
                     const elP = document.getElementById('mainPrice');
                     elP.innerText = currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     elP.style.color = changePercent >= 0 ? '#0ecb81' : '#f6465d';
@@ -332,13 +362,6 @@
                     elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
                     elC.style.color = changePercent >= 0 ? '#0ecb81' : '#f6465d';
 
-                    // Tính MACD
-                    const macdArray = calcMACD(history);
-                    const currentMACD = macdArray[macdArray.length - 1];
-                    const currentRSI = rsiData[rsiData.length - 1];
-
-                    // Cập nhật Cột Phải
-                    updateAI(currentRSI, currentMACD, changePercent, currentPrice);
                     updateOrderBook(currentPrice);
                 };
 
@@ -430,43 +453,39 @@
                 document.getElementById('orderBook').innerHTML = h;
             }
 
-            // --- CẬP NHẬT AI & THÔNG SỐ (FIX CONFIDENCE & ADD PARAMS) ---
+            // --- CẬP NHẬT AI & THÔNG SỐ (TRẢ VỀ GIÁ DỰ ĐOÁN ĐỂ VẼ BIỂU ĐỒ) ---
             function updateAI(rsi, macd, chg, price) {
                 let sig = "HOLD", col = "#888";
                 
-                // Confidence điều chỉnh chân thực hơn (45% -> 85%)
+                // Độ tự tin 45% -> 85%
                 let conf = 45 + Math.random() * 15; 
-                let predOffset = (Math.random() - 0.5) * (price * 0.001); // Sai số dự đoán
+                let predOffset = (Math.random() - 0.5) * (price * 0.001);
 
                 if (rsi > 65 || (macd < 0 && chg < -0.5)) {
                     sig = "SELL"; col = "#f6465d";
                     conf = 65 + Math.random() * 15;
-                    predOffset = -(price * (0.005 + Math.random() * 0.008)); // Dự đoán giảm
+                    predOffset = -(price * (0.005 + Math.random() * 0.005));
                     if(rsi > 75) { sig = "STRONG SELL"; conf += 5; }
                 } 
                 else if (rsi < 35 || (macd > 0 && chg > 0.5)) {
                     sig = "BUY"; col = "#0ecb81";
                     conf = 65 + Math.random() * 15;
-                    predOffset = (price * (0.005 + Math.random() * 0.008)); // Dự đoán tăng
+                    predOffset = (price * (0.005 + Math.random() * 0.005));
                     if(rsi < 25) { sig = "STRONG BUY"; conf += 5; }
                 }
 
-                // Chặn confidence tối đa không quá 89% cho chân thực
                 if(conf > 88.5) conf = 88.5 - Math.random();
 
                 const predPrice = price + predOffset;
 
-                // Stop Loss & Take Profit linh động theo tín hiệu
+                // Stop Loss / Take Profit
                 let sl, tp;
                 if(sig.includes("BUY")) {
-                    sl = price * 0.985; // Cắt lỗ 1.5%
-                    tp = price * 1.03;  // Chốt lời 3%
+                    sl = price * 0.985; tp = price * 1.03;
                 } else if(sig.includes("SELL")) {
-                    sl = price * 1.015;
-                    tp = price * 0.97;
+                    sl = price * 1.015; tp = price * 0.97;
                 } else {
-                    sl = price * 0.99;
-                    tp = price * 1.01;
+                    sl = price * 0.99; tp = price * 1.01;
                 }
 
                 // Cập nhật DOM
@@ -480,7 +499,6 @@
                 document.getElementById('aiPredPrice').innerText = predPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 document.getElementById('aiPredPrice').style.color = col;
 
-                // Cập nhật bảng thông số
                 document.getElementById('slVal').innerText = sl.toLocaleString('en-US', {minimumFractionDigits: 2});
                 document.getElementById('tpVal').innerText = tp.toLocaleString('en-US', {minimumFractionDigits: 2});
                 
@@ -489,6 +507,8 @@
 
                 document.getElementById('macdVal').innerText = macd.toFixed(2);
                 document.getElementById('macdVal').style.color = macd > 0 ? "#0ecb81" : "#f6465d";
+
+                return predPrice; // Trả về để vẽ line nét đứt
             }
         });
     </script>
