@@ -13,7 +13,7 @@
     
     <style>
         /* =========================================
-           GIỮ NGUYÊN 100% CSS GIAO DIỆN CHUYÊN NGHIỆP
+           1. CORE VARIABLES & SETUP 
            ========================================= */
         :root {
             --bg-dark: #050608;
@@ -28,106 +28,53 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background: var(--bg-dark); 
-            background-image: var(--bg-gradient);
-            color: var(--text-main); 
-            font-family: 'JetBrains Mono', monospace; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        ::-webkit-scrollbar { width: 5px; } 
-        ::-webkit-scrollbar-track { background: transparent; } 
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 5px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        body { background: var(--bg-dark); background-image: var(--bg-gradient); color: var(--text-main); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 5px; } ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
 
-        /* LOGIN SCREEN */
+        /* =========================================
+           2. LOGIN SCREEN
+           ========================================= */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,4,6,0.85); backdrop-filter: blur(20px); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        
-        .login-box { 
-            width: 90%; max-width: 420px; padding: 40px; 
-            background: linear-gradient(145deg, rgba(20,24,33,0.7), rgba(10,12,16,0.9)); 
-            border: 1px solid var(--border-light); 
-            border-radius: 20px; 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1); 
-            text-align: center; 
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-box::before {
-            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--up-color), transparent);
-            animation: scanline 3s linear infinite;
-        }
+        .login-box { width: 90%; max-width: 420px; padding: 40px; background: linear-gradient(145deg, rgba(20,24,33,0.7), rgba(10,12,16,0.9)); border: 1px solid var(--border-light); border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1); text-align: center; position: relative; overflow: hidden; }
+        .login-box::before { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--up-color), transparent); animation: scanline 3s linear infinite; }
         @keyframes scanline { 0% {left: -100%;} 100% {left: 100%;} }
-
-        .login-box h2 { 
-            color: #fff; margin-bottom: 30px; letter-spacing: 3px; 
-            border-bottom: 2px solid var(--up-color); display: inline-block; padding-bottom: 10px; 
-            text-shadow: 0 0 15px rgba(0, 210, 131, 0.5); font-family: 'JetBrains Mono', monospace;
-        }
+        .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 3px; border-bottom: 2px solid var(--up-color); display: inline-block; padding-bottom: 10px; text-shadow: 0 0 15px rgba(0, 210, 131, 0.5); font-family: 'JetBrains Mono', monospace; transition: 0.3s;}
         
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         .input-group input { width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--up-color); font-size: 1rem; outline: none; transition: all 0.3s; font-family: 'JetBrains Mono', monospace; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
         .input-group input:focus { border-color: var(--up-color); box-shadow: 0 0 15px rgba(0, 210, 131, 0.3), inset 0 2px 5px rgba(0,0,0,0.5); }
         
-        button#mainAuthBtn { 
-            width: 100%; padding: 14px; margin-top: 10px; 
-            background: linear-gradient(90deg, #00d283, #009960); 
-            color: #000; font-weight: 800; border: none; border-radius: 8px; 
-            cursor: pointer; font-size: 1rem; transition: all 0.3s; 
-            letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0, 210, 131, 0.4);
-        }
+        button#mainAuthBtn { width: 100%; padding: 14px; margin-top: 10px; background: linear-gradient(90deg, #00d283, #009960); color: #000; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.3s; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 210, 131, 0.4); }
         button#mainAuthBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 210, 131, 0.6); }
         
-        .toggle-auth { margin-top: 25px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .toggle-auth { margin-top: 25px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-right: 15px;}
         .toggle-auth:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        #loginMsg { margin-top: 20px; font-size: 0.85rem; font-weight: 600; min-height: 20px; }
+        
+        #loginMsg { margin-top: 15px; font-size: 0.85rem; font-weight: 600; min-height: 20px; }
         .secure-text { margin-top: 25px; color: #555; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* MAIN APP */
+        /* =========================================
+           3. MAIN APP 
+           ========================================= */
         .main-app { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 1s; }
         
-        header { 
-            height: 70px; background: rgba(5,6,8,0.7); backdrop-filter: blur(15px); 
-            border-bottom: 1px solid var(--border-light); 
-            display: flex; justify-content: space-between; align-items: center; padding: 0 25px; 
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5); z-index: 10;
-        }
+        header { height: 70px; background: rgba(5,6,8,0.7); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); z-index: 10; }
         .brand { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; letter-spacing: 1.5px; color: #fff; display: flex; align-items: center; gap: 10px; }
         .brand span { color: var(--accent-color); text-shadow: 0 0 15px rgba(59, 130, 246, 0.8); }
         .brand sup { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #aaa; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); letter-spacing: 0; margin-left: 5px; }
-        .market-ticker { display: flex; gap: 25px; font-size: 0.85rem; letter-spacing: 0.5px; }
+        
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
+        .social-btn { color: var(--text-muted); font-size: 1.4rem; cursor: pointer; transition: all 0.3s; position: relative; }
+        .social-btn:hover { color: var(--accent-color); text-shadow: 0 0 15px var(--accent-color); transform: scale(1.1); }
+        .social-btn .badge { position: absolute; top: -6px; right: -8px; background: var(--down-color); color: #fff; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 2px solid var(--bg-dark); display: none; }
+        .market-ticker { font-size: 0.85rem; letter-spacing: 0.5px; padding-left: 20px; border-left: 1px solid rgba(255,255,255,0.1); }
 
-        .grid-container { 
-            flex: 1; display: grid; grid-template-columns: 280px 1fr 340px; gap: 15px; 
-            padding: 15px; overflow: hidden; 
-        }
+        .grid-container { flex: 1; display: grid; grid-template-columns: 280px 1fr 340px; gap: 15px; padding: 15px; overflow: hidden; }
 
-        .panel { 
-            background: var(--panel-bg); backdrop-filter: blur(15px);
-            border: 1px solid var(--border-light); border-radius: 16px; 
-            padding: 20px; overflow-y: auto; display: flex; flex-direction: column; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .panel:hover {
-            box-shadow: 0 15px 50px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-
-        .panel-header { 
-            font-size: 0.8rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; 
-        }
+        .panel { background: var(--panel-bg); backdrop-filter: blur(15px); border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .panel-header { font-size: 0.8rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
         .panel-header i { color: var(--accent-color); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
 
         .ob-row { display: flex; justify-content: space-between; margin-bottom: 3px; padding: 4px 6px; font-size: 0.75rem; border-radius: 4px; transition: background 0.2s; cursor: default; }
@@ -141,43 +88,19 @@
         .main-price { font-size: 4rem; font-weight: 700; color: var(--up-color); font-family: 'Rajdhani', sans-serif; line-height: 1; text-shadow: 0 0 25px rgba(0, 210, 131, 0.4); transition: color 0.3s, text-shadow 0.3s; }
 
         .ai-confidence { text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .conf-circle { 
-            width: 140px; height: 140px; border-radius: 50%; 
-            border: 4px solid var(--border-light); margin: 10px auto 0; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            transition: all 0.5s; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%); 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
+        .conf-circle { width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--border-light); margin: 10px auto 0; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.5s; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
         .conf-value { font-size: 2.8rem; font-weight: 700; color: #fff; font-family: 'Rajdhani', sans-serif; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .conf-label { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 2px; }
-
-        .signal-box { 
-            background: rgba(0,0,0,0.5); padding: 18px; 
-            border: 1px solid var(--border-light); border-radius: 12px; 
-            margin-top: 20px; text-align: center; transition: all 0.5s; 
-            box-shadow: inset 0 2px 15px rgba(0,0,0,0.5);
-        }
+        .signal-box { background: rgba(0,0,0,0.5); padding: 18px; border: 1px solid var(--border-light); border-radius: 12px; margin-top: 20px; text-align: center; transition: all 0.5s; box-shadow: inset 0 2px 15px rgba(0,0,0,0.5); }
         .signal-text { font-size: 2rem; font-weight: 800; letter-spacing: 4px; color: #fff; font-family: 'Rajdhani', sans-serif; transition: all 0.5s; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-
         .params-box { background: rgba(0,0,0,0.3); padding: 15px; border: 1px solid var(--border-light); border-radius: 12px; margin-top: 15px; }
         .param-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.8rem; }
         .param-label { color: var(--text-muted); }
         .param-val { color: #fff; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
 
         .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; padding-right: 5px; min-height: 150px; }
-        .news-item { 
-            margin-bottom: 12px; padding: 15px; 
-            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 10px; transition: all 0.3s; cursor: pointer; 
-            display: block; text-decoration: none; color: inherit; 
-        }
-        .news-item:hover { 
-            background: rgba(255,255,255,0.08); 
-            border-color: rgba(255,255,255,0.15); 
-            transform: translateY(-3px) scale(1.02); 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
-        }
+        .news-item { margin-bottom: 12px; padding: 15px; background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; transition: all 0.3s; cursor: pointer; display: block; text-decoration: none; color: inherit; }
+        .news-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         .news-title { font-size: 0.85rem; font-weight: 600; color: #fff; margin-bottom: 10px; line-height: 1.4; }
         .news-meta { font-size: 0.65rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .sentiment-tag { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -190,6 +113,134 @@
         @keyframes pulse-icon { 0% {opacity: 1; text-shadow: 0 0 15px var(--up-color);} 50% {opacity: 0.4; text-shadow: 0 0 0px transparent;} 100% {opacity: 1; text-shadow: 0 0 15px var(--up-color);} }
         .fa-circle-notch { animation: fa-spin 2s linear infinite, pulse-icon 1.5s ease-in-out infinite; }
 
+        /* =========================================
+           4. OVERLAY CHUNG (MẠNG XÃ HỘI & HỒ SƠ TỐI ƯU HÓA)
+           ========================================= */
+        .full-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,4,6,0.9); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .overlay-container { width: 85%; max-width: 1000px; height: 80vh; background: linear-gradient(145deg, rgba(20,24,33,0.95), rgba(10,12,16,0.98)); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1); display: flex; overflow: hidden; position: relative; }
+        .overlay-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #888; cursor: pointer; transition: 0.3s; z-index: 100; background: rgba(0,0,0,0.5); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
+        .overlay-close:hover { color: var(--down-color); transform: scale(1.1); background: rgba(0,0,0,0.8); }
+
+        /* --- TÍNH NĂNG CHAT TỐI ƯU UI --- */
+        .social-sidebar { width: 300px; background: rgba(0,0,0,0.5); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; position: relative; }
+        .social-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: bold; color: #fff; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        
+        .friend-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px;}
+        .friend-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .friend-item:hover, .friend-item.active { background: rgba(59, 130, 246, 0.15); border-left: 3px solid var(--accent-color); }
+        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; position: relative; border: 1px solid #444; overflow: hidden; flex-shrink: 0;}
+        .friend-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--up-color); position: absolute; bottom: 0; right: 0; border: 2px solid #111; z-index: 2;}
+        .status-dot.offline { background: var(--text-muted); }
+        .friend-info { flex: 1; overflow: hidden; }
+        .friend-info h4 { color: #fff; font-size: 0.95rem; margin-bottom: 4px; font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .friend-info p { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: transparent; position: relative;}
+        .chat-header { padding: 15px 20px; padding-right: 70px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); }
+        .chat-actions { margin-left: auto; display: flex; gap: 20px; font-size: 1.2rem; color: var(--accent-color); margin-right: 45px; }
+        .chat-actions i { cursor: pointer; transition: 0.3s; }
+        .chat-actions i:hover { color: #fff; text-shadow: 0 0 10px var(--accent-color); transform: scale(1.1); }
+
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        .msg-wrapper { display: flex; gap: 12px; align-items: flex-end; max-width: 80%; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .msg-wrapper.sent { align-self: flex-end; flex-direction: row-reverse; }
+        .msg-wrapper.received { align-self: flex-start; }
+        .msg-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 1px solid #444; flex-shrink: 0;}
+        .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .msg { padding: 12px 18px; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; position: relative; font-family: 'JetBrains Mono', monospace; word-wrap: break-word;}
+        .msg img { max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 5px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+        .msg a { color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;}
+        .msg a:hover { background: rgba(0,0,0,0.5); border-color: var(--accent-color); }
+        
+        .msg-received { background: rgba(255,255,255,0.08); border-bottom-left-radius: 0; border: 1px solid rgba(255,255,255,0.05); }
+        .msg-sent { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-bottom-right-radius: 0; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+        .msg-time { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 5px; text-align: right; }
+        .sent .msg-time { color: rgba(255,255,255,0.8); }
+
+        .chat-input-area { padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); }
+        .attach-icons { display: flex; gap: 15px; color: #888; font-size: 1.3rem; }
+        .attach-icons i { cursor: pointer; transition: 0.3s; }
+        .attach-icons i:hover { color: var(--up-color); }
+        .chat-input { flex: 1; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-family: 'JetBrains Mono'; outline: none; transition: 0.3s; }
+        .chat-input:focus { border-color: var(--accent-color); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+        .send-btn { background: var(--accent-color); color: #fff; border: none; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); font-size: 1.2rem;}
+        .send-btn:hover { background: #2563eb; transform: translateY(-2px); }
+
+        /* MÀN HÌNH TẠO GROUP / ADD FRIEND (MODAL TRONG SUỐT) */
+        .modal-overlay-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: linear-gradient(145deg, rgba(20,24,33,1), rgba(10,12,16,1)); border: 1px solid var(--accent-color); border-radius: 12px; width: 350px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; }
+        .modal-header { color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .modal-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px; color: #fff; font-family: 'JetBrains Mono'; border-radius: 6px; margin-bottom: 15px; outline: none; transition: 0.3s; text-align: center;}
+        .modal-input:focus { border-color: var(--accent-color); }
+        .modal-list { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;}
+        .modal-item { display: flex; justify-content: space-between; align-items: center; color: #ccc; font-size: 0.85rem; cursor: pointer; padding: 5px 0;}
+        .modal-item input { accent-color: var(--up-color); cursor: pointer; width: 16px; height: 16px;}
+        .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 10px;}
+        .modal-btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'JetBrains Mono'; font-size: 0.8rem; width: 100%; transition: 0.3s;}
+        .modal-cancel { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); }
+        .modal-cancel:hover { background: rgba(255,255,255,0.05); color: #fff;}
+        .modal-create { background: var(--accent-color); color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);}
+        .modal-create:hover { background: #2563eb; transform: translateY(-2px);}
+        .modal-delete { background: rgba(255, 59, 94, 0.1); color: var(--down-color); border: 1px solid rgba(255, 59, 94, 0.3); }
+        .modal-delete:hover { background: var(--down-color); color: #fff; box-shadow: 0 4px 15px rgba(255, 59, 94, 0.4); transform: translateY(-2px);}
+        .kick-btn { color: var(--down-color); padding: 5px; transition: 0.3s; cursor: pointer; }
+        .kick-btn:hover { transform: scale(1.2); text-shadow: 0 0 5px var(--down-color); }
+
+        /* REALISTIC CALL OVERLAY */
+        #callOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,6,8,0.95); backdrop-filter: blur(25px); z-index: 30000; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
+        #callVideoBg { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; }
+        .video-me { position: absolute; bottom: 30px; right: 30px; width: 120px; height: 160px; background: #222; border-radius: 12px; border: 2px solid var(--accent-color); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 5;}
+        .video-me img { width: 100%; height: 100%; object-fit: cover; }
+        .call-content { z-index: 10; text-align: center; margin-top: 15vh; display: flex; flex-direction: column; align-items: center; }
+        .call-avatar-ring { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 4px solid var(--accent-color); animation: ringPulse 1.5s infinite; box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);}
+        .call-avatar-ring img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+        .hangup-btn { width: 65px; height: 65px; border-radius: 50%; background: var(--down-color); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff; cursor: pointer; box-shadow: 0 5px 20px rgba(255, 59, 94, 0.5); transition: 0.3s; margin-top: auto; margin-bottom: 10vh; z-index: 10; align-self: center;}
+        .hangup-btn:hover { transform: scale(1.1); background: #ff1a43; }
+
+        /* --- PROFILE --- */
+        .profile-wrapper { width: 100%; max-width: 650px; margin: 0 auto; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; background: rgba(0,0,0,0.2); }
+        .pf-cover { height: 200px; width: 100%; background-color: #1a1a1a; background-image: url('https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000&auto=format&fit=crop'); background-size: cover; background-position: 50% 50%; position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .pf-edit-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; font-size: 2rem; color: #fff; transition: 0.3s; z-index: 5;}
+        .pf-edit-overlay:hover { background: rgba(0,0,0,0.3); }
+        .is-editing .pf-edit-overlay { display: flex; cursor: pointer; }
+        .is-editing .pf-cover, .is-editing .pf-avatar-img { cursor: grab; }
+        .is-editing .pf-cover:active, .is-editing .pf-avatar-img:active { cursor: grabbing; }
+        .pf-edit-hint { position: absolute; bottom: 10px; width: 100%; text-align: center; font-size: 0.8rem; color: #fff; text-shadow: 0 2px 4px #000; font-family: 'JetBrains Mono'; pointer-events: none;}
+
+        .pf-avatar-section { display: flex; justify-content: space-between; padding: 0 20px; position: relative; top: -50px; margin-bottom: -50px; align-items: flex-end; }
+        .pf-avatar-wrap { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #111; background: #222; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .pf-avatar-img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; pointer-events: none; }
+        .is-editing .pf-avatar-img { pointer-events: auto; } 
+        
+        .pf-btn { background: transparent; border: 1px solid var(--border-light); color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'JetBrains Mono'; margin-top: 60px; backdrop-filter: blur(5px);}
+        .pf-btn:hover { background: rgba(255,255,255,0.1); }
+        .pf-btn-save { background: var(--up-color); color: #000; border: none; display: none; box-shadow: 0 4px 15px rgba(0,210,131,0.4); }
+        .pf-btn-save:hover { background: #00e690; transform: translateY(-2px); }
+
+        .pf-info { padding: 10px 20px 20px; }
+        .pf-name { font-size: 1.5rem; font-family: 'Rajdhani', sans-serif; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .pf-handle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px; }
+        .pf-bio { font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; color: #ddd; }
+        .pf-meta { display: flex; gap: 15px; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; flex-wrap: wrap; }
+        .pf-stats { display: flex; gap: 20px; font-size: 0.9rem; }
+        .pf-stats b { color: #fff; }
+
+        .pf-tabs { display: flex; border-bottom: 1px solid var(--border-light); margin-top: 10px; background: rgba(0,0,0,0.3); }
+        .pf-tab { flex: 1; text-align: center; padding: 15px 0; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.3s; position: relative; font-family: 'Rajdhani'; font-size: 1.1rem; letter-spacing: 1px;}
+        .pf-tab:hover { background: rgba(255,255,255,0.05); color: #ddd; }
+        .pf-tab.active { color: #fff; }
+        .pf-tab.active::after { content: ''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 4px; background: var(--accent-color); border-radius: 4px 4px 0 0; box-shadow: 0 -2px 10px rgba(59,130,246,0.5);}
+
+        /* CUSTOM TOAST NOTIFICATION */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-msg { background: rgba(13, 16, 23, 0.9); border-left: 4px solid var(--accent-color); color: #fff; padding: 15px 20px; border-radius: 8px; font-family: 'JetBrains Mono'; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); animation: slideInRight 0.3s ease-out forwards; display: flex; align-items: center; gap: 10px;}
+        @keyframes slideInRight { from {transform: translateX(100%); opacity: 0;} to {transform: translateX(0); opacity: 1;} }
+
         @media (max-width: 1024px) {
             body { height: auto; overflow-y: auto; }
             .main-app { height: auto; }
@@ -198,29 +249,43 @@
             .chart-wrapper { min-height: 380px; }
             .indicator-wrapper { min-height: 180px; }
             .main-price { font-size: 3rem; }
+            
+            .overlay-container { flex-direction: column; width: 95%; height: 90vh; }
+            .social-sidebar { width: 100%; height: 30%; border-right: none; border-bottom: 1px solid var(--border-light); }
+            .chat-area { height: 70%; }
+            .msg-wrapper { max-width: 95%; }
+            .chat-header { padding-right: 20px; } 
         }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
-        <div class="login-box">
+        <div class="login-box" id="authBox">
             <h2 id="authTitle">LOGIN</h2>
-            <div class="input-group">
-                <label>USER NAME</label>
-                <input type="text" id="email" placeholder="USERNAME">
+            
+            <div id="authInputs">
+                <div class="input-group">
+                    <label>USER NAME</label>
+                    <input type="text" id="usernameInput" placeholder="USERNAME">
+                </div>
+                <div class="input-group">
+                    <label>PASSWORD</label>
+                    <input type="password" id="passwordInput" placeholder="••••••">
+                </div>
+                <div style="text-align: left; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;" id="rememberGroup">
+                    <input type="checkbox" id="rememberMe" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--up-color);">
+                    <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888; font-weight: normal; margin:0; letter-spacing: 0;">Remember Me</label>
+                </div>
             </div>
-            <div class="input-group">
-                <label>PASSWORD</label>
-                <input type="password" id="password" placeholder="••••••">
-            </div>
-            <div style="text-align: left; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="rememberMe" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--up-color);">
-                <label for="rememberMe" style="font-size: 0.8rem; cursor: pointer; color: #888; font-weight: normal; margin:0; letter-spacing: 0;">Remember Me</label>
-            </div>
+
             <div id="loginMsg"></div>
-            <button id="mainAuthBtn">LOGIN</button>
-            <div class="toggle-auth" id="toggleAuthBtn">NEED AN ACCOUNT? REGISTER</div>
+            <button id="mainAuthBtn" onclick="handleAuth()">LOGIN</button>
+            
+            <div style="margin-top: 20px;">
+                <span class="toggle-auth" id="toggleRegBtn" onclick="toggleMode('register')">NEED AN ACCOUNT? REGISTER</span>
+                <span class="toggle-auth" id="toggleForgotBtn" onclick="toggleMode('forgot')" style="color: var(--down-color);">FORGOT PASSWORD?</span>
+            </div>
         </div>
         <div class="secure-text"><i class="fas fa-shield-alt"></i> PROJECT BY TEAM 1</div>
     </div>
@@ -228,7 +293,18 @@
     <div class="main-app" id="mainApp">
         <header>
             <div class="brand"><i class="fas fa-cube" style="color: var(--accent-color);"></i> STABLE<span>CAST</span> <sup>TEAM 1 - ADY201m</sup></div>
-            <div class="market-ticker" id="tickerStatus" style="color:var(--up-color); font-weight: 600;"><i class="fas fa-circle-notch fa-spin"></i> SYNCING...</div>
+            
+            <div class="nav-actions">
+                <div class="social-btn" onclick="openChatAndClearBadge()" title="Community Chat">
+                    <i class="fas fa-comments"></i><span class="badge" id="msgBadge">2</span>
+                </div>
+                <div class="social-btn" onclick="toggleOverlay('profileOverlay')" title="User Profile">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="market-ticker" id="tickerStatus" style="color:var(--up-color); font-weight: 600;">
+                    <i class="fas fa-circle-notch fa-spin"></i> SYNCING...
+                </div>
+            </div>
         </header>
 
         <div class="grid-container">
@@ -295,355 +371,885 @@
                 <div class="news-feed" id="newsFeed"></div>
             </div>
         </div>
+    </div>
 
-        <div class="project-footer">
-            <span class="highlight-text">DISCLAIMER:</span> This project is developed for educational purposes within the <span class="highlight-text">ADY201m course (FPT University)</span>. 
-            All data, market indicators, and AI predictions are simulated for demonstration only and do not hold real-world financial value. 
-            &copy; 2026 StableCast Project.
+    <div id="socialOverlay" class="full-overlay">
+        <div class="overlay-container">
+            <div class="overlay-close" onclick="toggleOverlay('socialOverlay')"><i class="fas fa-times"></i></div>
+            
+            <div class="social-sidebar">
+                <div class="social-header">
+                    <span>Messages</span>
+                    <div style="display:flex; gap:15px;">
+                        <i class="fas fa-user-plus" style="cursor:pointer; color:var(--text-muted); transition:0.3s;" title="Add Friend" onclick="openAddFriendModal()" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'"></i>
+                        <i class="fas fa-users-cog" style="cursor:pointer; color:var(--accent-color);" title="Create New Group" onclick="toggleModal('createGroupModal')"></i>
+                    </div>
+                </div>
+                <div class="friend-list" id="sidebarFriendList">
+                    </div>
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-header">
+                    <div class="friend-avatar" id="currentChatAvatar">
+                        </div>
+                    <div style="flex:1;">
+                        <h4 id="currentChatName" style="color:#fff; font-family:'Rajdhani'; font-size:1.2rem;">...</h4>
+                        <p id="currentChatStatus" style="color:var(--up-color); font-size:0.75rem;">...</p>
+                    </div>
+                    <div class="chat-actions">
+                        <i class="fas fa-phone-alt" title="Voice Call" onclick="startCall('voice')"></i>
+                        <i class="fas fa-video" title="Video Call" onclick="startCall('video')"></i>
+                        <i class="fas fa-info-circle" title="Chat Info" onclick="openGroupInfo()"></i>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessagesBox">
+                    </div>
+
+                <div class="chat-input-area" id="chatInputArea">
+                    <div class="attach-icons">
+                        <i class="fas fa-paperclip" title="Attach File" onclick="document.getElementById('attachFileInput').click()"></i>
+                        <i class="fas fa-image" title="Send Image" onclick="document.getElementById('attachImgInput').click()"></i>
+                    </div>
+                    <input type="text" id="chatInputTxt" class="chat-input" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    
+                    <input type="file" id="attachFileInput" style="display:none;" onchange="handleChatAttach(event, 'file')">
+                    <input type="file" id="attachImgInput" accept="image/*" style="display:none;" onchange="handleChatAttach(event, 'image')">
+                </div>
+            </div>
+
+            <div id="createGroupModal" class="modal-overlay-inner">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>Create New Group</span>
+                        <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('createGroupModal')"></i>
+                    </div>
+                    <input type="text" id="newGroupName" class="modal-input" placeholder="Group Name...">
+                    <div class="modal-list" id="cgMemberList">
+                        </div>
+                    <div class="modal-actions">
+                        <button class="modal-btn modal-cancel" onclick="toggleModal('createGroupModal')">Cancel</button>
+                        <button class="modal-btn modal-create" onclick="confirmCreateGroup()">Create Group</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="addFriendModal" class="modal-overlay-inner">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>Add New Friend</span>
+                        <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('addFriendModal')"></i>
+                    </div>
+                    <div class="modal-list" id="afUserList">
+                        </div>
+                </div>
+            </div>
+
+            <div id="groupInfoModal" class="modal-overlay-inner">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>Chat Info</span>
+                        <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('groupInfoModal')"></i>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 15px; position:relative;">
+                        <div class="friend-avatar" style="width: 80px; height: 80px; margin: 0 auto 10px; cursor: pointer; border: 2px solid var(--border-light);" onclick="document.getElementById('giAvatarInput').click()">
+                            <img id="giAvatarImg" src="">
+                            <div class="pf-edit-overlay" style="display:flex; border-radius:50%; font-size:1.2rem; background: rgba(0,0,0,0.6);"><i class="fas fa-camera"></i></div>
+                        </div>
+                        <input type="text" id="giNameInput" class="modal-input" style="font-size: 1.1rem; font-weight: bold; border-color: transparent; border-bottom: 1px dashed rgba(255,255,255,0.2); padding: 5px; margin-bottom: 5px;" onchange="updateGroupDetails('name')">
+                        <div style="font-size:0.7rem; color:var(--text-muted);"><i class="fas fa-pen"></i> Edit name</div>
+                    </div>
+                    
+                    <div style="font-size: 0.85rem; font-weight:bold; color:#fff; margin-bottom:5px;">Members <span id="giLeaderTag" style="color:var(--up-color); font-weight:normal; font-size:0.75rem;"></span></div>
+                    <div class="modal-list" id="giMemberList"></div>
+                    
+                    <div class="modal-actions">
+                        <button id="giDeleteBtn" class="modal-btn modal-delete" onclick="deleteOrLeaveGroup()">Leave Group</button>
+                    </div>
+                </div>
+            </div>
+            <input type="file" id="giAvatarInput" accept="image/*" style="display:none;" onchange="updateGroupDetails('avatar', event)">
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <div id="callOverlay" class="full-overlay" style="z-index: 30000; flex-direction: column;">
+        <div id="callVideoBg" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#111;">
+            <img id="callVideoMainImg" src="" style="width:100%; height:100%; object-fit:cover; opacity:0.5; filter: blur(5px);">
+            <div style="position:absolute; bottom:30px; right:30px; width:120px; height:160px; background:#222; border-radius:12px; border:2px solid var(--accent-color); overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.8); z-index:5;">
+                 <img id="callVideoMyImg" src="" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+        </div>
+        
+        <div class="call-content">
+            <div class="call-avatar-ring">
+                <img id="callAvatarImg" src="">
+            </div>
+            <h2 id="callName" style="color:#fff; margin-top:20px; font-family:'Rajdhani', sans-serif; font-size: 2.5rem; letter-spacing: 1px;">...</h2>
+            <p id="callStatusText" style="color:var(--up-color); font-family:'JetBrains Mono'; margin-top: 10px; font-size: 1.1rem;">Ringing...</p>
+        </div>
+        
+        <div class="hangup-btn" onclick="endCall()" title="End Call">
+            <i class="fas fa-phone-slash"></i>
+        </div>
+    </div>
+
+    <div id="profileOverlay" class="full-overlay">
+        <div class="overlay-container profile-wrapper">
+            <div class="overlay-close" onclick="toggleOverlay('profileOverlay')" style="position: sticky; float: right; margin: 15px 15px -50px 0;"><i class="fas fa-times"></i></div>
             
-            const loginOverlay = document.getElementById('loginOverlay');
-            const mainApp = document.getElementById('mainApp');
-            const btnLogin = document.getElementById('mainAuthBtn');
-            const toggleBtn = document.getElementById('toggleAuthBtn');
+            <div id="pfCover" class="pf-cover">
+                <div class="pf-edit-overlay" onclick="document.getElementById('coverInput').click()">
+                    <div style="display:flex; flex-direction: column; align-items:center;">
+                        <i class="fas fa-camera"></i>
+                        <span class="pf-edit-hint">Click to Change, Drag to Position</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pf-avatar-section">
+                <div class="pf-avatar-wrap">
+                    <img id="pfAvatarImg" class="pf-avatar-img" src="https://i.pravatar.cc/150?img=12">
+                    <div class="pf-edit-overlay" style="border-radius: 50%; font-size:1.2rem;" onclick="document.getElementById('avatarInput').click()">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                </div>
+                <div>
+                    <button id="editProfileBtn" class="pf-btn" onclick="toggleEditProfile()">Edit profile</button>
+                    <button id="saveProfileBtn" class="pf-btn pf-btn-save" onclick="toggleEditProfile()">Save changes</button>
+                </div>
+            </div>
+
+            <div class="pf-info">
+                <div class="pf-name" id="profileName">Loading...</div>
+                <div class="pf-handle" id="profileHandle">@loading</div>
+                <div class="pf-bio">
+                    AI Student at FPT University. Crypto & Code enthusiast. 🚀
+                </div>
+                <div class="pf-meta">
+                    <span><i class="fas fa-map-marker-alt"></i> Nha Trang, VN</span>
+                    <span><i class="fas fa-link"></i> stablecast.vn</span>
+                    <span><i class="fas fa-calendar-alt"></i> Joined Feb 2026</span>
+                </div>
+                <div class="pf-stats">
+                    <span><b>124</b> <span style="color:var(--text-muted)">Following</span></span>
+                    <span><b>1,092</b> <span style="color:var(--text-muted)">Followers</span></span>
+                </div>
+            </div>
+
+            <div class="pf-tabs">
+                <div class="pf-tab active">Posts</div>
+                <div class="pf-tab">Replies</div>
+                <div class="pf-tab">Media</div>
+                <div class="pf-tab">Likes</div>
+            </div>
+
+            <div style="padding: 40px 20px; text-align: center; color: var(--text-muted);">
+                <i class="fas fa-comments" style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                No posts yet. Start the conversation!
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="handleProfileUpload(event, 'cover')">
+    <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleProfileUpload(event, 'avatar')">
+
+    <script>
+        // ==========================================
+        // TOAST NOTIFICATIONS (THAY THẾ ALERT)
+        // ==========================================
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            toast.innerHTML = `<i class="fas fa-check-circle" style="color:var(--up-color);"></i> ${message}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // ==========================================
+        // 1. QUẢN LÝ ĐĂNG NHẬP (LOCALSTORAGE)
+        // ==========================================
+        let authMode = 'login'; 
+        let currentUser = null;
+
+        function toggleMode(mode) {
+            authMode = mode;
             const title = document.getElementById('authTitle');
+            const btnLogin = document.getElementById('mainAuthBtn');
+            const toggleReg = document.getElementById('toggleRegBtn');
+            const toggleFor = document.getElementById('toggleForgotBtn');
             const msg = document.getElementById('loginMsg');
-            let isRegister = false;
+            msg.textContent = "";
 
-            // --- SỬA LẠI LOGIC CHUYỂN ĐỔI LOGIN/REGISTER CHO ĐÚNG ---
-            toggleBtn.addEventListener('click', () => {
-                isRegister = !isRegister;
-                msg.textContent = "";
-                if(isRegister) {
-                    title.textContent = "REGISTER";
-                    btnLogin.textContent = "REGISTER";
-                    toggleBtn.textContent = "ALREADY A MEMBER? LOGIN";
-                    btnLogin.style.background = "linear-gradient(90deg, #3b82f6, #2563eb)";
-                    btnLogin.style.boxShadow = "0 4px 15px rgba(59, 130, 246, 0.4)";
-                    title.style.borderBottomColor = "#3b82f6";
-                    title.style.textShadow = "0 0 10px rgba(59, 130, 246, 0.4)";
+            if (mode === 'register') {
+                title.textContent = "REGISTER ACCOUNT";
+                btnLogin.textContent = "CREATE ACCOUNT";
+                toggleReg.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
+                toggleReg.setAttribute("onclick", "toggleMode('login')");
+                toggleFor.style.display = "none";
+                document.getElementById('rememberGroup').style.display = "none";
+            } else if (mode === 'forgot') {
+                title.textContent = "RESET PASSWORD";
+                btnLogin.textContent = "RESET PASSWORD";
+                toggleReg.textContent = "BACK TO LOGIN";
+                toggleReg.setAttribute("onclick", "toggleMode('login')");
+                toggleFor.style.display = "none";
+                document.getElementById('rememberGroup').style.display = "none";
+            } else {
+                title.textContent = "LOGIN";
+                btnLogin.textContent = "LOGIN";
+                toggleReg.textContent = "NEED AN ACCOUNT? REGISTER";
+                toggleReg.setAttribute("onclick", "toggleMode('register')");
+                toggleFor.style.display = "inline-block";
+                document.getElementById('rememberGroup').style.display = "flex";
+            }
+        }
+
+        function handleAuth() {
+            const u = document.getElementById('usernameInput').value.trim();
+            const p = document.getElementById('passwordInput').value.trim();
+            const msg = document.getElementById('loginMsg');
+            
+            if(!u || !p) { msg.style.color = "var(--down-color)"; msg.textContent = "Username and Password required."; return; }
+
+            let usersDB = JSON.parse(localStorage.getItem('stablecast_users')) || {};
+
+            if (authMode === 'register') {
+                if (usersDB[u]) {
+                    msg.style.color = "var(--down-color)"; msg.textContent = "Username already exists!";
                 } else {
-                    title.textContent = "LOGIN";
-                    btnLogin.textContent = "LOGIN";
-                    toggleBtn.textContent = "NEED AN ACCOUNT? REGISTER";
-                    btnLogin.style.background = "linear-gradient(90deg, #00d283, #009960)";
-                    btnLogin.style.boxShadow = "0 4px 15px rgba(0, 210, 131, 0.4)";
-                    title.style.borderBottomColor = "#00d283";
-                    title.style.textShadow = "0 0 10px rgba(0, 210, 131, 0.4)";
+                    usersDB[u] = { password: p, avatar: 'https://i.pravatar.cc/150?u='+u, cover: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000' };
+                    localStorage.setItem('stablecast_users', JSON.stringify(usersDB));
+                    msg.style.color = "var(--up-color)"; msg.textContent = "Success! Please Login.";
+                    setTimeout(() => toggleMode('login'), 1500);
                 }
-            });
+            } else if (authMode === 'forgot') {
+                if (!usersDB[u]) {
+                    msg.style.color = "var(--down-color)"; msg.textContent = "Username not found.";
+                } else {
+                    usersDB[u].password = p;
+                    localStorage.setItem('stablecast_users', JSON.stringify(usersDB));
+                    msg.style.color = "var(--up-color)"; msg.textContent = "Password updated successfully.";
+                    setTimeout(() => toggleMode('login'), 1500);
+                }
+            } else { 
+                if (usersDB[u] && usersDB[u].password === p) {
+                    currentUser = { username: u, ...usersDB[u] };
+                    enterApp();
+                } else {
+                    msg.style.color = "var(--down-color)"; msg.textContent = "Invalid credentials.";
+                }
+            }
+        }
 
-            btnLogin.addEventListener('click', () => {
-                const u = document.getElementById('email').value;
-                const p = document.getElementById('password').value;
-                if(!u && !p && !isRegister) { enterApp(); return; }
-                if(!u || !p) { msg.style.color = "var(--down-color)"; msg.textContent = "Credentials required."; return; }
-                if(isRegister) {
-                    msg.style.color = "#3b82f6"; msg.textContent = "Registration Success! Please Login.";
-                    setTimeout(() => toggleBtn.click(), 1000);
-                } else { enterApp(); }
-            });
+        function enterApp() {
+            const msg = document.getElementById('loginMsg');
+            msg.style.color = "var(--up-color)";
+            msg.textContent = "ACCESS GRANTED. INITIALIZING...";
+            
+            document.getElementById('profileName').textContent = currentUser.username;
+            document.getElementById('profileHandle').textContent = "@" + currentUser.username.toLowerCase();
+            document.getElementById('pfAvatarImg').src = currentUser.avatar;
+            document.getElementById('pfCover').style.backgroundImage = `url('${currentUser.cover}')`;
+            
+            initChatEngine(); 
+            updateMsgBadge();
 
-            function enterApp() {
-                msg.style.color = "var(--up-color)";
-                msg.textContent = "CONNECTING... STANDBY.";
+            setTimeout(() => {
+                document.getElementById('loginOverlay').style.opacity = 0;
                 setTimeout(() => {
-                    loginOverlay.style.opacity = 0;
-                    setTimeout(() => {
-                        loginOverlay.style.display = 'none';
-                        mainApp.style.display = 'flex';
-                        setTimeout(() => mainApp.style.opacity = 1, 100);
-                        initNewsEngine(); 
-                        startCoreEngine();
-                    }, 500);
-                }, 800);
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'flex';
+                    setTimeout(() => document.getElementById('mainApp').style.opacity = 1, 100);
+                    initNewsEngine(); 
+                    startCoreEngine();
+                }, 500);
+            }, 800);
+        }
+
+        // ==========================================
+        // 2. SOCIAL OVERLAYS & DYNAMIC CHAT LOGIC
+        // ==========================================
+        let unreadCount = 2; 
+        function updateMsgBadge() {
+            const badge = document.getElementById('msgBadge');
+            if(unreadCount > 0) {
+                badge.style.display = 'block'; badge.innerText = unreadCount;
+            } else { badge.style.display = 'none'; }
+        }
+        
+        function openChatAndClearBadge() {
+            unreadCount = 0; updateMsgBadge();
+            toggleOverlay('socialOverlay');
+        }
+
+        function toggleOverlay(id) {
+            const overlay = document.getElementById(id);
+            if (overlay.style.display === 'flex') {
+                overlay.style.opacity = 0;
+                setTimeout(() => overlay.style.display = 'none', 300);
+                if(id === 'profileOverlay' && document.getElementById('profileOverlay').classList.contains('is-editing')) toggleEditProfile(); 
+            } else {
+                overlay.style.display = 'flex';
+                setTimeout(() => overlay.style.opacity = 1, 10);
             }
+        }
 
-            // --- NEWS ENGINE ---
-            let globalNewsArray = [
-                { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "https://cointelegraph.com" },
-                { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "https://coindesk.com" },
-                { title: "Whale activity spikes as $500M USDT moves to Binance", source: "CryptoQuant", time: "12 mins ago", sentiment: "neg", url: "https://cryptoquant.com" },
-                { title: "New AI models show unprecedented accuracy in crypto forecasting", source: "Forbes", time: "1 hr ago", sentiment: "pos", url: "https://forbes.com" },
-                { title: "Market volatility expected to increase ahead of Fed meeting", source: "Bloomberg", time: "2 hrs ago", sentiment: "neg", url: "https://bloomberg.com" }
-            ];
+        // --- HỆ THỐNG DỮ LIỆU CHAT ĐỘNG (LƯU TỪNG TÀI KHOẢN) ---
+        let chatDB = {};
+        let activeChatId = 'cloud';
 
-            let lastTimeIndex = -1;
-
-            function renderNews() {
-                const feed = document.getElementById('newsFeed');
-                if(!feed || globalNewsArray.length === 0) return;
-                
-                let timeIndex = Math.floor(Date.now() / 6000);
-                if(timeIndex === lastTimeIndex) return; 
-                lastTimeIndex = timeIndex;
-
-                let html = '';
-                let startIndex = timeIndex % globalNewsArray.length;
-
-                for(let i = 0; i < Math.min(4, globalNewsArray.length); i++) {
-                    const item = globalNewsArray[(startIndex + i) % globalNewsArray.length];
-                    const label = item.sentiment === 'pos' ? "BULLISH" : "BEARISH";
-                    const sentClass = item.sentiment === 'pos' ? "sent-pos" : "sent-neg";
-                    html += `
-                        <a href="${item.url}" target="_blank" class="news-item">
-                            <div class="news-title">${item.title}</div>
-                            <div class="news-meta">
-                                <span><i class="fas fa-newspaper"></i> ${item.source} • ${item.time}</span>
-                                <span class="sentiment-tag ${sentClass}">${label}</span>
-                            </div>
-                        </a>
-                    `;
-                }
-                feed.innerHTML = html;
-            }
-
-            function initNewsEngine() {
-                renderNews(); 
-                setInterval(renderNews, 1000); 
-
-                fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN')
-                    .then(res => res.json())
-                    .then(data => {
-                        if(data && data.Data && data.Data.length > 0) {
-                            globalNewsArray = data.Data.map(article => {
-                                const titleLower = article.title.toLowerCase();
-                                let sent = "pos";
-                                if(titleLower.match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud|delay)/)) {
-                                    sent = "neg";
-                                }
-                                const date = new Date(article.published_on * 1000);
-                                const timeStr = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
-                                return {
-                                    title: article.title,
-                                    source: article.source_info.name,
-                                    time: timeStr,
-                                    sentiment: sent,
-                                    url: article.url
-                                };
-                            });
-                            lastTimeIndex = -1; 
-                            renderNews();
-                        }
-                    }).catch(e => console.log("Using local fallback news."));
-            }
-
-            // --- CORE ENGINE ---
-            async function startCoreEngine() {
-                let history = [];
-                let aiHistory = []; 
-                let labels = [];
-
-                try {
-                    const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100');
-                    const data = await res.json();
-                    history = data.map(d => parseFloat(d[4]));
-                    labels = data.map((_, i) => i);
-                    aiHistory = history.map(p => p + (Math.sin(p) - 0.5) * (p * 0.0015)); 
-                    document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-check-circle"></i> BINANCE SECURE LINK';
-                } catch (e) {
-                    let price = 43250.00;
-                    history = Array.from({length: 100}, (_, i) => { price += Math.sin(i) * 100; return price; });
-                    aiHistory = history.map(p => p + Math.cos(p) * 50);
-                    labels = Array.from({length: 100}, (_,i) => i);
-                }
-
-                Chart.defaults.color = '#8492a6';
-                Chart.defaults.font.family = "'JetBrains Mono', monospace";
-
-                const ctxP = document.getElementById('priceChart').getContext('2d');
-                const pChart = new Chart(ctxP, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Real Price', data: history, borderColor: '#00d283', borderWidth: 2.5, pointRadius: 0, fill: true,
-                                backgroundColor: (ctx) => {
-                                    const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400);
-                                    grad.addColorStop(0, 'rgba(0, 210, 131, 0.25)'); grad.addColorStop(1, 'rgba(0, 210, 131, 0)');
-                                    return grad;
-                                }, tension: 0.2
-                            },
-                            {
-                                label: 'AI Forecast', data: aiHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false, tension: 0.2
-                            }
-                        ]
-                    },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, 
-                        scales: {x:{display:false}, y:{position:'right', grid:{color:'rgba(255,255,255,0.05)', drawBorder: false}}} 
+        function initChatEngine() {
+            let savedChats = localStorage.getItem('stablecast_chats_' + currentUser.username);
+            if(savedChats) {
+                chatDB = JSON.parse(savedChats);
+                activeChatId = Object.keys(chatDB)[0] || 'cloud';
+            } else {
+                // Khởi tạo DB mặc định cho user mới
+                chatDB = {
+                    'cloud': { name: 'My Cloud', type: 'cloud', isLeader: false, members: [], desc: 'Saved messages & files', msgs: [] },
+                    'group1': { name: 'FPT Crypto Group', type: 'group', isLeader: false, members: ['Huy_Trader', 'Sơn_Dev', 'Alex Trader'], avatar: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=200&auto=format&fit=crop', online: true, 
+                        msgs: [
+                            {sender: 'Huy_Trader', avatar: 'https://i.pravatar.cc/150?img=11', text: 'Chào người mới nha!', time: '10:42 AM', isMe: false}
+                        ] 
                     }
-                });
-
-                const ctxI = document.getElementById('indicatorChart').getContext('2d');
-                const iChart = new Chart(ctxI, {
-                    type: 'line',
-                    data: { labels: labels, datasets: [{ label: 'RSI', data: calcRSI(history), borderColor: '#3b82f6', borderWidth: 1.5, pointRadius: 0 }] },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, 
-                        scales: {x:{display:false}, y:{position:'right', min:0, max:100, grid:{color:'rgba(255,255,255,0.05)', drawBorder: false}}} 
-                    }
-                });
-
-                const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    const currentPrice = parseFloat(data.c); 
-                    const changePercent = parseFloat(data.P);
-
-                    history.shift(); history.push(currentPrice);
-                    
-                    const rsiData = calcRSI(history);
-                    const currentRSI = rsiData[rsiData.length - 1];
-                    const macdArray = calcMACD(history);
-                    const currentMACD = macdArray[macdArray.length - 1];
-
-                    const predPrice = updateAI(currentRSI, currentMACD, changePercent, currentPrice);
-                    
-                    aiHistory.shift(); aiHistory.push(predPrice);
-
-                    pChart.data.datasets[0].data = history; 
-                    pChart.data.datasets[1].data = aiHistory; 
-                    pChart.update(); 
-                    
-                    iChart.data.datasets[0].data = rsiData;
-                    iChart.update();
-
-                    const elP = document.getElementById('mainPrice');
-                    elP.innerText = currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    
-                    if(changePercent >= 0) {
-                        elP.style.color = "var(--up-color)";
-                        elP.style.textShadow = "0 0 25px rgba(0, 210, 131, 0.5)";
-                    } else {
-                        elP.style.color = "var(--down-color)";
-                        elP.style.textShadow = "0 0 25px rgba(255, 59, 94, 0.5)";
-                    }
-                    
-                    const elC = document.getElementById('priceChange');
-                    elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-                    elC.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)";
-
-                    updateOrderBook(currentPrice);
                 };
+                saveChatDB();
             }
+            renderSidebar();
+            switchChat(activeChatId);
+        }
 
-            // --- MATH HELPERS ---
-            function calcEMA(data, period) {
-                let k = 2/(period+1), ema=data[0], res=[];
-                data.forEach(p => { ema = p*k + ema*(1-k); res.push(ema); });
-                return res;
-            }
+        function saveChatDB() {
+            localStorage.setItem('stablecast_chats_' + currentUser.username, JSON.stringify(chatDB));
+        }
 
-            function calcMACD(data) {
-                let ema12 = calcEMA(data, 12);
-                let ema26 = calcEMA(data, 26);
-                let macd = [];
-                for(let i=0; i<data.length; i++) macd.push(ema12[i] - ema26[i]);
-                return macd;
-            }
-
-            function calcRSI(data) {
-                let res = Array(14).fill(50);
-                for(let i=14; i<data.length; i++) {
-                    let up = 0, down = 0;
-                    for(let j=i-14; j<i; j++) {
-                        let diff = data[j+1] - data[j];
-                        if(diff > 0) up += diff; else down -= diff;
-                    }
-                    if (down === 0) res.push(100);
-                    else res.push(100 - (100 / (1 + up / down)));
-                }
-                return res;
-            }
-
-            function updateOrderBook(p) {
-                let h = "";
-                for(let i=5; i>0; i--) {
-                    let fakeQty = Math.abs(Math.sin(p * i)) * 2; 
-                    h += `<div class="ob-row bg-red-soft"><span style="color:var(--down-color)">${(p+i*1.5).toFixed(2)}</span> <span style="color:#aaa">${fakeQty.toFixed(3)}</span></div>`;
-                }
-                h += `<div style="text-align:center; color:#fff; font-size:1.1rem; padding: 6px 0; border-top:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05); margin:6px 0; text-shadow: 0 0 10px rgba(255,255,255,0.3);">${p.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>`;
-                for(let i=1; i<=5; i++) {
-                    let fakeQty = Math.abs(Math.cos(p * i)) * 2;
-                    h += `<div class="ob-row bg-green-soft"><span style="color:var(--up-color)">${(p-i*1.5).toFixed(2)}</span> <span style="color:#aaa">${fakeQty.toFixed(3)}</span></div>`;
-                }
-                document.getElementById('orderBook').innerHTML = h;
-            }
-
-            // --- CẬP NHẬT AI ---
-            function updateAI(rsi, macd, chg, price) {
-                let sig = "HOLD", col = "#8492a6"; 
-                let hexOpacity = "33"; 
+        function renderSidebar() {
+            const list = document.getElementById('sidebarFriendList');
+            let html = '';
+            
+            for (const id in chatDB) {
+                const chat = chatDB[id];
+                const activeCls = id === activeChatId ? 'active' : '';
                 
-                let pseudoRand1 = Math.abs(Math.sin(price * 100)); 
-                let pseudoRand2 = Math.abs(Math.cos(price * 100));
-
-                let conf = 45 + pseudoRand1 * 15; 
-                let predOffset = (pseudoRand2 - 0.5) * (price * 0.001);
-
-                if (rsi > 65 || (macd < 0 && chg < -0.5)) {
-                    sig = "SELL"; col = "#ff3b5e"; hexOpacity = "66";
-                    conf = 65 + pseudoRand1 * 15;
-                    predOffset = -(price * (0.005 + pseudoRand2 * 0.005));
-                    if(rsi > 75) { sig = "STRONG SELL"; conf += 5; }
-                } 
-                else if (rsi < 35 || (macd > 0 && chg > 0.5)) {
-                    sig = "BUY"; col = "#00d283"; hexOpacity = "66"; 
-                    conf = 65 + pseudoRand1 * 15;
-                    predOffset = (price * (0.005 + pseudoRand2 * 0.005));
-                    if(rsi < 25) { sig = "STRONG BUY"; conf += 5; }
-                }
-
-                if(conf > 88.5) conf = 88.5 - pseudoRand1;
-
-                const predPrice = price + predOffset;
-
-                let sl, tp;
-                if(sig.includes("BUY")) {
-                    sl = price * 0.985; tp = price * 1.03;
-                } else if(sig.includes("SELL")) {
-                    sl = price * 1.015; tp = price * 0.97;
+                let avatarHTML = '';
+                if(chat.type === 'cloud') {
+                    avatarHTML = `<div class="friend-avatar" style="background: var(--accent-color); border:none;"><i class="fas fa-cloud"></i></div>`;
                 } else {
-                    sl = price * 0.99; tp = price * 1.01;
+                    let dot = chat.online ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`;
+                    avatarHTML = `<div class="friend-avatar"><img src="${chat.avatar}">${dot}</div>`;
                 }
 
-                const sigBox = document.getElementById('signalBox');
-                document.getElementById('aiSignal').innerText = sig;
-                document.getElementById('aiSignal').style.color = col;
-                document.getElementById('aiSignal').style.textShadow = `0 0 20px ${col}${hexOpacity}`;
+                let lastMsg = chat.msgs.length > 0 ? chat.msgs[chat.msgs.length-1].text : (chat.desc || 'No messages yet');
+                if(lastMsg.includes('<a')) lastMsg = '[Sent a file]';
+                if(lastMsg.includes('<img')) lastMsg = '[Sent an image]';
+
+                html += `
+                    <div class="friend-item ${activeCls}" onclick="switchChat('${id}')">
+                        ${avatarHTML}
+                        <div class="friend-info">
+                            <h4>${chat.name}</h4>
+                            <p>${lastMsg}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            list.innerHTML = html;
+        }
+
+        function switchChat(id) {
+            activeChatId = id;
+            renderSidebar(); 
+            
+            const chat = chatDB[id];
+            if(!chat) return;
+
+            // Cập nhật Header
+            document.getElementById('currentChatName').textContent = chat.name;
+            const avatarBox = document.getElementById('currentChatAvatar');
+            if(chat.type === 'cloud') {
+                avatarBox.style.background = 'var(--accent-color)'; avatarBox.style.border = 'none';
+                avatarBox.innerHTML = `<i class="fas fa-cloud"></i>`;
+                document.getElementById('currentChatStatus').textContent = 'Only you can see this';
+                document.getElementById('chatInputArea').style.display = 'flex';
+            } else {
+                avatarBox.style.background = '#222'; avatarBox.style.border = '1px solid #444';
+                let dot = chat.online ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`;
+                avatarBox.innerHTML = `<img src="${chat.avatar}">${dot}`;
+                document.getElementById('currentChatStatus').textContent = chat.type === 'group' ? `${chat.members.length + 1} Members` : (chat.online ? 'Online' : 'Offline');
+                document.getElementById('chatInputArea').style.display = 'flex';
+            }
+
+            // Render Messages
+            const box = document.getElementById('chatMessagesBox');
+            box.innerHTML = '';
+            
+            if(chat.msgs.length === 0) {
+                box.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px;">This is the start of your history with ${chat.name}</div>`;
+            } else {
+                chat.msgs.forEach(m => {
+                    let wrapperCls = m.isMe ? 'sent' : 'received';
+                    let msgCls = m.isMe ? 'msg-sent' : 'msg-received';
+                    let senderName = m.isMe || chat.type === 'user' ? '' : `<span style="color:var(--accent-color); font-weight:bold; display:block; margin-bottom:3px; font-size:0.75rem;">${m.sender}</span>`;
+                    
+                    // Xử lý avatar fallback nếu user chưa có ảnh
+                    let safeAvatar = m.avatar || 'https://i.pravatar.cc/150';
+
+                    box.insertAdjacentHTML('beforeend', `
+                        <div class="msg-wrapper ${wrapperCls}">
+                            <div class="msg-avatar"><img src="${safeAvatar}"></div>
+                            <div class="msg ${msgCls}">
+                                ${senderName}
+                                ${m.text}
+                                <div class="msg-time">${m.time}</div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // --- Hàm Gửi Tin Nhắn ---
+        function sendMessage() {
+            let input = document.getElementById('chatInputTxt');
+            let text = input.value.trim();
+            if(!text) return;
+            appendMsgToDB(text, 'text');
+            input.value = '';
+        }
+
+        // --- Gửi Ảnh/File Tạo Link ---
+        function handleChatAttach(event, type) {
+            const file = event.target.files[0];
+            if(!file) return;
+            
+            if(type === 'image') {
+                const reader = new FileReader();
+                reader.onload = (e) => appendMsgToDB(`<img src="${e.target.result}">`, 'html');
+                reader.readAsDataURL(file);
+            } else {
+                const fileUrl = URL.createObjectURL(file);
+                let htmlLink = `<a href="${fileUrl}" download="${file.name}"><i class="fas fa-file-download" style="color:var(--up-color);"></i> Download: ${file.name}</a>`;
+                appendMsgToDB(htmlLink, 'html');
+            }
+            event.target.value = ''; 
+        }
+
+        function appendMsgToDB(content, type) {
+            if(!chatDB[activeChatId]) return;
+            let time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            chatDB[activeChatId].msgs.push({
+                sender: currentUser.username,
+                avatar: currentUser.avatar,
+                text: content,
+                time: time,
+                isMe: true
+            });
+            saveChatDB();
+            switchChat(activeChatId); 
+        }
+
+
+        // ==========================================
+        // TÍNH NĂNG ADD FRIEND & CREATE GROUP
+        // ==========================================
+
+        function openAddFriendModal() {
+            const usersDB = JSON.parse(localStorage.getItem('stablecast_users')) || {};
+            const list = document.getElementById('afUserList');
+            list.innerHTML = '';
+            
+            let hasUsers = false;
+            for(let u in usersDB) {
+                if(u === currentUser.username) continue; // Bỏ qua chính mình
                 
-                sigBox.style.borderColor = col;
-                sigBox.style.boxShadow = `inset 0 0 25px ${col}33`;
+                // Kiểm tra xem đã kết bạn chưa
+                let alreadyAdded = false;
+                for(let id in chatDB) {
+                    if(chatDB[id].type === 'user' && chatDB[id].name === u) { alreadyAdded = true; break; }
+                }
                 
-                document.getElementById('aiConf').innerText = conf.toFixed(1) + "%";
-                const circle = document.querySelector('.conf-circle');
-                circle.style.borderColor = col;
-                circle.style.boxShadow = `0 0 30px ${col}55, inset 0 0 15px ${col}22`;
+                if(!alreadyAdded) {
+                    hasUsers = true;
+                    list.insertAdjacentHTML('beforeend', `
+                        <div class="modal-item" style="cursor:default;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div class="friend-avatar" style="width:35px;height:35px;border:none;"><img src="${usersDB[u].avatar}"></div>
+                                <span style="color:#fff; font-weight:bold;">${u}</span>
+                            </div>
+                            <button class="cg-btn modal-create" onclick="addFriend('${u}', '${usersDB[u].avatar}')" style="padding: 6px 12px; font-size:0.75rem;">Add</button>
+                        </div>
+                    `);
+                }
+            }
+            if(!hasUsers) list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0;">No new users found to add.</div>`;
+            
+            toggleModal('addFriendModal');
+        }
 
-                document.getElementById('aiPredPrice').innerText = predPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById('aiPredPrice').style.color = col;
-                document.getElementById('aiPredPrice').style.textShadow = `0 0 20px ${col}55`;
+        function addFriend(username, avatar) {
+            const id = 'user_' + Date.now();
+            chatDB[id] = { name: username, type: 'user', isLeader: false, members: [], avatar: avatar, online: true, msgs: [] };
+            saveChatDB();
+            toggleModal('addFriendModal');
+            showToast(`${username} added to your list!`);
+            renderSidebar();
+            switchChat(id);
+        }
 
-                document.getElementById('slVal').innerText = sl.toLocaleString('en-US', {minimumFractionDigits: 2});
-                document.getElementById('tpVal').innerText = tp.toLocaleString('en-US', {minimumFractionDigits: 2});
-                
-                document.getElementById('rsiVal').innerText = rsi.toFixed(2);
-                document.getElementById('rsiVal').style.color = rsi > 70 ? "var(--down-color)" : (rsi < 30 ? "var(--up-color)" : "#fff");
-                document.getElementById('rsiVal').style.textShadow = rsi > 70 ? "0 0 10px var(--down-color)" : (rsi < 30 ? "0 0 10px var(--up-color)" : "none");
+        // Modal Tạo Nhóm: Lấy danh sách bạn bè hiện tại
+        function openCreateGroupModal() {
+            const list = document.getElementById('cgMemberList');
+            list.innerHTML = '';
+            let hasFriends = false;
+            
+            for(let id in chatDB) {
+                if(chatDB[id].type === 'user') {
+                    hasFriends = true;
+                    list.insertAdjacentHTML('beforeend', `<label class="modal-item"><input type="checkbox" value="${chatDB[id].name}"> ${chatDB[id].name}</label>`);
+                }
+            }
+            if(!hasFriends) list.innerHTML = `<div style="color:#888; font-size:0.8rem; text-align:center;">Add some friends first!</div>`;
+            
+            toggleModal('createGroupModal');
+        }
 
-                document.getElementById('macdVal').innerText = macd.toFixed(2);
-                document.getElementById('macdVal').style.color = macd > 0 ? "var(--up-color)" : "var(--down-color)";
-                document.getElementById('macdVal').style.textShadow = macd > 0 ? "0 0 10px var(--up-color)" : "0 0 10px var(--down-color)";
 
-                return predPrice; 
+        function confirmCreateGroup() {
+            const name = document.getElementById('newGroupName').value.trim() || 'New Group';
+            const checked = Array.from(document.querySelectorAll('#createGroupModal input:checked')).map(cb => cb.value);
+            
+            if(checked.length === 0) { showToast('Please select at least 1 member'); return; }
+            
+            const randomAvatar = `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random()*100000)}?auto=format&fit=crop&w=150`;
+            const id = 'group_' + Date.now();
+
+            chatDB[id] = {
+                name: name, type: 'group', isLeader: true, members: checked, avatar: randomAvatar, online: true, msgs: []
+            };
+            
+            document.getElementById('newGroupName').value = '';
+            saveChatDB();
+            toggleModal('createGroupModal');
+            showToast(`Group "${name}" created!`);
+            
+            renderSidebar();
+            switchChat(id);
+        }
+
+        // --- LOGIC THÔNG TIN NHÓM (GROUP INFO) ---
+        function openGroupInfo() {
+            const chat = chatDB[activeChatId];
+            if (chat.type === 'cloud') {
+                showToast("My Cloud info cannot be edited."); return;
+            }
+
+            document.getElementById('giNameInput').value = chat.name;
+            document.getElementById('giAvatarImg').src = chat.avatar;
+            document.getElementById('giLeaderTag').textContent = chat.isLeader ? "(You are Leader)" : "";
+            
+            const delBtn = document.getElementById('giDeleteBtn');
+            if(chat.type === 'user') {
+                delBtn.textContent = "Delete Conversation";
+            } else {
+                delBtn.textContent = chat.isLeader ? "Delete Group" : "Leave Group";
+            }
+
+            // Render Danh sách thành viên
+            const list = document.getElementById('giMemberList');
+            list.innerHTML = '';
+            if(chat.type === 'group') {
+                chat.members.forEach((mem, index) => {
+                    let kickHtml = chat.isLeader ? `<i class="fas fa-user-times kick-btn" onclick="kickMember('${index}')" title="Kick Member"></i>` : ``;
+                    list.insertAdjacentHTML('beforeend', `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${mem}</span> ${kickHtml}</div>`);
+                });
+            } else {
+                list.innerHTML = `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${chat.name}</span></div>`;
+            }
+
+            toggleModal('groupInfoModal');
+        }
+
+        function updateGroupDetails(type, event) {
+            const chat = chatDB[activeChatId];
+            if(type === 'avatar') {
+                const file = event.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    chat.avatar = e.target.result;
+                    document.getElementById('giAvatarImg').src = chat.avatar;
+                    saveChatDB();
+                    showToast("Avatar updated!");
+                    renderSidebar(); switchChat(activeChatId);
+                }
+                reader.readAsDataURL(file);
+            } else { 
+                chat.name = document.getElementById('giNameInput').value.trim() || 'Unnamed';
+                saveChatDB();
+                showToast("Name updated!");
+                renderSidebar(); switchChat(activeChatId);
+            }
+        }
+
+        function kickMember(index) {
+            const chat = chatDB[activeChatId];
+            const kicked = chat.members.splice(index, 1);
+            saveChatDB();
+            showToast(`${kicked} removed from group.`);
+            openGroupInfo(); 
+            renderSidebar(); switchChat(activeChatId); 
+        }
+
+        function deleteOrLeaveGroup() {
+            const name = chatDB[activeChatId].name;
+            delete chatDB[activeChatId];
+            saveChatDB();
+            toggleModal('groupInfoModal');
+            showToast(`${name} deleted/left successfully.`);
+            activeChatId = 'cloud'; 
+            renderSidebar(); switchChat(activeChatId);
+        }
+
+        // ==========================================
+        // REALISTIC CALL LOGIC
+        // ==========================================
+        let callTimeout;
+        function startCall(type) {
+            if(activeChatId === 'cloud') { showToast("Cannot call My Cloud."); return; }
+            
+            const chat = chatDB[activeChatId];
+            const overlay = document.getElementById('callOverlay');
+            const bg = document.getElementById('callVideoBg');
+            
+            document.getElementById('callName').textContent = chat.name;
+            document.getElementById('callAvatarImg').src = chat.avatar;
+            document.getElementById('callStatusText').textContent = "Calling... Waiting for answer";
+            
+            if(type === 'video') {
+                bg.style.display = 'block';
+                document.getElementById('callVideoMainImg').src = chat.avatar;
+                document.getElementById('callVideoMyImg').src = currentUser.avatar;
+            } else {
+                bg.style.display = 'none';
+            }
+            
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = 1, 10);
+            
+            // Giả lập nghe máy sau 4 giây
+            callTimeout = setTimeout(() => {
+                document.getElementById('callStatusText').textContent = "00:01";
+                // Bắt đầu đếm giây (Demo)
+            }, 4000);
+        }
+        
+        function endCall() {
+            clearTimeout(callTimeout);
+            const overlay = document.getElementById('callOverlay');
+            document.getElementById('callStatusText').textContent = "Call Ended";
+            setTimeout(() => {
+                overlay.style.opacity = 0;
+                setTimeout(() => overlay.style.display = 'none', 300);
+            }, 1000);
+        }
+
+        // ==========================================
+        // 3. PROFILE EDIT LOGIC KÉO THẢ (GIỮ NGUYÊN)
+        // ==========================================
+        function toggleEditProfile() {
+            const pf = document.getElementById('profileOverlay');
+            pf.classList.toggle('is-editing');
+            const isEdit = pf.classList.contains('is-editing');
+            document.getElementById('editProfileBtn').style.display = isEdit ? 'none' : 'inline-block';
+            document.getElementById('saveProfileBtn').style.display = isEdit ? 'inline-block' : 'none';
+        }
+
+        function handleProfileUpload(event, type) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if(type === 'cover') {
+                    const cover = document.getElementById('pfCover');
+                    cover.style.backgroundImage = `url('${e.target.result}')`;
+                    cover.style.backgroundPosition = '50% 50%'; 
+                    if(currentUser) { currentUser.cover = e.target.result; localStorage.setItem('stablecast_users', JSON.stringify({...JSON.parse(localStorage.getItem('stablecast_users')), [currentUser.username]: currentUser})); }
+                } else {
+                    const avatar = document.getElementById('pfAvatarImg');
+                    avatar.src = e.target.result;
+                    avatar.style.objectPosition = '50% 50%'; 
+                    if(currentUser) { 
+                        currentUser.avatar = e.target.result; 
+                        localStorage.setItem('stablecast_users', JSON.stringify({...JSON.parse(localStorage.getItem('stablecast_users')), [currentUser.username]: currentUser})); 
+                    }
+                    for(let id in chatDB) {
+                        chatDB[id].msgs.forEach(m => { if(m.isMe) m.avatar = e.target.result; });
+                    }
+                    saveChatDB();
+                    if(activeChatId) switchChat(activeChatId); 
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        let isDraggingProf = false, dragTargetProf = null, startXP, startYP, bgPx = 50, bgPy = 50, avPx = 50, avPy = 50; 
+        document.getElementById('pfCover').addEventListener('mousedown', (e) => {
+            if(!document.getElementById('profileOverlay').classList.contains('is-editing')) return;
+            isDraggingProf = true; dragTargetProf = 'cover'; startXP = e.clientX; startYP = e.clientY; e.preventDefault();
+        });
+        document.getElementById('pfAvatarImg').addEventListener('mousedown', (e) => {
+            if(!document.getElementById('profileOverlay').classList.contains('is-editing')) return;
+            isDraggingProf = true; dragTargetProf = 'avatar'; startXP = e.clientX; startYP = e.clientY; e.preventDefault();
+        });
+        window.addEventListener('mousemove', (e) => {
+            if(!isDraggingProf) return;
+            const dx = e.clientX - startXP; const dy = e.clientY - startYP;
+            startXP = e.clientX; startYP = e.clientY;
+            if(dragTargetProf === 'cover') {
+                bgPx -= dx * 0.2; bgPy -= dy * 0.2; bgPx = Math.max(0, Math.min(100, bgPx)); bgPy = Math.max(0, Math.min(100, bgPy));
+                document.getElementById('pfCover').style.backgroundPosition = `${bgPx}% ${bgPy}%`;
+            } else if (dragTargetProf === 'avatar') {
+                avPx -= dx * 0.5; avPy -= dy * 0.5; avPx = Math.max(0, Math.min(100, avPx)); avPy = Math.max(0, Math.min(100, avPy));
+                document.getElementById('pfAvatarImg').style.objectPosition = `${avPx}% ${avPy}%`;
             }
         });
+        window.addEventListener('mouseup', () => { isDraggingProf = false; dragTargetProf = null; });
+
+        // ==========================================
+        // 4. CHART & AI ENGINE (GIỮ NGUYÊN 100%)
+        // ==========================================
+        let globalNewsArrayBase = [
+            { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "https://cointelegraph.com" },
+            { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "https://coindesk.com" },
+            { title: "Whale activity spikes as $500M USDT moves to Binance", source: "CryptoQuant", time: "12 mins ago", sentiment: "neg", url: "https://cryptoquant.com" }
+        ];
+
+        let lastTimeIdxNews = -1;
+
+        function renderNewsFeed() {
+            const feed = document.getElementById('newsFeed');
+            if(!feed || globalNewsArrayBase.length === 0) return;
+            let timeIndex = Math.floor(Date.now() / 6000);
+            if(timeIndex === lastTimeIdxNews) return; 
+            lastTimeIdxNews = timeIndex;
+
+            let html = ''; let startIndex = timeIndex % globalNewsArrayBase.length;
+            for(let i = 0; i < Math.min(4, globalNewsArrayBase.length); i++) {
+                const item = globalNewsArrayBase[(startIndex + i) % globalNewsArrayBase.length];
+                const label = item.sentiment === 'pos' ? "BULLISH" : "BEARISH";
+                const sentClass = item.sentiment === 'pos' ? "sent-pos" : "sent-neg";
+                html += `<a href="${item.url}" target="_blank" class="news-item"><div class="news-title">${item.title}</div><div class="news-meta"><span><i class="fas fa-newspaper"></i> ${item.source} • ${item.time}</span><span class="sentiment-tag ${sentClass}">${label}</span></div></a>`;
+            }
+            feed.innerHTML = html;
+        }
+
+        function initNewsEngine() {
+            renderNewsFeed(); setInterval(renderNewsFeed, 1000); 
+            fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN').then(res => res.json()).then(data => {
+                if(data && data.Data && data.Data.length > 0) {
+                    globalNewsArrayBase = data.Data.map(article => {
+                        let sent = article.title.toLowerCase().match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud|delay)/) ? "neg" : "pos";
+                        const date = new Date(article.published_on * 1000);
+                        return { title: article.title, source: article.source_info.name, time: ("0"+date.getHours()).slice(-2)+":"+("0"+date.getMinutes()).slice(-2), sentiment: sent, url: article.url };
+                    });
+                    lastTimeIdxNews = -1; renderNewsFeed();
+                }
+            }).catch(e => console.log("Using local fallback news."));
+        }
+
+        async function startCoreEngine() {
+            let history = [], aiHistory = [], labels = [];
+
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100');
+                const data = await res.json();
+                history = data.map(d => parseFloat(d[4])); labels = data.map((_, i) => i);
+                aiHistory = history.map(p => p + (Math.sin(p) - 0.5) * (p * 0.0015)); 
+            } catch (e) {
+                let price = 43250; history = Array.from({length: 100}, (_, i) => { price+=Math.sin(i)*100; return price; });
+                aiHistory = history.map(p => p + Math.cos(p)*50); labels = Array.from({length: 100}, (_,i) => i);
+            }
+
+            Chart.defaults.color = '#8492a6'; Chart.defaults.font.family = "'JetBrains Mono', monospace";
+            const ctxP = document.getElementById('priceChart').getContext('2d');
+            const pChart = new Chart(ctxP, {
+                type: 'line', data: { labels: labels, datasets: [
+                    { label: 'Real', data: history, borderColor: '#00d283', borderWidth: 2.5, pointRadius: 0, fill: true, backgroundColor: (ctx) => { const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400); grad.addColorStop(0, 'rgba(0,210,131,0.25)'); grad.addColorStop(1, 'rgba(0,210,131,0)'); return grad; }, tension: 0.2 },
+                    { label: 'AI', data: aiHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [6,6], pointRadius: 0, fill: false, tension: 0.2 }
+                ]},
+                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', grid:{color:'rgba(255,255,255,0.05)'}}} }
+            });
+
+            const ctxI = document.getElementById('indicatorChart').getContext('2d');
+            const iChart = new Chart(ctxI, {
+                type: 'line', data: { labels: labels, datasets: [{ label: 'RSI', data: calcRSI(history), borderColor: '#3b82f6', borderWidth: 1.5, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', min:0, max:100, grid:{color:'rgba(255,255,255,0.05)'}}} }
+            });
+
+            const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data); const currentPrice = parseFloat(data.c); const changePercent = parseFloat(data.P);
+                history.shift(); history.push(currentPrice);
+                const rsiData = calcRSI(history); const macdArray = calcMACD(history);
+                const predPrice = updateAI(rsiData[rsiData.length-1], macdArray[macdArray.length-1], changePercent, currentPrice);
+                aiHistory.shift(); aiHistory.push(predPrice);
+                pChart.data.datasets[0].data = history; pChart.data.datasets[1].data = aiHistory; pChart.update(); 
+                iChart.data.datasets[0].data = rsiData; iChart.update();
+
+                const elP = document.getElementById('mainPrice'); elP.innerText = currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
+                elP.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)";
+                elP.style.textShadow = changePercent >= 0 ? "0 0 20px rgba(0, 210, 131, 0.4)" : "0 0 20px rgba(255, 59, 94, 0.4)";
+                
+                const elC = document.getElementById('priceChange'); elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
+                elC.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)";
+                updateOrderBook(currentPrice);
+            };
+        }
+
+        function calcEMA(data, period) { let k = 2/(period+1), ema=data[0], res=[]; data.forEach(p => { ema = p*k + ema*(1-k); res.push(ema); }); return res; }
+        function calcMACD(data) { let ema12 = calcEMA(data, 12), ema26 = calcEMA(data, 26), macd = []; for(let i=0; i<data.length; i++) macd.push(ema12[i] - ema26[i]); return macd; }
+        function calcRSI(data) { let res = Array(14).fill(50); for(let i=14; i<data.length; i++) { let up = 0, down = 0; for(let j=i-14; j<i; j++) { let diff = data[j+1] - data[j]; if(diff > 0) up += diff; else down -= diff; } res.push(down === 0 ? 100 : 100 - (100 / (1 + up / down))); } return res; }
+        
+        function updateOrderBook(p) { 
+            let h = ""; 
+            for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:var(--down-color)">${(p+i*1.5).toFixed(2)}</span> <span style="color:#aaa">${(Math.abs(Math.sin(p*i))*2).toFixed(3)}</span></div>`; 
+            h += `<div style="text-align:center; color:#fff; font-size:1.1rem; padding: 6px 0; border-top:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05); margin:6px 0;">${p.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>`; 
+            for(let i=1; i<=5; i++) h += `<div class="ob-row bg-green-soft"><span style="color:var(--up-color)">${(p-i*1.5).toFixed(2)}</span> <span style="color:#aaa">${(Math.abs(Math.cos(p*i))*2).toFixed(3)}</span></div>`; 
+            document.getElementById('orderBook').innerHTML = h; 
+        }
+
+        function updateAI(rsi, macd, chg, price) {
+            let sig = "HOLD", col = "#8492a6", hexOpacity = "33", pseudoRand1 = Math.abs(Math.sin(price*100)), pseudoRand2 = Math.abs(Math.cos(price*100)), conf = 45 + pseudoRand1*15, predOffset = (pseudoRand2-0.5)*(price*0.001);
+            if (rsi > 65 || (macd < 0 && chg < -0.5)) { sig = "SELL"; col = "#ff3b5e"; hexOpacity = "66"; conf = 65 + pseudoRand1*15; predOffset = -(price*(0.005+pseudoRand2*0.005)); if(rsi > 75) { sig = "STRONG SELL"; conf += 5; } } 
+            else if (rsi < 35 || (macd > 0 && chg > 0.5)) { sig = "BUY"; col = "#00d283"; hexOpacity = "66"; conf = 65 + pseudoRand1*15; predOffset = (price*(0.005+pseudoRand2*0.005)); if(rsi < 25) { sig = "STRONG BUY"; conf += 5; } }
+            if(conf > 88.5) conf = 88.5 - pseudoRand1; const predPrice = price + predOffset;
+            let sl = sig.includes("BUY") ? price*0.985 : (sig.includes("SELL") ? price*1.015 : price*0.99), tp = sig.includes("BUY") ? price*1.03 : (sig.includes("SELL") ? price*0.97 : price*1.01);
+            
+            const sigBox = document.getElementById('signalBox'); document.getElementById('aiSignal').innerText = sig; document.getElementById('aiSignal').style.color = col; document.getElementById('aiSignal').style.textShadow = `0 0 20px ${col}${hexOpacity}`; sigBox.style.borderColor = col; sigBox.style.boxShadow = `inset 0 0 25px ${col}33`;
+            document.getElementById('aiConf').innerText = conf.toFixed(1) + "%"; const circle = document.querySelector('.conf-circle'); circle.style.borderColor = col; circle.style.boxShadow = `0 0 30px ${col}55, inset 0 0 15px ${col}22`;
+            document.getElementById('aiPredPrice').innerText = predPrice.toLocaleString('en-US', {minimumFractionDigits: 2}); document.getElementById('aiPredPrice').style.color = col; document.getElementById('aiPredPrice').style.textShadow = `0 0 20px ${col}55`;
+            document.getElementById('slVal').innerText = sl.toLocaleString('en-US', {minimumFractionDigits: 2}); document.getElementById('tpVal').innerText = tp.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('rsiVal').innerText = rsi.toFixed(2); document.getElementById('rsiVal').style.color = rsi > 70 ? "var(--down-color)" : (rsi < 30 ? "var(--up-color)" : "#fff");
+            document.getElementById('macdVal').innerText = macd.toFixed(2); document.getElementById('macdVal').style.color = macd > 0 ? "var(--up-color)" : "var(--down-color)";
+            return predPrice; 
+        }
     </script>
 </body>
 </html>
