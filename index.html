@@ -72,7 +72,7 @@
         .brand span { color: var(--accent-color); }
         .market-ticker { display: flex; gap: 20px; font-size: 0.85rem; }
 
-        .grid-container { flex: 1; display: grid; grid-template-columns: 280px 1fr 320px; gap: 1px; background: var(--border-color); overflow: hidden; }
+        .grid-container { flex: 1; display: grid; grid-template-columns: 280px 1fr 340px; gap: 1px; background: var(--border-color); overflow: hidden; }
         .panel { background: var(--bg-color); padding: 15px; overflow-y: auto; display: flex; flex-direction: column; }
         .panel-header { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
 
@@ -85,7 +85,8 @@
         .price-overlay { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
         .main-price { font-size: 3.5rem; font-weight: bold; color: var(--up-color); font-family: 'Rajdhani', sans-serif; line-height: 1; }
 
-        .ai-confidence { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border-color); }
+        /* --- CỘT PHẢI (AI) --- */
+        .ai-confidence { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
         .conf-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--border-color); margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: border-color 0.5s; }
         .conf-value { font-size: 2rem; font-weight: bold; color: #fff; }
         .conf-label { font-size: 0.7rem; color: var(--text-muted); }
@@ -93,6 +94,13 @@
         .signal-box { background: #111; padding: 15px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; text-align: center; transition: border-color 0.5s; }
         .signal-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; transition: color 0.5s; }
 
+        /* Bảng thông số kỹ thuật mới thêm */
+        .params-box { background: #111; padding: 12px; border: 1px solid #333; border-radius: 4px; margin-top: 15px; }
+        .param-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
+        .param-label { color: #888; }
+        .param-val { color: #fff; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+
+        /* Tin tức thật */
         .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; }
         .news-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #222; }
         .news-title { font-size: 0.85rem; font-weight: bold; color: #fff; margin-bottom: 4px; line-height: 1.3; }
@@ -165,16 +173,33 @@
 
             <div class="panel">
                 <div class="panel-header"><span>AI Prediction Engine</span> <i class="fas fa-brain"></i></div>
+                
                 <div class="ai-confidence">
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size:0.75rem; color:#3b82f6; text-transform:uppercase; font-weight:bold; margin-bottom:2px;">AI Forecast (Next 1H)</div>
+                        <div id="aiPredPrice" style="font-size:2.2rem; font-weight:bold; color:#fff; font-family:'Rajdhani', sans-serif;">LOADING...</div>
+                    </div>
+
                     <div class="conf-circle" id="confCircle">
                         <div class="conf-value" id="aiConf">--%</div>
                         <div class="conf-label">CONFIDENCE</div>
                     </div>
                 </div>
+
                 <div class="signal-box" id="signalBox">
                     <div style="font-size:0.7rem; color:#888; margin-bottom: 5px;">RECOMMENDED ACTION</div>
                     <div class="signal-text" id="aiSignal">ANALYZING</div>
                 </div>
+
+                <div class="params-box">
+                    <div class="param-row"><span class="param-label">Stop Loss (ATR)</span> <span class="param-val" id="slVal" style="color:var(--down-color)">---</span></div>
+                    <div class="param-row"><span class="param-label">Take Profit</span> <span class="param-val" id="tpVal" style="color:var(--up-color)">---</span></div>
+                    <div class="param-row" style="border-top:1px solid #222; padding-top:8px; margin-top:8px;">
+                        <span class="param-label">RSI (14)</span> <span class="param-val" id="rsiVal">---</span>
+                    </div>
+                    <div class="param-row" style="margin-bottom:0;"><span class="param-label">MACD (12,26)</span> <span class="param-val" id="macdVal">---</span></div>
+                </div>
+
                 <div class="panel-header" style="margin-top:20px;"><span>Live Market Sentiment</span> <i class="fas fa-globe"></i></div>
                 <div class="news-feed" id="newsFeed"></div>
             </div>
@@ -237,7 +262,7 @@
                         loginOverlay.style.display = 'none';
                         mainApp.style.display = 'flex';
                         setTimeout(() => mainApp.style.opacity = 1, 100);
-                        startCoreEngine(); // Start API & WS
+                        startCoreEngine();
                     }, 500);
                 }, 800);
             }
@@ -247,7 +272,7 @@
                 let history = [];
                 let labels = [];
 
-                // 1. Lấy dữ liệu lịch sử từ Binance
+                // 1. Fetch History
                 try {
                     const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100');
                     const data = await res.json();
@@ -260,7 +285,7 @@
                     labels = Array.from({length: 100}, (_,i) => i);
                 }
 
-                // 2. Vẽ Biểu đồ
+                // 2. Setup Charts
                 const ctxP = document.getElementById('priceChart').getContext('2d');
                 const pChart = new Chart(ctxP, {
                     type: 'line',
@@ -294,7 +319,9 @@
 
                     history.shift(); history.push(currentPrice);
                     pChart.data.datasets[0].data = history;
-                    iChart.data.datasets[0].data = calcRSI(history);
+                    
+                    const rsiData = calcRSI(history);
+                    iChart.data.datasets[0].data = rsiData;
                     pChart.update(); iChart.update();
 
                     const elP = document.getElementById('mainPrice');
@@ -305,17 +332,23 @@
                     elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
                     elC.style.color = changePercent >= 0 ? '#0ecb81' : '#f6465d';
 
-                    updateAI(calcRSI(history).pop(), changePercent);
+                    // Tính MACD
+                    const macdArray = calcMACD(history);
+                    const currentMACD = macdArray[macdArray.length - 1];
+                    const currentRSI = rsiData[rsiData.length - 1];
+
+                    // Cập nhật Cột Phải
+                    updateAI(currentRSI, currentMACD, changePercent, currentPrice);
                     updateOrderBook(currentPrice);
                 };
 
-                // Gọi News API
+                // Fetch News API
                 fetchLiveNews();
-                setInterval(showNextNews, 4500); // Đổi tin tức mỗi 4.5s
-                setInterval(fetchLiveNews, 300000); // Cập nhật danh sách từ web mỗi 5 phút
+                setInterval(showNextNews, 4500); 
+                setInterval(fetchLiveNews, 300000); 
             }
 
-            // --- REAL NEWS ENGINE (CRYPTOCOMPARE API) ---
+            // --- REAL NEWS ENGINE ---
             let realNewsList = [];
             let currentNewsIndex = 0;
 
@@ -326,30 +359,24 @@
                     realNewsList = data.Data; 
                     showNextNews();
                 } catch (e) {
-                    console.error("Lỗi tải tin tức:", e);
+                    console.error("News error:", e);
                 }
             }
 
             function showNextNews() {
                 if(realNewsList.length === 0) return;
-                
                 const article = realNewsList[currentNewsIndex];
                 currentNewsIndex = (currentNewsIndex + 1) % realNewsList.length;
 
-                // Phân tích Sentiment dựa trên từ khóa trong tiêu đề
                 const titleLower = article.title.toLowerCase();
-                let sentiment = "pos";
-                let label = "BULLISH";
-                if(titleLower.match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud|lawsuit)/)) {
-                    sentiment = "neg";
-                    label = "BEARISH";
+                let sentiment = "pos"; let label = "BULLISH";
+                if(titleLower.match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud)/)) {
+                    sentiment = "neg"; label = "BEARISH";
                 }
 
-                // Chỉnh format thời gian
                 const date = new Date(article.published_on * 1000);
                 const timeString = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
 
-                // Khi click vào thẻ <a> sẽ tự mở link bài báo mới (target="_blank")
                 const h = `
                     <a href="${article.url}" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="news-item" style="transition: opacity 0.3s; cursor: pointer;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">
@@ -367,7 +394,21 @@
                 if(feed.children.length > 5) feed.lastChild.remove();
             }
 
-            // --- HELPERS ---
+            // --- MATH HELPERS ---
+            function calcEMA(data, period) {
+                let k = 2/(period+1), ema=data[0], res=[];
+                data.forEach(p => { ema = p*k + ema*(1-k); res.push(ema); });
+                return res;
+            }
+
+            function calcMACD(data) {
+                let ema12 = calcEMA(data, 12);
+                let ema26 = calcEMA(data, 26);
+                let macd = [];
+                for(let i=0; i<data.length; i++) macd.push(ema12[i] - ema26[i]);
+                return macd;
+            }
+
             function calcRSI(data) {
                 let res = Array(14).fill(50);
                 for(let i=14; i<data.length; i++) {
@@ -376,8 +417,7 @@
                         let diff = data[j+1] - data[j];
                         if(diff > 0) up += diff; else down -= diff;
                     }
-                    if (down === 0) res.push(100);
-                    else res.push(100 - (100 / (1 + up/down)));
+                    res.push(down === 0 ? 100 : 100 - (100 / (1 + up / down)));
                 }
                 return res;
             }
@@ -390,20 +430,65 @@
                 document.getElementById('orderBook').innerHTML = h;
             }
 
-            function updateAI(rsi, chg) {
-                let sig="HOLD", col="#888", conf = 85 + Math.random()*10;
-                if(rsi > 70) { sig="STRONG SELL"; col="#f6465d"; conf+=3; }
-                else if(rsi < 30) { sig="STRONG BUY"; col="#0ecb81"; conf+=3; }
-                else if(chg > 1.5) { sig="BUY"; col="#0ecb81"; }
-                else if(chg < -1.5) { sig="SELL"; col="#f6465d"; }
+            // --- CẬP NHẬT AI & THÔNG SỐ (FIX CONFIDENCE & ADD PARAMS) ---
+            function updateAI(rsi, macd, chg, price) {
+                let sig = "HOLD", col = "#888";
                 
-                const sigBox = document.getElementById('aiSignal');
-                sigBox.innerText = sig;
-                sigBox.style.color = col;
-                
+                // Confidence điều chỉnh chân thực hơn (45% -> 85%)
+                let conf = 45 + Math.random() * 15; 
+                let predOffset = (Math.random() - 0.5) * (price * 0.001); // Sai số dự đoán
+
+                if (rsi > 65 || (macd < 0 && chg < -0.5)) {
+                    sig = "SELL"; col = "#f6465d";
+                    conf = 65 + Math.random() * 15;
+                    predOffset = -(price * (0.005 + Math.random() * 0.008)); // Dự đoán giảm
+                    if(rsi > 75) { sig = "STRONG SELL"; conf += 5; }
+                } 
+                else if (rsi < 35 || (macd > 0 && chg > 0.5)) {
+                    sig = "BUY"; col = "#0ecb81";
+                    conf = 65 + Math.random() * 15;
+                    predOffset = (price * (0.005 + Math.random() * 0.008)); // Dự đoán tăng
+                    if(rsi < 25) { sig = "STRONG BUY"; conf += 5; }
+                }
+
+                // Chặn confidence tối đa không quá 89% cho chân thực
+                if(conf > 88.5) conf = 88.5 - Math.random();
+
+                const predPrice = price + predOffset;
+
+                // Stop Loss & Take Profit linh động theo tín hiệu
+                let sl, tp;
+                if(sig.includes("BUY")) {
+                    sl = price * 0.985; // Cắt lỗ 1.5%
+                    tp = price * 1.03;  // Chốt lời 3%
+                } else if(sig.includes("SELL")) {
+                    sl = price * 1.015;
+                    tp = price * 0.97;
+                } else {
+                    sl = price * 0.99;
+                    tp = price * 1.01;
+                }
+
+                // Cập nhật DOM
+                document.getElementById('aiSignal').innerText = sig;
+                document.getElementById('aiSignal').style.color = col;
                 document.getElementById('signalBox').style.borderColor = col;
+                
                 document.getElementById('aiConf').innerText = conf.toFixed(1) + "%";
-                document.getElementById('confCircle').style.borderColor = col;
+                document.querySelector('.conf-circle').style.borderColor = col;
+
+                document.getElementById('aiPredPrice').innerText = predPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('aiPredPrice').style.color = col;
+
+                // Cập nhật bảng thông số
+                document.getElementById('slVal').innerText = sl.toLocaleString('en-US', {minimumFractionDigits: 2});
+                document.getElementById('tpVal').innerText = tp.toLocaleString('en-US', {minimumFractionDigits: 2});
+                
+                document.getElementById('rsiVal').innerText = rsi.toFixed(2);
+                document.getElementById('rsiVal').style.color = rsi > 70 ? "#f6465d" : (rsi < 30 ? "#0ecb81" : "#fff");
+
+                document.getElementById('macdVal').innerText = macd.toFixed(2);
+                document.getElementById('macdVal').style.color = macd > 0 ? "#0ecb81" : "#f6465d";
             }
         });
     </script>
