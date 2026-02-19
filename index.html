@@ -19,22 +19,20 @@
             --border-color: #1f2937;
             --text-main: #e5e7eb;
             --text-muted: #6b7280;
-            --up-color: #0ecb81; /* Binance Green */
-            --down-color: #f6465d; /* Binance Red */
-            --accent-color: #3b82f6; /* Blue */
+            --up-color: #0ecb81; 
+            --down-color: #f6465d; 
+            --accent-color: #3b82f6; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Mặc định trên PC: Khóa cuộn trang (overflow: hidden), full màn hình */
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
-        /* =========================================
-           1. LOGIN SCREEN 
-           ========================================= */
+        /* --- LOGIN SCREEN --- */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-box { width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); text-align: center; }
+        .login-box { width: 90%; max-width: 420px; padding: 40px; background: #111; border: 1px solid #333; box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); text-align: center; }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid var(--up-color); display: inline-block; padding-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; color: #848e9c; font-size: 0.75rem; margin-bottom: 5px; text-transform: uppercase; }
@@ -46,9 +44,7 @@
         #loginMsg { margin-top: 20px; font-size: 0.85rem; min-height: 20px; }
         .secure-text { margin-top: 20px; color: #444; font-size: 0.7rem; letter-spacing: 1px; }
 
-        /* =========================================
-           2. MAIN INTERFACE (3 CỘT)
-           ========================================= */
+        /* --- MAIN INTERFACE --- */
         .main-app { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 1s; }
         
         header { height: 60px; background: var(--panel-bg); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
@@ -83,7 +79,6 @@
         .param-label { color: #888; }
         .param-val { color: #fff; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
 
-        /* Tin tức thật (BẢO VỆ CHỐNG TRỐNG) */
         .news-feed { flex: 1; overflow-y: auto; margin-top: 15px; padding-right: 5px; min-height: 150px; }
         .news-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #222; transition: opacity 0.3s; cursor: pointer; display: block; text-decoration: none; color: inherit; }
         .news-item:hover { opacity: 0.7; }
@@ -95,6 +90,40 @@
 
         .project-footer { background: #080808; border-top: 1px solid #222; padding: 10px 20px; text-align: center; font-size: 0.7rem; color: #555; line-height: 1.4; }
         .highlight-text { color: #888; font-weight: bold; }
+
+        /* =========================================
+           3. RESPONSIVE CHO ĐIỆN THOẠI (KHÔNG ẢNH HƯỞNG MÁY TÍNH)
+           ========================================= */
+        @media (max-width: 1024px) {
+            body { 
+                height: auto; 
+                overflow-y: auto; /* Mở khóa cuộn trang trên đt */
+            }
+            .main-app { 
+                height: auto; 
+            }
+            header {
+                flex-direction: column; /* Xếp Header dọc */
+                height: auto;
+                padding: 15px;
+                gap: 10px;
+                text-align: center;
+            }
+            .grid-container {
+                grid-template-columns: 1fr; /* CHUYỂN TỪ 3 CỘT THÀNH 1 CỘT DỌC */
+                gap: 10px;
+                overflow: visible;
+            }
+            .chart-wrapper {
+                min-height: 350px; /* Cấp không gian cho biểu đồ vẽ */
+            }
+            .indicator-wrapper {
+                min-height: 150px;
+            }
+            .main-price {
+                font-size: 2.5rem; /* Thu nhỏ chữ giá một chút */
+            }
+        }
     </style>
 </head>
 <body>
@@ -188,8 +217,7 @@
                 </div>
 
                 <div class="panel-header" style="margin-top:20px;"><span>Live Market Sentiment</span> <i class="fas fa-globe"></i></div>
-                <div class="news-feed" id="newsFeed">
-                    </div>
+                <div class="news-feed" id="newsFeed"></div>
             </div>
         </div>
 
@@ -250,13 +278,13 @@
                         loginOverlay.style.display = 'none';
                         mainApp.style.display = 'flex';
                         setTimeout(() => mainApp.style.opacity = 1, 100);
-                        initNewsEngine(); // Kích hoạt tin tức NGAY LẬP TỨC
-                        startCoreEngine(); // Bắt đầu load API giá
+                        initNewsEngine();
+                        startCoreEngine();
                     }, 500);
                 }, 800);
             }
 
-            // --- NEWS ENGINE CHỐNG LỖI 100% ---
+            // --- NEWS ENGINE CHỐNG TRỐNG ---
             let globalNewsArray = [
                 { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "#" },
                 { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "#" },
@@ -270,7 +298,6 @@
                 if(!feed) return;
                 
                 let html = '';
-                // Lấy 4 bài báo đầu tiên để vẽ
                 for(let i = 0; i < Math.min(4, globalNewsArray.length); i++) {
                     const item = globalNewsArray[i];
                     const label = item.sentiment === 'pos' ? "BULLISH" : "BEARISH";
@@ -289,22 +316,17 @@
             }
 
             function initNewsEngine() {
-                // Vẽ dữ liệu gốc ngay lập tức, không để trống
                 renderNews();
-
-                // Luân chuyển tin tức cứ mỗi 5 giây cho hiệu ứng động
                 setInterval(() => {
                     const first = globalNewsArray.shift();
                     globalNewsArray.push(first);
                     renderNews();
                 }, 5000);
 
-                // Thử kéo API thật (Chạy ngầm)
                 fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN')
                     .then(res => res.json())
                     .then(data => {
                         if(data && data.Data && data.Data.length > 0) {
-                            // Ghi đè bằng dữ liệu thật nếu API thành công
                             globalNewsArray = data.Data.map(article => {
                                 const titleLower = article.title.toLowerCase();
                                 let sent = "pos";
@@ -323,8 +345,7 @@
                             });
                             renderNews();
                         }
-                    })
-                    .catch(e => console.log("Using local fallback news due to API limits."));
+                    }).catch(e => console.log("Using fallback news."));
             }
 
             // --- CORE ENGINE (BINANCE API & WEBSOCKET) ---
@@ -507,4 +528,3 @@
     </script>
 </body>
 </html>
-
