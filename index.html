@@ -11,7 +11,8 @@
     <meta name="apple-mobile-web-app-title" content="StableCast">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%233b82f6' d='M239.1 6.3l-208 78c-18.7 7-31.1 25-31.1 45v225.1c0 18.2 10.3 34.8 26.5 42.9l208 104c13.5 6.8 29.4 6.8 42.9 0l208-104c16.2-8.1 26.5-24.8 26.5-42.9V129.3c0-20-12.4-37.9-31.1-44.9l-208-78C262 2.2 250 2.2 239.1 6.3zM256 68.4l192 72v.3l-192 83.2-192-83.2v-.3l192-72zm-32 158.5v192.6l-160-80V171.8l160 55.1zm64 192.6V226.9l160-55.1v167.6l-160 80z'/></svg>" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23050608'/><path fill='%233b82f6' d='M239.1 6.3l-208 78c-18.7 7-31.1 25-31.1 45v225.1c0 18.2 10.3 34.8 26.5 42.9l208 104c13.5 6.8 29.4 6.8 42.9 0l208-104c16.2-8.1 26.5-24.8 26.5-42.9V129.3c0-20-12.4-37.9-31.1-44.9l-208-78C262 2.2 250 2.2 239.1 6.3zM256 68.4l192 72v.3l-192 83.2-192-83.2v-.3l192-72zm-32 158.5v192.6l-160-80V171.8l160 55.1zm64 192.6V226.9l160-55.1v167.6l-160 80z' transform='translate(64, 64) scale(0.75)'/></svg>">
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2881/2881142.png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -112,6 +113,7 @@
            ========================================= */
         .full-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,4,6,0.9); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
         .overlay-container { width: 85%; max-width: 1000px; height: 80vh; background: linear-gradient(145deg, rgba(20,24,33,0.95), rgba(10,12,16,0.98)); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1); display: flex; overflow: hidden; position: relative; }
+        
         .overlay-close { position: fixed; top: 20px; right: 20px; font-size: 1.5rem; color: #888; cursor: pointer; transition: 0.3s; z-index: 99999; background: rgba(0,0,0,0.6); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);}
         .overlay-close:hover { color: var(--down-color); transform: scale(1.1); background: rgba(0,0,0,0.9); border-color: var(--down-color);}
 
@@ -129,12 +131,10 @@
         .friend-info h4 { color: #fff; font-size: 0.95rem; margin-bottom: 4px; font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .friend-info p { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* THEME HÌNH NỀN CHAT ĐƯỢC CHUYỂN VÀO LỚP TÁCH BIỆT */
         .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; overflow: hidden;}
         .chat-bg-layer { position: absolute; top:0; left:0; width:100%; height:100%; z-index:-2; background-size:cover; background-position:center; transition: background 0.3s ease;}
         .chat-bg-overlay { position: absolute; top:0; left:0; width:100%; height:100%; z-index:-1; background: rgba(0,0,0,0.6); display: none; }
 
-        /* HEADER & INPUT NHẬN GLASSMORPHISM ĐỂ HIỂN THỊ NỀN */
         .chat-header { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 10; position:relative; }
         .chat-actions { margin-left: auto; display: flex; gap: 20px; font-size: 1.2rem; color: var(--accent-color); }
         .chat-actions i { cursor: pointer; transition: 0.3s; }
@@ -699,7 +699,7 @@
         }
         function fireNotification(title, body) {
             if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/3128/3128304.png' });
+                new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/1173/1173269.png' });
             }
         }
 
@@ -793,7 +793,7 @@
         function backToFriendList() { document.getElementById('chatOverlayContainer').classList.remove('show-mobile-chat'); }
 
         let chatDB = {};
-        let prevChatDBLength = {}; // Để theo dõi tin nhắn mới và bắn thông báo
+        let prevChatDBLength = {}; 
         let activeChatId = 'cloud';
         let isFirstLoad = true;
         let globalUsersCache = {}; 
@@ -808,7 +808,6 @@
                 if(doc.exists && doc.data().chatData) {
                     chatDB = JSON.parse(doc.data().chatData);
                     
-                    // Logic kiểm tra tin nhắn mới và bắn thông báo
                     if(!isFirstLoad) {
                         for(let id in chatDB) {
                             let currLen = chatDB[id].msgs.length;
@@ -819,7 +818,6 @@
                                     if(document.getElementById('socialOverlay').style.display !== 'flex' || activeChatId !== id) {
                                         unreadCount++; updateMsgBadge(); 
                                     }
-                                    // Bắn notification push
                                     fireNotification(`New message from ${newestMsg.sender}`, newestMsg.text.includes('<img') ? '[Image sent]' : newestMsg.text);
                                 }
                             }
@@ -829,7 +827,6 @@
                         for(let id in chatDB) prevChatDBLength[id] = chatDB[id].msgs.length;
                     }
                 } else {
-                    // Tuyệt đối không lưu đè rỗng
                     chatDB = { 'cloud': { name: 'My Cloud', type: 'cloud', isLeader: false, members: [], desc: 'Saved messages & files', msgs: [], themeKey: 'default' } };
                 }
                 renderSidebar(); if(chatDB[activeChatId]) { switchChat(activeChatId, true); } else { switchChat('cloud', true); }
@@ -871,7 +868,6 @@
                 document.getElementById('currentChatStatus').textContent = chat.type === 'group' ? `${chat.members.length + 1} Members` : (isOnline ? 'Online' : 'Offline');
             }
 
-            // XỬ LÝ THEME TÁCH LỚP (HEADER KO BỊ ĐEN)
             const box = document.getElementById('chatMessagesBox');
             const bgDiv = document.getElementById('chatAreaBg');
             const overlayDiv = document.getElementById('chatAreaOverlay');
@@ -916,7 +912,7 @@
             let time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             chatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: true }); 
-            prevChatDBLength[activeChatId] = chatDB[activeChatId].msgs.length; // Tránh tự báo notif
+            prevChatDBLength[activeChatId] = chatDB[activeChatId].msgs.length; 
             saveChatDB(); 
             
             let chat = chatDB[activeChatId];
