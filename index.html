@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>StableCast</title>
     
+    <meta name="theme-color" content="#050608">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StableCast">
+    
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%233b82f6' d='M239.1 6.3l-208 78c-18.7 7-31.1 25-31.1 45v225.1c0 18.2 10.3 34.8 26.5 42.9l208 104c13.5 6.8 29.4 6.8 42.9 0l208-104c16.2-8.1 26.5-24.8 26.5-42.9V129.3c0-20-12.4-37.9-31.1-44.9l-208-78C262 2.2 250 2.2 239.1 6.3zM256 68.4l192 72v.3l-192 83.2-192-83.2v-.3l192-72zm-32 158.5v192.6l-160-80V171.8l160 55.1zm64 192.6V226.9l160-55.1v167.6l-160 80z'/></svg>" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23050608'/><path fill='%233b82f6' d='M239.1 6.3l-208 78c-18.7 7-31.1 25-31.1 45v225.1c0 18.2 10.3 34.8 26.5 42.9l208 104c13.5 6.8 29.4 6.8 42.9 0l208-104c16.2-8.1 26.5-24.8 26.5-42.9V129.3c0-20-12.4-37.9-31.1-44.9l-208-78C262 2.2 250 2.2 239.1 6.3zM256 68.4l192 72v.3l-192 83.2-192-83.2v-.3l192-72zm-32 158.5v192.6l-160-80V171.8l160 55.1zm64 192.6V226.9l160-55.1v167.6l-160 80z' transform='translate(64, 64) scale(0.75)'/></svg>">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,17 +22,11 @@
            1. CORE VARIABLES & SETUP 
            ========================================= */
         :root {
-            --bg-dark: #050608;
-            --bg-gradient: radial-gradient(circle at 50% -20%, #111a2e 0%, #030406 100%);
-            --panel-bg: rgba(13, 16, 23, 0.55);
-            --border-light: rgba(255, 255, 255, 0.08);
-            --text-main: #e2e8f0;
-            --text-muted: #8492a6;
-            --up-color: #00d283; 
-            --down-color: #ff3b5e; 
-            --accent-color: #3b82f6; 
+            --bg-dark: #050608; --bg-gradient: radial-gradient(circle at 50% -20%, #111a2e 0%, #030406 100%);
+            --panel-bg: rgba(13, 16, 23, 0.55); --border-light: rgba(255, 255, 255, 0.08);
+            --text-main: #e2e8f0; --text-muted: #8492a6;
+            --up-color: #00d283; --down-color: #ff3b5e; --accent-color: #3b82f6; 
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg-dark); background-image: var(--bg-gradient); color: var(--text-main); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
         ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 5px; } ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
@@ -50,7 +50,6 @@
         
         .toggle-auth { margin-top: 25px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-right: 15px;}
         .toggle-auth:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        
         #loginMsg { margin-top: 15px; font-size: 0.85rem; font-weight: 600; min-height: 20px; }
         .secure-text { margin-top: 25px; color: #555; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
 
@@ -58,12 +57,10 @@
            3. MAIN APP 
            ========================================= */
         .main-app { display: none; height: 100%; flex-direction: column; opacity: 0; transition: opacity 1s; }
-        
         header { height: 70px; background: rgba(5,6,8,0.7); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); z-index: 10; }
         .brand { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; letter-spacing: 1.5px; color: #fff; display: flex; align-items: center; gap: 10px; }
         .brand span { color: var(--accent-color); text-shadow: 0 0 15px rgba(59, 130, 246, 0.8); }
         .brand sup { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #aaa; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); letter-spacing: 0; margin-left: 5px; }
-        
         .nav-actions { display: flex; align-items: center; gap: 20px; }
         .social-btn { color: var(--text-muted); font-size: 1.4rem; cursor: pointer; transition: all 0.3s; position: relative; }
         .social-btn:hover { color: var(--accent-color); text-shadow: 0 0 15px var(--accent-color); transform: scale(1.1); }
@@ -71,12 +68,11 @@
         .market-ticker { font-size: 0.85rem; letter-spacing: 0.5px; padding-left: 20px; border-left: 1px solid rgba(255,255,255,0.1); }
 
         .grid-container { flex: 1; display: grid; grid-template-columns: 280px 1fr 340px; gap: 15px; padding: 15px; overflow: hidden; }
-
         .panel { background: var(--panel-bg); backdrop-filter: blur(15px); border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .panel:hover { box-shadow: 0 15px 50px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1); }
         .panel-header { font-size: 0.8rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
         .panel-header i { color: var(--accent-color); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
-
+        
         .ob-row { display: flex; justify-content: space-between; margin-bottom: 3px; padding: 4px 6px; font-size: 0.75rem; border-radius: 4px; transition: background 0.2s; cursor: default; }
         .ob-row:hover { background: rgba(255,255,255,0.1); transform: scale(1.02); }
         .bg-red-soft { background: rgba(255, 59, 94, 0.05); }
@@ -108,23 +104,20 @@
         .sent-neg { background: rgba(255, 59, 94, 0.15); color: var(--down-color); border: 1px solid rgba(255, 59, 94, 0.4); }
 
         .project-footer { background: rgba(4,5,7,0.9); backdrop-filter: blur(10px); border-top: 1px solid var(--border-light); padding: 12px 20px; text-align: center; font-size: 0.7rem; color: #666; line-height: 1.5; z-index: 10; }
-        .highlight-text { color: #aaa; font-weight: bold; }
-
         @keyframes pulse-icon { 0% {opacity: 1; text-shadow: 0 0 15px var(--up-color);} 50% {opacity: 0.4; text-shadow: 0 0 0px transparent;} 100% {opacity: 1; text-shadow: 0 0 15px var(--up-color);} }
         .fa-circle-notch { animation: fa-spin 2s linear infinite, pulse-icon 1.5s ease-in-out infinite; }
 
         /* =========================================
-           4. OVERLAY CHUNG (MẠNG XÃ HỘI & HỒ SƠ TỐI ƯU HÓA)
+           4. OVERLAYS CHUNG 
            ========================================= */
         .full-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,4,6,0.9); backdrop-filter: blur(15px); z-index: 20000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
         .overlay-container { width: 85%; max-width: 1000px; height: 80vh; background: linear-gradient(145deg, rgba(20,24,33,0.95), rgba(10,12,16,0.98)); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1); display: flex; overflow: hidden; position: relative; }
-        .overlay-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #888; cursor: pointer; transition: 0.3s; z-index: 100; background: rgba(0,0,0,0.5); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
-        .overlay-close:hover { color: var(--down-color); transform: scale(1.1); background: rgba(0,0,0,0.8); }
+        .overlay-close { position: fixed; top: 20px; right: 20px; font-size: 1.5rem; color: #888; cursor: pointer; transition: 0.3s; z-index: 99999; background: rgba(0,0,0,0.6); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);}
+        .overlay-close:hover { color: var(--down-color); transform: scale(1.1); background: rgba(0,0,0,0.9); border-color: var(--down-color);}
 
-        /* --- TÍNH NĂNG CHAT TỐI ƯU UI --- */
-        .social-sidebar { width: 300px; background: rgba(0,0,0,0.5); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; position: relative; }
+        /* --- CHAT UI --- */
+        .social-sidebar { width: 300px; background: rgba(0,0,0,0.5); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; position: relative; z-index: 10;}
         .social-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: bold; color: #fff; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
-        
         .friend-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px;}
         .friend-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
         .friend-item:hover, .friend-item.active { background: rgba(59, 130, 246, 0.15); border-left: 3px solid var(--accent-color); }
@@ -136,14 +129,20 @@
         .friend-info h4 { color: #fff; font-size: 0.95rem; margin-bottom: 4px; font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .friend-info p { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: transparent; position: relative;}
-        .chat-header { padding: 15px 20px; padding-right: 70px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); }
-        .chat-actions { margin-left: auto; display: flex; gap: 20px; font-size: 1.2rem; color: var(--accent-color); margin-right: 45px; }
+        /* THEME HÌNH NỀN CHAT ĐƯỢC CHUYỂN VÀO LỚP TÁCH BIỆT */
+        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; overflow: hidden;}
+        .chat-bg-layer { position: absolute; top:0; left:0; width:100%; height:100%; z-index:-2; background-size:cover; background-position:center; transition: background 0.3s ease;}
+        .chat-bg-overlay { position: absolute; top:0; left:0; width:100%; height:100%; z-index:-1; background: rgba(0,0,0,0.6); display: none; }
+
+        /* HEADER & INPUT NHẬN GLASSMORPHISM ĐỂ HIỂN THỊ NỀN */
+        .chat-header { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 10; position:relative; }
+        .chat-actions { margin-left: auto; display: flex; gap: 20px; font-size: 1.2rem; color: var(--accent-color); }
         .chat-actions i { cursor: pointer; transition: 0.3s; }
         .chat-actions i:hover { color: #fff; text-shadow: 0 0 10px var(--accent-color); transform: scale(1.1); }
+        .mobile-back-btn { display: none; cursor: pointer; font-size: 1.4rem; color: var(--text-muted); transition: 0.3s; margin-right: 10px;}
+        .mobile-back-btn:hover { color: var(--accent-color); }
 
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; z-index: 5; position: relative;}
         .msg-wrapper { display: flex; gap: 12px; align-items: flex-end; max-width: 80%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .msg-wrapper.sent { align-self: flex-end; flex-direction: row-reverse; }
@@ -157,11 +156,11 @@
         .msg a:hover { background: rgba(0,0,0,0.5); border-color: var(--accent-color); }
         
         .msg-received { background: rgba(255,255,255,0.08); border-bottom-left-radius: 0; border: 1px solid rgba(255,255,255,0.05); }
-        .msg-sent { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-bottom-right-radius: 0; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+        .msg-sent { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-bottom-right-radius: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .msg-time { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 5px; text-align: right; }
         .sent .msg-time { color: rgba(255,255,255,0.8); }
 
-        .chat-input-area { padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); }
+        .chat-input-area { padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); position: relative; z-index: 10;}
         .attach-icons { display: flex; gap: 15px; color: #888; font-size: 1.3rem; }
         .attach-icons i { cursor: pointer; transition: 0.3s; }
         .attach-icons i:hover { color: var(--up-color); }
@@ -170,13 +169,21 @@
         .send-btn { background: var(--accent-color); color: #fff; border: none; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); font-size: 1.2rem;}
         .send-btn:hover { background: #2563eb; transform: translateY(-2px); }
 
-        /* MÀN HÌNH TẠO GROUP / ADD FRIEND (MODAL TRONG SUỐT) */
+        .emoji-picker { position: absolute; bottom: 80px; left: 20px; background: rgba(20,24,33,0.95); border: 1px solid var(--border-light); border-radius: 12px; padding: 15px; display: none; grid-template-columns: repeat(5, 1fr); gap: 15px; z-index: 100; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .emoji-item { cursor: pointer; font-size: 1.5rem; transition: 0.2s; text-align: center; }
+        .emoji-item:hover { transform: scale(1.3); }
+
+        .theme-circle { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background-size: cover !important; background-position: center !important;}
+        .theme-circle:hover { transform: scale(1.1); }
+        .theme-circle.active { border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.6); }
+
+        /* MODALS INNER */
         .modal-overlay-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: center; justify-content: center; }
-        .modal-content { background: linear-gradient(145deg, rgba(20,24,33,1), rgba(10,12,16,1)); border: 1px solid var(--accent-color); border-radius: 12px; width: 350px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; }
+        .modal-content { background: linear-gradient(145deg, rgba(20,24,33,1), rgba(10,12,16,1)); border: 1px solid var(--accent-color); border-radius: 12px; width: 350px; max-width: 90%; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; }
         .modal-header { color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         .modal-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px; color: #fff; font-family: 'JetBrains Mono'; border-radius: 6px; margin-bottom: 15px; outline: none; transition: 0.3s; text-align: center;}
         .modal-input:focus { border-color: var(--accent-color); }
-        .modal-list { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;}
+        .modal-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;}
         .modal-item { display: flex; justify-content: space-between; align-items: center; color: #ccc; font-size: 0.85rem; cursor: pointer; padding: 5px 0;}
         .modal-item input { accent-color: var(--up-color); cursor: pointer; width: 16px; height: 16px;}
         .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 10px;}
@@ -190,7 +197,7 @@
         .kick-btn { color: var(--down-color); padding: 5px; transition: 0.3s; cursor: pointer; }
         .kick-btn:hover { transform: scale(1.2); text-shadow: 0 0 5px var(--down-color); }
 
-        /* REALISTIC CALL OVERLAY */
+        /* CALL OVERLAY */
         #callOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,6,8,0.95); backdrop-filter: blur(25px); z-index: 30000; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
         #callVideoBg { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; }
         .video-me { position: absolute; bottom: 30px; right: 30px; width: 120px; height: 160px; background: #222; border-radius: 12px; border: 2px solid var(--accent-color); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 5;}
@@ -203,21 +210,23 @@
         .hangup-btn:hover { transform: scale(1.1); background: #ff1a43; }
 
         /* --- PROFILE --- */
-        .profile-wrapper { width: 100%; max-width: 650px; margin: 0 auto; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; background: rgba(0,0,0,0.2); }
-        .pf-cover { height: 200px; width: 100%; background-color: #1a1a1a; background-image: url('https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000&auto=format&fit=crop'); background-size: cover; background-position: 50% 50%; position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .profile-wrapper { width: 100%; max-width: 650px; margin: auto; display: flex; flex-direction: column; background: rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; overflow-x: hidden; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);}
+        .pf-cover { height: 200px; width: 100%; background-color: #1a1a1a; background-image: url('https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000&auto=format&fit=crop'); background-size: cover; background-position: 50% 50%; position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;}
         .pf-edit-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; font-size: 2rem; color: #fff; transition: 0.3s; z-index: 5;}
         .pf-edit-overlay:hover { background: rgba(0,0,0,0.3); }
         .is-editing .pf-edit-overlay { display: flex; cursor: pointer; }
         .is-editing .pf-cover, .is-editing .pf-avatar-img { cursor: grab; }
         .is-editing .pf-cover:active, .is-editing .pf-avatar-img:active { cursor: grabbing; }
-        .pf-edit-hint { position: absolute; bottom: 10px; width: 100%; text-align: center; font-size: 0.8rem; color: #fff; text-shadow: 0 2px 4px #000; font-family: 'JetBrains Mono'; pointer-events: none;}
+        .editable-field { padding: 2px 5px; border-radius: 4px; border: 1px solid transparent; transition: 0.3s; outline: none; }
+        .is-editing .editable-field { border: 1px dashed rgba(255,255,255,0.3); background: rgba(0,0,0,0.3); cursor: text; }
+        .is-editing .editable-field:focus { border-color: var(--accent-color); background: rgba(0,0,0,0.6); }
 
         .pf-avatar-section { display: flex; justify-content: space-between; padding: 0 20px; position: relative; top: -50px; margin-bottom: -50px; align-items: flex-end; }
-        .pf-avatar-wrap { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #111; background: #222; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .pf-avatar-wrap { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #111; background: #222; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0;}
         .pf-avatar-img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; pointer-events: none; }
         .is-editing .pf-avatar-img { pointer-events: auto; } 
         
-        .pf-btn { background: transparent; border: 1px solid var(--border-light); color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'JetBrains Mono'; margin-top: 60px; backdrop-filter: blur(5px);}
+        .pf-btn { background: rgba(0,0,0,0.5); border: 1px solid var(--border-light); color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'JetBrains Mono'; margin-top: 60px; backdrop-filter: blur(5px);}
         .pf-btn:hover { background: rgba(255,255,255,0.1); }
         .pf-btn-save { background: var(--up-color); color: #000; border: none; display: none; box-shadow: 0 4px 15px rgba(0,210,131,0.4); }
         .pf-btn-save:hover { background: #00e690; transform: translateY(-2px); }
@@ -225,7 +234,7 @@
         .pf-info { padding: 10px 20px 20px; }
         .pf-name { font-size: 1.5rem; font-family: 'Rajdhani', sans-serif; font-weight: 700; color: #fff; margin-bottom: 2px; }
         .pf-handle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px; }
-        .pf-bio { font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; color: #ddd; }
+        .pf-bio { font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; color: #ddd; min-height: 20px; }
         .pf-meta { display: flex; gap: 15px; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; flex-wrap: wrap; }
         .pf-stats { display: flex; gap: 20px; font-size: 0.9rem; }
         .pf-stats b { color: #fff; }
@@ -236,29 +245,70 @@
         .pf-tab.active { color: #fff; }
         .pf-tab.active::after { content: ''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 4px; background: var(--accent-color); border-radius: 4px 4px 0 0; box-shadow: 0 -2px 10px rgba(59,130,246,0.5);}
 
+        /* --- COMMUNITY FEED UI --- */
+        .feed-container { max-width: 850px; margin: 0 auto; width: 100%; padding: 20px; overflow-y: auto; max-height: 90vh; }
+        .post-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 20px; display:flex; gap:15px; }
+        .post-input-area { flex: 1; display:flex; flex-direction: column; gap:10px;}
+        .post-input { width: 100%; background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono'; font-size: 1.1rem; outline: none; resize: none; min-height: 60px; }
+        .post-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;}
+        .post-btn { background: var(--accent-color); color: #fff; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'JetBrains Mono';}
+        .post-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
+        .post-preview-container { position: relative; display: inline-block; margin-top: 10px; }
+        .remove-img-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border-radius: 50%; padding: 8px 10px; cursor: pointer; transition: 0.3s; }
+        .remove-img-btn:hover { background: var(--down-color); }
+        
+        .feed-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: 0.3s;}
+        .feed-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        .feed-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px;}
+        .feed-author { font-weight: bold; color: #fff; font-family: 'Rajdhani'; font-size: 1.2rem; }
+        .feed-time { color: var(--text-muted); font-size: 0.8rem; }
+        .feed-content { color: #ddd; font-size: 1rem; line-height: 1.6; margin-bottom: 15px; word-wrap: break-word;}
+        .feed-content img { max-width: 100%; max-height: 500px; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); object-fit: cover;}
+        .feed-interaction { display: flex; gap: 25px; color: var(--text-muted); font-size: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;}
+        .feed-action { cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .feed-action:hover { color: var(--accent-color); }
+        .feed-action.liked { color: var(--down-color); }
+        .feed-action.liked i { animation: pulse-icon 0.5s ease; }
+        
+        .comment-section { margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 15px; display: none;}
+        .comment-item { display: flex; gap: 10px; margin-bottom: 12px; font-size: 0.9rem;}
+        .comment-input-box { display: flex; gap: 10px; align-items: center; margin-top: 15px;}
+        .comment-input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 20px; color: #fff; outline: none; font-family: 'JetBrains Mono';}
+
         /* CUSTOM TOAST NOTIFICATION */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-msg { background: rgba(13, 16, 23, 0.9); border-left: 4px solid var(--accent-color); color: #fff; padding: 15px 20px; border-radius: 8px; font-family: 'JetBrains Mono'; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); animation: slideInRight 0.3s ease-out forwards; display: flex; align-items: center; gap: 10px;}
         @keyframes slideInRight { from {transform: translateX(100%); opacity: 0;} to {transform: translateX(0); opacity: 1;} }
 
         @media (max-width: 1024px) {
-            body { height: auto; overflow-y: auto; }
+            body { overflow-y: auto; height: auto; }
             .main-app { height: auto; }
             header { flex-direction: column; height: auto; padding: 15px; gap: 12px; text-align: center; }
-            .grid-container { grid-template-columns: 1fr; gap: 15px; overflow: visible; padding: 10px; }
+            .grid-container { grid-template-columns: 1fr; display: flex; flex-direction: column; overflow: visible; padding: 10px; gap: 15px;}
             .chart-wrapper { min-height: 380px; }
             .indicator-wrapper { min-height: 180px; }
             .main-price { font-size: 3rem; }
             
-            .overlay-container { flex-direction: column; width: 95%; height: 90vh; }
-            .social-sidebar { width: 100%; height: 30%; border-right: none; border-bottom: 1px solid var(--border-light); }
-            .chat-area { height: 70%; }
+            .overlay-container { flex-direction: column; width: 100%; height: 100vh; border-radius: 0; border: none; max-height: 100vh;}
+            .social-sidebar { width: 100%; height: 100%; border-right: none; display: flex; }
+            .chat-area { width: 100%; height: 100%; display: none; } 
+            .show-mobile-chat .social-sidebar { display: none !important; }
+            .show-mobile-chat .chat-area { display: flex !important; }
+            
+            .mobile-back-btn { display: block !important; }
             .msg-wrapper { max-width: 95%; }
-            .chat-header { padding-right: 20px; } 
+            .chat-header { padding-right: 15px; } 
+            
+            .profile-wrapper { border-radius: 0; max-height: 100vh;}
+            .feed-container { max-height: 100vh; padding-top: 50px;}
         }
     </style>
 </head>
 <body>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <div id="loginOverlay">
         <div class="login-box" id="authBox">
@@ -287,7 +337,7 @@
                 <span class="toggle-auth" id="toggleForgotBtn" onclick="toggleMode('forgot')" style="color: var(--down-color);">FORGOT PASSWORD?</span>
             </div>
         </div>
-        <div class="secure-text"><i class="fas fa-shield-alt"></i> PROJECT BY TEAM 1</div>
+        <div class="secure-text"><i class="fas fa-shield-alt"></i> SECURE LOGIN VIA GOOGLE CLOUD</div>
     </div>
 
     <div class="main-app" id="mainApp">
@@ -295,14 +345,20 @@
             <div class="brand"><i class="fas fa-cube" style="color: var(--accent-color);"></i> STABLE<span>CAST</span> <sup>TEAM 1 - ADY201m</sup></div>
             
             <div class="nav-actions">
-                <div class="social-btn" onclick="openChatAndClearBadge()" title="Community Chat">
-                    <i class="fas fa-comments"></i><span class="badge" id="msgBadge">2</span>
+                <div class="social-btn" onclick="openCommunityFeed()" title="Global Community">
+                    <i class="fas fa-globe-americas"></i>
                 </div>
-                <div class="social-btn" onclick="toggleOverlay('profileOverlay')" title="User Profile">
+                <div class="social-btn" onclick="openGlobalAddFriend()" title="Find Friends">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="social-btn" onclick="openChatAndClearBadge()" title="Community Chat">
+                    <i class="fas fa-comments"></i><span class="badge" id="msgBadge">0</span>
+                </div>
+                <div class="social-btn" onclick="openProfile()" title="User Profile">
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div class="market-ticker" id="tickerStatus" style="color:var(--up-color); font-weight: 600;">
-                    <i class="fas fa-circle-notch fa-spin"></i> SYNCING...
+                    <i class="fas fa-circle-notch fa-spin"></i> CLOUD SYNCED
                 </div>
             </div>
         </header>
@@ -314,9 +370,9 @@
                 
                 <div class="panel-header" style="margin-top:25px;"><span>System Diagnostics</span> <i class="fas fa-microchip"></i></div>
                 <div style="font-size:0.8rem; color:#aaa; font-weight: 500;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Network Latency</span> <span style="color:var(--up-color); text-shadow: 0 0 8px var(--up-color);">12ms</span></div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Tensor RAM</span> <span>14.2 GB</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Data Origin</span> <span style="color:#fff;">Binance WSS</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Network Latency</span> <span id="sysLatency" style="color:var(--up-color); text-shadow: 0 0 8px var(--up-color);">12ms</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Tensor RAM</span> <span id="sysRam">14.2 GB</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Data Origin</span> <span id="sysOrigin" style="color:#fff;">Binance WSS</span></div>
                 </div>
             </div>
 
@@ -341,7 +397,6 @@
 
             <div class="panel">
                 <div class="panel-header"><span>Prediction Engine</span> <i class="fas fa-brain"></i></div>
-                
                 <div class="ai-confidence">
                     <div style="margin-bottom: 15px;">
                         <div style="font-size:0.75rem; color:var(--accent-color); text-transform:uppercase; font-weight:700; letter-spacing: 1px; margin-bottom:5px;">Target Price (1H)</div>
@@ -352,12 +407,10 @@
                         <div class="conf-label">CONFIDENCE</div>
                     </div>
                 </div>
-
                 <div class="signal-box" id="signalBox">
                     <div style="font-size:0.7rem; color:#aaa; margin-bottom: 8px; font-weight: 600; letter-spacing: 1px;">ALGORITHMIC ACTION</div>
                     <div class="signal-text" id="aiSignal">ANALYZING</div>
                 </div>
-
                 <div class="params-box">
                     <div class="param-row"><span class="param-label">Stop Loss (ATR)</span> <span class="param-val" id="slVal" style="color:var(--down-color)">---</span></div>
                     <div class="param-row"><span class="param-label">Take Profit</span> <span class="param-val" id="tpVal" style="color:var(--up-color)">---</span></div>
@@ -366,35 +419,73 @@
                     </div>
                     <div class="param-row" style="margin-bottom:0;"><span class="param-label">MACD (12,26)</span> <span class="param-val" id="macdVal">---</span></div>
                 </div>
-
                 <div class="panel-header" style="margin-top:25px;"><span>Global Sentiment</span> <i class="fas fa-globe-americas"></i></div>
                 <div class="news-feed" id="newsFeed"></div>
             </div>
         </div>
     </div>
 
+    <div id="feedOverlay" class="full-overlay">
+        <div class="overlay-close" onclick="toggleOverlay('feedOverlay')"><i class="fas fa-times"></i></div>
+        <div class="feed-container">
+            <h3 style="color:#fff; font-family:'Rajdhani'; font-size: 1.8rem; margin-bottom: 20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Global Feed</h3>
+            
+            <div class="post-box">
+                <div class="friend-avatar" style="width: 50px; height: 50px; flex-shrink: 0;"><img id="feedMyAvatar" src=""></div>
+                <div class="post-input-area">
+                    <textarea id="postInputTxt" class="post-input" placeholder="What's happening in the market?"></textarea>
+                    
+                    <div id="postPreviewContainer" class="post-preview-container" style="display:none;">
+                        <img id="postPreviewImg" style="max-width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                        <i class="fas fa-times remove-img-btn" onclick="removePostImage()" title="Remove Image"></i>
+                    </div>
+
+                    <div class="post-actions">
+                        <i class="fas fa-image" style="color: var(--accent-color); font-size: 1.3rem; cursor: pointer; transition: 0.3s;" onclick="document.getElementById('postImgInput').click()" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--accent-color)'"></i>
+                        <button class="post-btn" onclick="publishPost()">Post</button>
+                    </div>
+                    <input type="file" id="postImgInput" accept="image/*" style="display: none;" onchange="previewPostImage(event)">
+                </div>
+            </div>
+
+            <div id="feedPostsArea">
+                <div style="text-align:center; color:var(--text-muted); padding: 50px;">Loading posts...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shareModal" class="modal-overlay-inner" style="z-index: 25000;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Share Post</span>
+                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('shareModal')"></i>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0;">Send to your friends:</p>
+            <div class="modal-list" id="shareFriendList"></div>
+        </div>
+    </div>
+
     <div id="socialOverlay" class="full-overlay">
-        <div class="overlay-container">
+        <div class="overlay-container" id="chatOverlayContainer">
             <div class="overlay-close" onclick="toggleOverlay('socialOverlay')"><i class="fas fa-times"></i></div>
             
             <div class="social-sidebar">
                 <div class="social-header">
                     <span>Messages</span>
-                    <div style="display:flex; gap:15px;">
-                        <i class="fas fa-user-plus" style="cursor:pointer; color:var(--text-muted); transition:0.3s;" title="Add Friend" onclick="openAddFriendModal()" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'"></i>
-                        <i class="fas fa-users-cog" style="cursor:pointer; color:var(--accent-color);" title="Create New Group" onclick="toggleModal('createGroupModal')"></i>
-                    </div>
+                    <i class="fas fa-users-cog" style="cursor:pointer; color:var(--accent-color);" title="Create New Group" onclick="openCreateGroupModal()"></i>
                 </div>
-                <div class="friend-list" id="sidebarFriendList">
-                    </div>
+                <div class="friend-list" id="sidebarFriendList"></div>
             </div>
 
             <div class="chat-area">
+                <div id="chatAreaBg" class="chat-bg-layer"></div>
+                <div id="chatAreaOverlay" class="chat-bg-overlay"></div>
+
                 <div class="chat-header">
-                    <div class="friend-avatar" id="currentChatAvatar">
-                        </div>
-                    <div style="flex:1;">
-                        <h4 id="currentChatName" style="color:#fff; font-family:'Rajdhani'; font-size:1.2rem;">...</h4>
+                    <i class="fas fa-chevron-left mobile-back-btn" onclick="backToFriendList()" title="Back"></i>
+                    <div class="friend-avatar" id="currentChatAvatar"></div>
+                    <div style="flex:1; overflow:hidden;">
+                        <h4 id="currentChatName" style="color:#fff; font-family:'Rajdhani'; font-size:1.2rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">...</h4>
                         <p id="currentChatStatus" style="color:var(--up-color); font-size:0.75rem;">...</p>
                     </div>
                     <div class="chat-actions">
@@ -404,11 +495,11 @@
                     </div>
                 </div>
 
-                <div class="chat-messages" id="chatMessagesBox">
-                    </div>
+                <div class="chat-messages" id="chatMessagesBox"></div>
 
                 <div class="chat-input-area" id="chatInputArea">
                     <div class="attach-icons">
+                        <i class="fas fa-smile" title="Emojis" onclick="toggleEmojiPicker()"></i>
                         <i class="fas fa-paperclip" title="Attach File" onclick="document.getElementById('attachFileInput').click()"></i>
                         <i class="fas fa-image" title="Send Image" onclick="document.getElementById('attachImgInput').click()"></i>
                     </div>
@@ -417,33 +508,34 @@
                     
                     <input type="file" id="attachFileInput" style="display:none;" onchange="handleChatAttach(event, 'file')">
                     <input type="file" id="attachImgInput" accept="image/*" style="display:none;" onchange="handleChatAttach(event, 'image')">
+
+                    <div id="emojiPicker" class="emoji-picker">
+                        <div class="emoji-item" onclick="insertEmoji('😀')">😀</div>
+                        <div class="emoji-item" onclick="insertEmoji('😂')">😂</div>
+                        <div class="emoji-item" onclick="insertEmoji('😍')">😍</div>
+                        <div class="emoji-item" onclick="insertEmoji('😎')">😎</div>
+                        <div class="emoji-item" onclick="insertEmoji('😭')">😭</div>
+                        <div class="emoji-item" onclick="insertEmoji('😡')">😡</div>
+                        <div class="emoji-item" onclick="insertEmoji('👍')">👍</div>
+                        <div class="emoji-item" onclick="insertEmoji('🔥')">🔥</div>
+                        <div class="emoji-item" onclick="insertEmoji('🚀')">🚀</div>
+                        <div class="emoji-item" onclick="insertEmoji('💰')">💰</div>
+                    </div>
                 </div>
             </div>
 
             <div id="createGroupModal" class="modal-overlay-inner">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <span>Create New Group</span>
+                        <span>Create Group</span>
                         <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('createGroupModal')"></i>
                     </div>
                     <input type="text" id="newGroupName" class="modal-input" placeholder="Group Name...">
-                    <div class="modal-list" id="cgMemberList">
-                        </div>
+                    <div class="modal-list" id="cgMemberList"></div>
                     <div class="modal-actions">
                         <button class="modal-btn modal-cancel" onclick="toggleModal('createGroupModal')">Cancel</button>
-                        <button class="modal-btn modal-create" onclick="confirmCreateGroup()">Create Group</button>
+                        <button class="modal-btn modal-create" onclick="confirmCreateGroup()">Create</button>
                     </div>
-                </div>
-            </div>
-
-            <div id="addFriendModal" class="modal-overlay-inner">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span>Add New Friend</span>
-                        <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('addFriendModal')"></i>
-                    </div>
-                    <div class="modal-list" id="afUserList">
-                        </div>
                 </div>
             </div>
 
@@ -453,25 +545,41 @@
                         <span>Chat Info</span>
                         <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('groupInfoModal')"></i>
                     </div>
-                    
                     <div style="text-align: center; margin-bottom: 15px; position:relative;">
-                        <div class="friend-avatar" style="width: 80px; height: 80px; margin: 0 auto 10px; cursor: pointer; border: 2px solid var(--border-light);" onclick="document.getElementById('giAvatarInput').click()">
+                        <div id="giAvatarContainer" class="friend-avatar" style="width: 80px; height: 80px; margin: 0 auto 10px; cursor: pointer; border: 2px solid var(--border-light);">
                             <img id="giAvatarImg" src="">
-                            <div class="pf-edit-overlay" style="display:flex; border-radius:50%; font-size:1.2rem; background: rgba(0,0,0,0.6);"><i class="fas fa-camera"></i></div>
+                            <div id="giCameraIcon" class="pf-edit-overlay" style="display:flex; border-radius:50%; font-size:1.2rem; background: rgba(0,0,0,0.6);"><i class="fas fa-camera"></i></div>
                         </div>
                         <input type="text" id="giNameInput" class="modal-input" style="font-size: 1.1rem; font-weight: bold; border-color: transparent; border-bottom: 1px dashed rgba(255,255,255,0.2); padding: 5px; margin-bottom: 5px;" onchange="updateGroupDetails('name')">
-                        <div style="font-size:0.7rem; color:var(--text-muted);"><i class="fas fa-pen"></i> Edit name</div>
+                        <div id="giNameLabel" style="font-size:0.7rem; color:var(--text-muted);"><i class="fas fa-pen"></i> Edit name</div>
                     </div>
                     
+                    <div style="font-size: 0.85rem; font-weight:bold; color:#fff; margin-bottom:10px;">Chat Theme</div>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+                        <div class="theme-circle" style="background: linear-gradient(135deg, #3b82f6, #2563eb);" title="Default" onclick="changeChatTheme('default')"></div>
+                        <div class="theme-circle" style="background: url('https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=1000'); border-color: #d946ef;" title="Cyberpunk" onclick="changeChatTheme('cyberpunk')"></div>
+                        <div class="theme-circle" style="background: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1000'); border-color: #10b981;" title="Matrix" onclick="changeChatTheme('matrix')"></div>
+                        <div class="theme-circle" style="background: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1000'); border-color: #f59e0b;" title="Space" onclick="changeChatTheme('space')"></div>
+                        <div class="theme-circle" style="background: rgba(255,255,255,0.1); display: flex; align-items:center; justify-content:center; border: 1px dashed #fff;" title="Upload Custom Theme" onclick="document.getElementById('customThemeInput').click()"><i class="fas fa-plus"></i></div>
+                    </div>
+
                     <div style="font-size: 0.85rem; font-weight:bold; color:#fff; margin-bottom:5px;">Members <span id="giLeaderTag" style="color:var(--up-color); font-weight:normal; font-size:0.75rem;"></span></div>
                     <div class="modal-list" id="giMemberList"></div>
-                    
                     <div class="modal-actions">
-                        <button id="giDeleteBtn" class="modal-btn modal-delete" onclick="deleteOrLeaveGroup()">Leave Group</button>
+                        <button id="giDeleteBtn" class="modal-btn modal-delete" onclick="blockOrLeaveGroup()">Block / Archive</button>
                     </div>
                 </div>
             </div>
             <input type="file" id="giAvatarInput" accept="image/*" style="display:none;" onchange="updateGroupDetails('avatar', event)">
+            <input type="file" id="customThemeInput" accept="image/*" style="display:none;" onchange="handleCustomThemeUpload(event)">
+        </div>
+    </div>
+
+    <div id="addFriendOverlay" class="full-overlay">
+        <div class="overlay-close" onclick="toggleOverlay('addFriendOverlay')"><i class="fas fa-times"></i></div>
+        <div class="overlay-container profile-wrapper" style="max-width: 500px; max-height: 70vh;">
+             <h3 style="color: #fff; padding: 20px; font-family:'Rajdhani'; border-bottom: 1px solid rgba(255,255,255,0.1); margin:0; font-size: 1.5rem;"><i class="fas fa-globe-americas" style="color:var(--accent-color);"></i> Global Network</h3>
+             <div class="friend-list" id="globalUserList" style="padding: 20px; overflow-y: auto;"></div>
         </div>
     </div>
 
@@ -482,770 +590,750 @@
                  <img id="callVideoMyImg" src="" style="width:100%;height:100%;object-fit:cover;">
             </div>
         </div>
-        
         <div class="call-content">
-            <div class="call-avatar-ring">
-                <img id="callAvatarImg" src="">
-            </div>
+            <div class="call-avatar-ring"><img id="callAvatarImg" src=""></div>
             <h2 id="callName" style="color:#fff; margin-top:20px; font-family:'Rajdhani', sans-serif; font-size: 2.5rem; letter-spacing: 1px;">...</h2>
             <p id="callStatusText" style="color:var(--up-color); font-family:'JetBrains Mono'; margin-top: 10px; font-size: 1.1rem;">Ringing...</p>
         </div>
-        
-        <div class="hangup-btn" onclick="endCall()" title="End Call">
-            <i class="fas fa-phone-slash"></i>
-        </div>
+        <div class="hangup-btn" onclick="endCall()" title="End Call"><i class="fas fa-phone-slash"></i></div>
     </div>
 
     <div id="profileOverlay" class="full-overlay">
-        <div class="overlay-container profile-wrapper">
-            <div class="overlay-close" onclick="toggleOverlay('profileOverlay')" style="position: sticky; float: right; margin: 15px 15px -50px 0;"><i class="fas fa-times"></i></div>
-            
+        <div class="overlay-close" onclick="toggleOverlay('profileOverlay')"><i class="fas fa-times"></i></div>
+        
+        <div class="profile-wrapper">
             <div id="pfCover" class="pf-cover">
-                <div class="pf-edit-overlay" onclick="document.getElementById('coverInput').click()">
-                    <div style="display:flex; flex-direction: column; align-items:center;">
-                        <i class="fas fa-camera"></i>
-                        <span class="pf-edit-hint">Click to Change, Drag to Position</span>
-                    </div>
-                </div>
+                <div class="pf-edit-overlay" onclick="document.getElementById('coverInput').click()"><div style="display:flex; flex-direction: column; align-items:center;"><i class="fas fa-camera"></i><span class="pf-edit-hint">Click to Change</span></div></div>
             </div>
 
             <div class="pf-avatar-section">
                 <div class="pf-avatar-wrap">
-                    <img id="pfAvatarImg" class="pf-avatar-img" src="https://i.pravatar.cc/150?img=12">
-                    <div class="pf-edit-overlay" style="border-radius: 50%; font-size:1.2rem;" onclick="document.getElementById('avatarInput').click()">
-                        <i class="fas fa-camera"></i>
-                    </div>
+                    <img id="pfAvatarImg" class="pf-avatar-img" src="">
+                    <div class="pf-edit-overlay" style="border-radius: 50%; font-size:1.2rem;" onclick="document.getElementById('avatarInput').click()"><i class="fas fa-camera"></i></div>
                 </div>
-                <div>
+                <div style="display: flex; gap: 10px;">
                     <button id="editProfileBtn" class="pf-btn" onclick="toggleEditProfile()">Edit profile</button>
-                    <button id="saveProfileBtn" class="pf-btn pf-btn-save" onclick="toggleEditProfile()">Save changes</button>
+                    <button class="pf-btn" style="color: var(--down-color); border-color: rgba(255, 59, 94, 0.3);" onclick="logOutUser()">Logout</button>
+                    <button id="saveProfileBtn" class="pf-btn pf-btn-save" onclick="saveProfileChanges()">Save changes</button>
                 </div>
             </div>
 
             <div class="pf-info">
                 <div class="pf-name" id="profileName">Loading...</div>
                 <div class="pf-handle" id="profileHandle">@loading</div>
-                <div class="pf-bio">
-                    AI Student at FPT University. Crypto & Code enthusiast. 🚀
-                </div>
+                <div class="pf-bio editable-field" id="pfBioTxt">...</div>
                 <div class="pf-meta">
-                    <span><i class="fas fa-map-marker-alt"></i> Nha Trang, VN</span>
-                    <span><i class="fas fa-link"></i> stablecast.vn</span>
-                    <span><i class="fas fa-calendar-alt"></i> Joined Feb 2026</span>
+                    <span><i class="fas fa-map-marker-alt"></i> <span class="editable-field" id="pfLocTxt">...</span></span>
+                    <span><i class="fas fa-link"></i> <span class="editable-field" id="pfWebTxt">...</span></span>
+                    <span><i class="fas fa-calendar-alt"></i> <span id="pfJoinTxt">...</span></span>
                 </div>
                 <div class="pf-stats">
-                    <span><b>124</b> <span style="color:var(--text-muted)">Following</span></span>
-                    <span><b>1,092</b> <span style="color:var(--text-muted)">Followers</span></span>
+                    <span><b id="pfFollowingCount">0</b> <span style="color:var(--text-muted)">Following</span></span>
+                    <span><b id="pfFollowerCount">0</b> <span style="color:var(--text-muted)">Followers</span></span>
                 </div>
             </div>
 
             <div class="pf-tabs">
-                <div class="pf-tab active">Posts</div>
-                <div class="pf-tab">Replies</div>
-                <div class="pf-tab">Media</div>
-                <div class="pf-tab">Likes</div>
+                <div class="pf-tab active" onclick="switchProfileTab('posts', this)">Posts</div>
+                <div class="pf-tab" onclick="switchProfileTab('replies', this)">Replies</div>
+                <div class="pf-tab" onclick="switchProfileTab('media', this)">Media</div>
+                <div class="pf-tab" onclick="switchProfileTab('likes', this)">Likes</div>
             </div>
 
-            <div style="padding: 40px 20px; text-align: center; color: var(--text-muted);">
-                <i class="fas fa-comments" style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
-                No posts yet. Start the conversation!
-            </div>
+            <div id="myProfilePostsArea" style="padding: 20px;"></div>
         </div>
     </div>
 
     <div id="toast-container"></div>
-
     <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="handleProfileUpload(event, 'cover')">
     <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleProfileUpload(event, 'avatar')">
 
     <script>
-        // ==========================================
-        // TOAST NOTIFICATIONS (THAY THẾ ALERT)
-        // ==========================================
+        // KHỞI TẠO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAK2kjWRLaZTCawfQywNdLJcmGvcALPLuc",
+            authDomain: "stablecast-login.firebaseapp.com",
+            projectId: "stablecast-login",
+            storageBucket: "stablecast-login.firebasestorage.app",
+            messagingSenderId: "282707836063",
+            appId: "1:282707836063:web:cdbe29c541635ca2ba76aa"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // CHAT THEMES CONFIG
+        const CHAT_THEMES = {
+            'default': { bg: '', bubble: 'linear-gradient(135deg, #3b82f6, #2563eb)' },
+            'cyberpunk': { bg: 'url(https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=1000)', bubble: 'linear-gradient(135deg, #8b5cf6, #d946ef)' },
+            'matrix': { bg: 'url(https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1000)', bubble: 'linear-gradient(135deg, #10b981, #059669)' },
+            'space': { bg: 'url(https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1000)', bubble: 'linear-gradient(135deg, #f59e0b, #d97706)' }
+        };
+
         function showToast(message) {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast-msg';
+            const toast = document.createElement('div'); toast.className = 'toast-msg';
             toast.innerHTML = `<i class="fas fa-check-circle" style="color:var(--up-color);"></i> ${message}`;
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.5s';
-                setTimeout(() => toast.remove(), 500);
-            }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
         }
 
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        // ==========================================
-        // 1. QUẢN LÝ ĐĂNG NHẬP (LOCALSTORAGE)
-        // ==========================================
-        let authMode = 'login'; 
-        let currentUser = null;
-
-        function toggleMode(mode) {
-            authMode = mode;
-            const title = document.getElementById('authTitle');
-            const btnLogin = document.getElementById('mainAuthBtn');
-            const toggleReg = document.getElementById('toggleRegBtn');
-            const toggleFor = document.getElementById('toggleForgotBtn');
-            const msg = document.getElementById('loginMsg');
-            msg.textContent = "";
-
-            if (mode === 'register') {
-                title.textContent = "REGISTER ACCOUNT";
-                btnLogin.textContent = "CREATE ACCOUNT";
-                toggleReg.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN";
-                toggleReg.setAttribute("onclick", "toggleMode('login')");
-                toggleFor.style.display = "none";
-                document.getElementById('rememberGroup').style.display = "none";
-            } else if (mode === 'forgot') {
-                title.textContent = "RESET PASSWORD";
-                btnLogin.textContent = "RESET PASSWORD";
-                toggleReg.textContent = "BACK TO LOGIN";
-                toggleReg.setAttribute("onclick", "toggleMode('login')");
-                toggleFor.style.display = "none";
-                document.getElementById('rememberGroup').style.display = "none";
-            } else {
-                title.textContent = "LOGIN";
-                btnLogin.textContent = "LOGIN";
-                toggleReg.textContent = "NEED AN ACCOUNT? REGISTER";
-                toggleReg.setAttribute("onclick", "toggleMode('register')");
-                toggleFor.style.display = "inline-block";
-                document.getElementById('rememberGroup').style.display = "flex";
-            }
-        }
-
-        function handleAuth() {
-            const u = document.getElementById('usernameInput').value.trim();
-            const p = document.getElementById('passwordInput').value.trim();
-            const msg = document.getElementById('loginMsg');
-            
-            if(!u || !p) { msg.style.color = "var(--down-color)"; msg.textContent = "Username and Password required."; return; }
-
-            let usersDB = JSON.parse(localStorage.getItem('stablecast_users')) || {};
-
-            if (authMode === 'register') {
-                if (usersDB[u]) {
-                    msg.style.color = "var(--down-color)"; msg.textContent = "Username already exists!";
-                } else {
-                    usersDB[u] = { password: p, avatar: 'https://i.pravatar.cc/150?u='+u, cover: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000' };
-                    localStorage.setItem('stablecast_users', JSON.stringify(usersDB));
-                    msg.style.color = "var(--up-color)"; msg.textContent = "Success! Please Login.";
-                    setTimeout(() => toggleMode('login'), 1500);
-                }
-            } else if (authMode === 'forgot') {
-                if (!usersDB[u]) {
-                    msg.style.color = "var(--down-color)"; msg.textContent = "Username not found.";
-                } else {
-                    usersDB[u].password = p;
-                    localStorage.setItem('stablecast_users', JSON.stringify(usersDB));
-                    msg.style.color = "var(--up-color)"; msg.textContent = "Password updated successfully.";
-                    setTimeout(() => toggleMode('login'), 1500);
-                }
-            } else { 
-                if (usersDB[u] && usersDB[u].password === p) {
-                    currentUser = { username: u, ...usersDB[u] };
-                    enterApp();
-                } else {
-                    msg.style.color = "var(--down-color)"; msg.textContent = "Invalid credentials.";
-                }
-            }
-        }
-
-        function enterApp() {
-            const msg = document.getElementById('loginMsg');
-            msg.style.color = "var(--up-color)";
-            msg.textContent = "ACCESS GRANTED. INITIALIZING...";
-            
-            document.getElementById('profileName').textContent = currentUser.username;
-            document.getElementById('profileHandle').textContent = "@" + currentUser.username.toLowerCase();
-            document.getElementById('pfAvatarImg').src = currentUser.avatar;
-            document.getElementById('pfCover').style.backgroundImage = `url('${currentUser.cover}')`;
-            
-            initChatEngine(); 
-            updateMsgBadge();
-
-            setTimeout(() => {
-                document.getElementById('loginOverlay').style.opacity = 0;
-                setTimeout(() => {
-                    document.getElementById('loginOverlay').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'flex';
-                    setTimeout(() => document.getElementById('mainApp').style.opacity = 1, 100);
-                    initNewsEngine(); 
-                    startCoreEngine();
-                }, 500);
-            }, 800);
-        }
-
-        // ==========================================
-        // 2. SOCIAL OVERLAYS & DYNAMIC CHAT LOGIC
-        // ==========================================
-        let unreadCount = 2; 
-        function updateMsgBadge() {
-            const badge = document.getElementById('msgBadge');
-            if(unreadCount > 0) {
-                badge.style.display = 'block'; badge.innerText = unreadCount;
-            } else { badge.style.display = 'none'; }
-        }
-        
-        function openChatAndClearBadge() {
-            unreadCount = 0; updateMsgBadge();
-            toggleOverlay('socialOverlay');
-        }
-
+        function toggleModal(id) { const modal = document.getElementById(id); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; }
         function toggleOverlay(id) {
             const overlay = document.getElementById(id);
             if (overlay.style.display === 'flex') {
-                overlay.style.opacity = 0;
-                setTimeout(() => overlay.style.display = 'none', 300);
+                overlay.style.opacity = 0; setTimeout(() => overlay.style.display = 'none', 300);
                 if(id === 'profileOverlay' && document.getElementById('profileOverlay').classList.contains('is-editing')) toggleEditProfile(); 
-            } else {
-                overlay.style.display = 'flex';
-                setTimeout(() => overlay.style.opacity = 1, 10);
+            } else { overlay.style.display = 'flex'; setTimeout(() => overlay.style.opacity = 1, 10); }
+        }
+
+        // ==========================================
+        // QUYỀN THÔNG BÁO PUSH NOTIFICATION
+        // ==========================================
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission();
+                }
+            }
+        }
+        function fireNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/3128/3128304.png' });
             }
         }
 
-        // --- HỆ THỐNG DỮ LIỆU CHAT ĐỘNG (LƯU TỪNG TÀI KHOẢN) ---
+        // ==========================================
+        // 1. QUẢN LÝ ĐĂNG NHẬP VÀ MẠNG
+        // ==========================================
+        let authMode = 'login'; 
+        let currentUser = null;
+        let isAppInitialized = false;
+
+        window.addEventListener('offline', () => {
+            document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-wifi" style="color:var(--down-color);"></i> OFFLINE';
+            document.getElementById('tickerStatus').style.color = 'var(--down-color)';
+            if(currentUser) db.collection('users').doc(currentUser.uid).update({ online: false }).catch(()=>{});
+        });
+        window.addEventListener('online', () => {
+            document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CLOUD SYNCED';
+            document.getElementById('tickerStatus').style.color = 'var(--up-color)';
+            if(currentUser) db.collection('users').doc(currentUser.uid).update({ online: true }).catch(()=>{});
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if (user && !isAppInitialized) {
+                const msg = document.getElementById('loginMsg');
+                if(msg) { msg.style.color = "var(--up-color)"; msg.textContent = "SESSION RESTORED. INITIALIZING..."; }
+                
+                db.collection('users').doc(user.uid).get().then((doc) => {
+                    if (doc.exists) { currentUser = { uid: user.uid, ...doc.data() }; enterApp(); }
+                });
+            }
+        });
+
+        function toggleMode(mode) {
+            authMode = mode; const title = document.getElementById('authTitle'); const btnLogin = document.getElementById('mainAuthBtn'); const toggleReg = document.getElementById('toggleRegBtn'); const toggleFor = document.getElementById('toggleForgotBtn'); const msg = document.getElementById('loginMsg'); msg.textContent = "";
+            if (mode === 'register') { title.textContent = "REGISTER ACCOUNT"; btnLogin.textContent = "CREATE ACCOUNT"; toggleReg.textContent = "ALREADY HAVE AN ACCOUNT? LOGIN"; toggleReg.setAttribute("onclick", "toggleMode('login')"); toggleFor.style.display = "none"; document.getElementById('rememberGroup').style.display = "none"; } 
+            else if (mode === 'forgot') { title.textContent = "RESET PASSWORD"; btnLogin.textContent = "RESET PASSWORD"; toggleReg.textContent = "BACK TO LOGIN"; toggleReg.setAttribute("onclick", "toggleMode('login')"); toggleFor.style.display = "none"; document.getElementById('rememberGroup').style.display = "none"; } 
+            else { title.textContent = "LOGIN"; btnLogin.textContent = "LOGIN"; toggleReg.textContent = "NEED AN ACCOUNT? REGISTER"; toggleReg.setAttribute("onclick", "toggleMode('register')"); toggleFor.style.display = "inline-block"; document.getElementById('rememberGroup').style.display = "flex"; }
+        }
+
+        function handleAuth() {
+            const rawU = document.getElementById('usernameInput').value.trim(); const p = document.getElementById('passwordInput').value.trim(); const msg = document.getElementById('loginMsg');
+            if(!rawU || !p) { msg.style.color = "var(--down-color)"; msg.textContent = "Username and Password required."; return; }
+            const email = rawU.toLowerCase() + "@stablecast.com"; msg.style.color = "var(--text-muted)"; msg.textContent = "Processing with Google Cloud...";
+
+            if (authMode === 'register') {
+                db.collection('users').where('username', '==', rawU).get().then(snap => {
+                    if(!snap.empty) { msg.style.color = "var(--down-color)"; msg.textContent = "Username already exists! Choose another."; return; }
+                    
+                    auth.createUserWithEmailAndPassword(email, p).then((userCredential) => {
+                        const uid = userCredential.user.uid;
+                        const defaultUser = { username: rawU, avatar: 'https://i.pravatar.cc/150?u='+rawU, cover: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000', bio: 'AI Student at FPT University. Crypto enthusiast. 🚀', location: 'Vietnam', website: 'stablecast.vn', joinDate: new Date().toLocaleDateString('en-US', {month:'short', year:'numeric'}), followers: [], following: [], online: true };
+                        db.collection('users').doc(uid).set(defaultUser).then(() => { msg.style.color = "var(--up-color)"; msg.textContent = "Success! Please Login."; setTimeout(() => toggleMode('login'), 1500); });
+                    }).catch((error) => { msg.style.color = "var(--down-color)"; msg.textContent = "Password must be at least 6 characters."; });
+                });
+            } else if (authMode === 'forgot') { msg.style.color = "var(--down-color)"; msg.textContent = "Please contact Team 1 Admin to reset password."; } 
+            else { 
+                const persistenceType = document.getElementById('rememberMe').checked ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+                auth.setPersistence(persistenceType).then(() => { return auth.signInWithEmailAndPassword(email, p); }).catch((error) => { msg.style.color = "var(--down-color)"; msg.textContent = "Invalid credentials."; });
+            }
+        }
+
+        function logOutUser() {
+            if(currentUser) db.collection('users').doc(currentUser.uid).update({ online: false });
+            auth.signOut().then(() => { window.location.replace(window.location.pathname); });
+        }
+
+        function enterApp() {
+            if(isAppInitialized) return; isAppInitialized = true;
+            const msg = document.getElementById('loginMsg'); if(msg) { msg.style.color = "var(--up-color)"; msg.textContent = "ACCESS GRANTED. INITIALIZING..."; }
+            
+            db.collection('users').doc(currentUser.uid).update({ online: true });
+            updateProfileUI(); requestNotificationPermission(); initChatEngine(); initDiagnostics(); initFeedEngine();
+
+            setTimeout(() => {
+                document.getElementById('loginOverlay').style.opacity = 0;
+                setTimeout(() => { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'flex'; setTimeout(() => document.getElementById('mainApp').style.opacity = 1, 100); initNewsEngine(); startCoreEngine(); }, 500);
+            }, 800);
+        }
+
+        function initDiagnostics() {
+            setInterval(() => { const latency = Math.floor(Math.random() * 15) + 8; const elLat = document.getElementById('sysLatency'); elLat.textContent = latency + 'ms'; if(latency > 18) { elLat.style.color = '#f59e0b'; elLat.style.textShadow = '0 0 8px #f59e0b'; } else { elLat.style.color = 'var(--up-color)'; elLat.style.textShadow = '0 0 8px var(--up-color)'; } }, 2000);
+            setInterval(() => { document.getElementById('sysRam').textContent = (14.0 + Math.random() * 0.8).toFixed(2) + ' GB'; }, 3000);
+        }
+
+        // ==========================================
+        // 2. SOCIAL OVERLAYS & REAL-TIME CHAT
+        // ==========================================
+        let unreadCount = 0; 
+        function updateMsgBadge() { const badge = document.getElementById('msgBadge'); if(unreadCount > 0) { badge.style.display = 'block'; badge.innerText = unreadCount; } else { badge.style.display = 'none'; } }
+        function openChatAndClearBadge() { unreadCount = 0; updateMsgBadge(); toggleOverlay('socialOverlay'); }
+        function backToFriendList() { document.getElementById('chatOverlayContainer').classList.remove('show-mobile-chat'); }
+
         let chatDB = {};
+        let prevChatDBLength = {}; // Để theo dõi tin nhắn mới và bắn thông báo
         let activeChatId = 'cloud';
+        let isFirstLoad = true;
+        let globalUsersCache = {}; 
 
         function initChatEngine() {
-            let savedChats = localStorage.getItem('stablecast_chats_' + currentUser.username);
-            if(savedChats) {
-                chatDB = JSON.parse(savedChats);
-                activeChatId = Object.keys(chatDB)[0] || 'cloud';
-            } else {
-                // Khởi tạo DB mặc định cho user mới
-                chatDB = {
-                    'cloud': { name: 'My Cloud', type: 'cloud', isLeader: false, members: [], desc: 'Saved messages & files', msgs: [] },
-                    'group1': { name: 'FPT Crypto Group', type: 'group', isLeader: false, members: ['Huy_Trader', 'Sơn_Dev', 'Alex Trader'], avatar: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=200&auto=format&fit=crop', online: true, 
-                        msgs: [
-                            {sender: 'Huy_Trader', avatar: 'https://i.pravatar.cc/150?img=11', text: 'Chào người mới nha!', time: '10:42 AM', isMe: false}
-                        ] 
+            db.collection('users').onSnapshot(snap => {
+                snap.forEach(doc => { globalUsersCache[doc.data().username] = doc.data(); });
+                renderSidebar(); if(chatDB[activeChatId]) switchChat(activeChatId, true);
+            });
+
+            db.collection('userChats').doc(currentUser.uid).onSnapshot((doc) => {
+                if(doc.exists && doc.data().chatData) {
+                    chatDB = JSON.parse(doc.data().chatData);
+                    
+                    // Logic kiểm tra tin nhắn mới và bắn thông báo
+                    if(!isFirstLoad) {
+                        for(let id in chatDB) {
+                            let currLen = chatDB[id].msgs.length;
+                            let prevLen = prevChatDBLength[id] || 0;
+                            if(currLen > prevLen) {
+                                let newestMsg = chatDB[id].msgs[currLen - 1];
+                                if(!newestMsg.isMe) {
+                                    if(document.getElementById('socialOverlay').style.display !== 'flex' || activeChatId !== id) {
+                                        unreadCount++; updateMsgBadge(); 
+                                    }
+                                    // Bắn notification push
+                                    fireNotification(`New message from ${newestMsg.sender}`, newestMsg.text.includes('<img') ? '[Image sent]' : newestMsg.text);
+                                }
+                            }
+                            prevChatDBLength[id] = currLen;
+                        }
+                    } else {
+                        for(let id in chatDB) prevChatDBLength[id] = chatDB[id].msgs.length;
                     }
-                };
-                saveChatDB();
-            }
-            renderSidebar();
-            switchChat(activeChatId);
+                } else {
+                    // Tuyệt đối không lưu đè rỗng
+                    chatDB = { 'cloud': { name: 'My Cloud', type: 'cloud', isLeader: false, members: [], desc: 'Saved messages & files', msgs: [], themeKey: 'default' } };
+                }
+                renderSidebar(); if(chatDB[activeChatId]) { switchChat(activeChatId, true); } else { switchChat('cloud', true); }
+                isFirstLoad = false;
+            });
         }
 
-        function saveChatDB() {
-            localStorage.setItem('stablecast_chats_' + currentUser.username, JSON.stringify(chatDB));
-        }
+        function saveChatDB() { if(currentUser) db.collection('userChats').doc(currentUser.uid).set({ chatData: JSON.stringify(chatDB) }); }
 
         function renderSidebar() {
-            const list = document.getElementById('sidebarFriendList');
-            let html = '';
-            
+            const list = document.getElementById('sidebarFriendList'); let html = '';
             for (const id in chatDB) {
-                const chat = chatDB[id];
-                const activeCls = id === activeChatId ? 'active' : '';
+                const chat = chatDB[id]; const activeCls = id === activeChatId ? 'active' : '';
                 
-                let avatarHTML = '';
-                if(chat.type === 'cloud') {
-                    avatarHTML = `<div class="friend-avatar" style="background: var(--accent-color); border:none;"><i class="fas fa-cloud"></i></div>`;
-                } else {
-                    let dot = chat.online ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`;
-                    avatarHTML = `<div class="friend-avatar"><img src="${chat.avatar}">${dot}</div>`;
-                }
+                let displayAvatar = chat.avatar; let isOnline = chat.online;
+                if(chat.type === 'user' && globalUsersCache[chat.name]) { displayAvatar = globalUsersCache[chat.name].avatar; isOnline = globalUsersCache[chat.name].online; }
 
+                let avatarHTML = chat.type === 'cloud' ? `<div class="friend-avatar" style="background: var(--accent-color); border:none;"><i class="fas fa-cloud"></i></div>` : `<div class="friend-avatar"><img src="${displayAvatar}">${isOnline ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`}</div>`;
                 let lastMsg = chat.msgs.length > 0 ? chat.msgs[chat.msgs.length-1].text : (chat.desc || 'No messages yet');
-                if(lastMsg.includes('<a')) lastMsg = '[Sent a file]';
-                if(lastMsg.includes('<img')) lastMsg = '[Sent an image]';
-
-                html += `
-                    <div class="friend-item ${activeCls}" onclick="switchChat('${id}')">
-                        ${avatarHTML}
-                        <div class="friend-info">
-                            <h4>${chat.name}</h4>
-                            <p>${lastMsg}</p>
-                        </div>
-                    </div>
-                `;
-            }
-            list.innerHTML = html;
+                if(lastMsg.includes('<a')) lastMsg = '[Sent a file]'; if(lastMsg.includes('<img')) lastMsg = '[Sent an image]';
+                html += `<div class="friend-item ${activeCls}" onclick="switchChat('${id}')">${avatarHTML}<div class="friend-info"><h4>${chat.name}</h4><p>${lastMsg}</p></div></div>`;
+            } list.innerHTML = html;
         }
 
-        function switchChat(id) {
-            activeChatId = id;
-            renderSidebar(); 
-            
-            const chat = chatDB[id];
-            if(!chat) return;
+        function switchChat(id, isAutoRefresh = false) {
+            activeChatId = id; renderSidebar(); const chat = chatDB[id]; if(!chat) return;
+            if(!isAutoRefresh) document.getElementById('chatOverlayContainer').classList.add('show-mobile-chat');
 
-            // Cập nhật Header
+            let displayAvatar = chat.avatar; let isOnline = chat.online;
+            if(chat.type === 'user' && globalUsersCache[chat.name]) { displayAvatar = globalUsersCache[chat.name].avatar; isOnline = globalUsersCache[chat.name].online; }
+
             document.getElementById('currentChatName').textContent = chat.name;
             const avatarBox = document.getElementById('currentChatAvatar');
             if(chat.type === 'cloud') {
-                avatarBox.style.background = 'var(--accent-color)'; avatarBox.style.border = 'none';
-                avatarBox.innerHTML = `<i class="fas fa-cloud"></i>`;
-                document.getElementById('currentChatStatus').textContent = 'Only you can see this';
-                document.getElementById('chatInputArea').style.display = 'flex';
+                avatarBox.style.background = 'var(--accent-color)'; avatarBox.style.border = 'none'; avatarBox.innerHTML = `<i class="fas fa-cloud"></i>`; document.getElementById('currentChatStatus').textContent = 'Only you can see this';
             } else {
                 avatarBox.style.background = '#222'; avatarBox.style.border = '1px solid #444';
-                let dot = chat.online ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`;
-                avatarBox.innerHTML = `<img src="${chat.avatar}">${dot}`;
-                document.getElementById('currentChatStatus').textContent = chat.type === 'group' ? `${chat.members.length + 1} Members` : (chat.online ? 'Online' : 'Offline');
-                document.getElementById('chatInputArea').style.display = 'flex';
+                avatarBox.innerHTML = `<img src="${displayAvatar}">${isOnline ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`}`;
+                document.getElementById('currentChatStatus').textContent = chat.type === 'group' ? `${chat.members.length + 1} Members` : (isOnline ? 'Online' : 'Offline');
             }
 
-            // Render Messages
+            // XỬ LÝ THEME TÁCH LỚP (HEADER KO BỊ ĐEN)
             const box = document.getElementById('chatMessagesBox');
+            const bgDiv = document.getElementById('chatAreaBg');
+            const overlayDiv = document.getElementById('chatAreaOverlay');
             box.innerHTML = '';
             
-            if(chat.msgs.length === 0) {
-                box.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px;">This is the start of your history with ${chat.name}</div>`;
+            let tKey = chat.themeKey || 'default';
+            let bgStyle = ''; let bubbleStyle = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+
+            if(CHAT_THEMES[tKey]) { bgStyle = CHAT_THEMES[tKey].bg; bubbleStyle = CHAT_THEMES[tKey].bubble; }
+            else if(tKey.startsWith('url')) { bgStyle = tKey; }
+
+            bgDiv.style.backgroundImage = bgStyle;
+            if(bgStyle !== '') { overlayDiv.style.display = 'block'; } else { overlayDiv.style.display = 'none'; }
+
+            if(chat.msgs.length === 0) { box.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px; z-index:1; position:relative;">This is the start of your history with ${chat.name}</div>`;
             } else {
                 chat.msgs.forEach(m => {
-                    let wrapperCls = m.isMe ? 'sent' : 'received';
-                    let msgCls = m.isMe ? 'msg-sent' : 'msg-received';
+                    let wrapperCls = m.isMe ? 'sent' : 'received'; let msgCls = m.isMe ? 'msg-sent' : 'msg-received';
                     let senderName = m.isMe || chat.type === 'user' ? '' : `<span style="color:var(--accent-color); font-weight:bold; display:block; margin-bottom:3px; font-size:0.75rem;">${m.sender}</span>`;
-                    
-                    // Xử lý avatar fallback nếu user chưa có ảnh
-                    let safeAvatar = m.avatar || 'https://i.pravatar.cc/150';
+                    let safeAvatar = m.isMe ? currentUser.avatar : (m.avatar || 'https://i.pravatar.cc/150');
+                    if(!m.isMe && chat.type === 'user' && globalUsersCache[chat.name]) safeAvatar = globalUsersCache[chat.name].avatar;
 
-                    box.insertAdjacentHTML('beforeend', `
-                        <div class="msg-wrapper ${wrapperCls}">
-                            <div class="msg-avatar"><img src="${safeAvatar}"></div>
-                            <div class="msg ${msgCls}">
-                                ${senderName}
-                                ${m.text}
-                                <div class="msg-time">${m.time}</div>
-                            </div>
-                        </div>
-                    `);
+                    let inlineStyle = m.isMe ? `style="background: ${bubbleStyle};"` : '';
+                    box.insertAdjacentHTML('beforeend', `<div class="msg-wrapper ${wrapperCls}"><div class="msg-avatar"><img src="${safeAvatar}"></div><div class="msg ${msgCls}" ${inlineStyle}>${senderName}${m.text}<div class="msg-time">${m.time}</div></div></div>`);
                 });
-            }
-            box.scrollTop = box.scrollHeight;
+            } box.scrollTop = box.scrollHeight;
         }
 
-        // --- Hàm Gửi Tin Nhắn ---
-        function sendMessage() {
-            let input = document.getElementById('chatInputTxt');
-            let text = input.value.trim();
-            if(!text) return;
-            appendMsgToDB(text, 'text');
-            input.value = '';
-        }
+        function toggleEmojiPicker() { const picker = document.getElementById('emojiPicker'); picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid'; }
+        function insertEmoji(emoji) { const input = document.getElementById('chatInputTxt'); input.value += emoji; input.focus(); toggleEmojiPicker(); }
 
-        // --- Gửi Ảnh/File Tạo Link ---
+        function sendMessage() { let input = document.getElementById('chatInputTxt'); let text = input.value.trim(); if(!text) return; appendMsgToDB(text, 'text'); input.value = ''; }
         function handleChatAttach(event, type) {
-            const file = event.target.files[0];
-            if(!file) return;
-            
-            if(type === 'image') {
-                const reader = new FileReader();
-                reader.onload = (e) => appendMsgToDB(`<img src="${e.target.result}">`, 'html');
-                reader.readAsDataURL(file);
-            } else {
-                const fileUrl = URL.createObjectURL(file);
-                let htmlLink = `<a href="${fileUrl}" download="${file.name}"><i class="fas fa-file-download" style="color:var(--up-color);"></i> Download: ${file.name}</a>`;
-                appendMsgToDB(htmlLink, 'html');
-            }
+            const file = event.target.files[0]; if(!file) return;
+            if(type === 'image') { const reader = new FileReader(); reader.onload = (e) => appendMsgToDB(`<img src="${e.target.result}">`, 'html'); reader.readAsDataURL(file); } 
+            else { const fileUrl = URL.createObjectURL(file); let htmlLink = `<a href="${fileUrl}" download="${file.name}"><i class="fas fa-file-download" style="color:var(--up-color);"></i> Download: ${file.name}</a>`; appendMsgToDB(htmlLink, 'html'); }
             event.target.value = ''; 
         }
 
         function appendMsgToDB(content, type) {
             if(!chatDB[activeChatId]) return;
             let time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            chatDB[activeChatId].msgs.push({
-                sender: currentUser.username,
-                avatar: currentUser.avatar,
-                text: content,
-                time: time,
-                isMe: true
+            
+            chatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: true }); 
+            prevChatDBLength[activeChatId] = chatDB[activeChatId].msgs.length; // Tránh tự báo notif
+            saveChatDB(); 
+            
+            let chat = chatDB[activeChatId];
+            if(chat.type === 'user') {
+                db.collection('users').where('username', '==', chat.name).get().then(snap => {
+                    if(!snap.empty) {
+                        let otherUid = snap.docs[0].id;
+                        db.collection('userChats').doc(otherUid).get().then(doc2 => {
+                            let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
+                            let targetId = null;
+                            for(let id in otherChatDB) { if(otherChatDB[id].type === 'user' && otherChatDB[id].name === currentUser.username) { targetId = id; break; } }
+                            if(!targetId) { targetId = 'user_' + Date.now(); otherChatDB[targetId] = { name: currentUser.username, type: 'user', isLeader: false, members: [], avatar: currentUser.avatar, online: true, msgs: [], themeKey: 'default' }; }
+                            otherChatDB[targetId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: false });
+                            db.collection('userChats').doc(otherUid).set({ chatData: JSON.stringify(otherChatDB) });
+                        });
+                    }
+                });
+            } else if (chat.type === 'group') {
+                chat.members.forEach(memName => {
+                    db.collection('users').where('username', '==', memName).get().then(snap => {
+                        if(!snap.empty) {
+                            let memUid = snap.docs[0].id;
+                            db.collection('userChats').doc(memUid).get().then(doc2 => {
+                                let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
+                                if(otherChatDB[activeChatId]) {
+                                    otherChatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: false });
+                                    db.collection('userChats').doc(memUid).set({ chatData: JSON.stringify(otherChatDB) });
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        }
+
+        // ==========================================
+        // TÍNH NĂNG ADD FRIEND 
+        // ==========================================
+        function openGlobalAddFriend() {
+            toggleOverlay('addFriendOverlay');
+            const list = document.getElementById('globalUserList'); list.innerHTML = '<div style="color:#fff; text-align:center;">Scanning Global Network...</div>';
+            
+            db.collection('users').get().then((querySnapshot) => {
+                list.innerHTML = ''; let hasUsers = false;
+                querySnapshot.forEach((doc) => {
+                    let uData = doc.data(); let u = uData.username; if(u === currentUser.username) return; 
+                    let alreadyAdded = false; for(let id in chatDB) { if(chatDB[id].type === 'user' && chatDB[id].name === u) { alreadyAdded = true; break; } }
+                    
+                    if(!alreadyAdded) {
+                        hasUsers = true;
+                        list.insertAdjacentHTML('beforeend', `<div class="friend-item" style="cursor:default; background: rgba(0,0,0,0.3); margin-bottom: 10px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:15px; width: 100%;"><div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${uData.avatar}"></div><div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${u}</h4><p style="color:var(--text-muted); font-size:0.75rem; margin:0;">Suggested for you</p></div><button class="pf-btn-save" style="display:block; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor:pointer;" onclick="addFriendGlobal('${doc.id}', '${u}', '${uData.avatar}')"><i class="fas fa-user-plus"></i> Add</button></div></div>`);
+                    }
+                });
+                if(!hasUsers) list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0;">No new users found in the network.</div>`;
             });
-            saveChatDB();
-            switchChat(activeChatId); 
         }
 
-
-        // ==========================================
-        // TÍNH NĂNG ADD FRIEND & CREATE GROUP
-        // ==========================================
-
-        function openAddFriendModal() {
-            const usersDB = JSON.parse(localStorage.getItem('stablecast_users')) || {};
-            const list = document.getElementById('afUserList');
-            list.innerHTML = '';
-            
-            let hasUsers = false;
-            for(let u in usersDB) {
-                if(u === currentUser.username) continue; // Bỏ qua chính mình
-                
-                // Kiểm tra xem đã kết bạn chưa
-                let alreadyAdded = false;
-                for(let id in chatDB) {
-                    if(chatDB[id].type === 'user' && chatDB[id].name === u) { alreadyAdded = true; break; }
-                }
-                
-                if(!alreadyAdded) {
-                    hasUsers = true;
-                    list.insertAdjacentHTML('beforeend', `
-                        <div class="modal-item" style="cursor:default;">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div class="friend-avatar" style="width:35px;height:35px;border:none;"><img src="${usersDB[u].avatar}"></div>
-                                <span style="color:#fff; font-weight:bold;">${u}</span>
-                            </div>
-                            <button class="cg-btn modal-create" onclick="addFriend('${u}', '${usersDB[u].avatar}')" style="padding: 6px 12px; font-size:0.75rem;">Add</button>
-                        </div>
-                    `);
-                }
-            }
-            if(!hasUsers) list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0;">No new users found to add.</div>`;
-            
-            toggleModal('addFriendModal');
-        }
-
-        function addFriend(username, avatar) {
+        function addFriendGlobal(otherUid, username, avatar) {
             const id = 'user_' + Date.now();
-            chatDB[id] = { name: username, type: 'user', isLeader: false, members: [], avatar: avatar, online: true, msgs: [] };
-            saveChatDB();
-            toggleModal('addFriendModal');
-            showToast(`${username} added to your list!`);
-            renderSidebar();
-            switchChat(id);
+            chatDB[id] = { name: username, type: 'user', isLeader: false, members: [], avatar: avatar, online: true, msgs: [], themeKey: 'default' };
+            saveChatDB(); toggleOverlay('addFriendOverlay'); showToast(`You and ${username} are now connected!`);
+            db.collection('users').doc(currentUser.uid).update({ following: firebase.firestore.FieldValue.arrayUnion(otherUid) });
+            db.collection('users').doc(otherUid).update({ followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
         }
 
-        // Modal Tạo Nhóm: Lấy danh sách bạn bè hiện tại
         function openCreateGroupModal() {
-            const list = document.getElementById('cgMemberList');
-            list.innerHTML = '';
-            let hasFriends = false;
-            
-            for(let id in chatDB) {
-                if(chatDB[id].type === 'user') {
-                    hasFriends = true;
-                    list.insertAdjacentHTML('beforeend', `<label class="modal-item"><input type="checkbox" value="${chatDB[id].name}"> ${chatDB[id].name}</label>`);
-                }
-            }
+            const list = document.getElementById('cgMemberList'); list.innerHTML = ''; let hasFriends = false;
+            for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<label class="modal-item"><input type="checkbox" value="${chatDB[id].name}"> ${chatDB[id].name}</label>`); } }
             if(!hasFriends) list.innerHTML = `<div style="color:#888; font-size:0.8rem; text-align:center;">Add some friends first!</div>`;
-            
             toggleModal('createGroupModal');
         }
-
 
         function confirmCreateGroup() {
             const name = document.getElementById('newGroupName').value.trim() || 'New Group';
             const checked = Array.from(document.querySelectorAll('#createGroupModal input:checked')).map(cb => cb.value);
-            
             if(checked.length === 0) { showToast('Please select at least 1 member'); return; }
-            
             const randomAvatar = `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random()*100000)}?auto=format&fit=crop&w=150`;
             const id = 'group_' + Date.now();
+            chatDB[id] = { name: name, type: 'group', isLeader: true, members: checked, avatar: randomAvatar, online: true, msgs: [], themeKey: 'default' };
+            
+            checked.forEach(memName => {
+                db.collection('users').where('username', '==', memName).get().then(snap => {
+                    if(!snap.empty) {
+                        let memUid = snap.docs[0].id;
+                        db.collection('userChats').doc(memUid).get().then(doc2 => {
+                            let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
+                            let memArr = checked.filter(n => n !== memName); memArr.push(currentUser.username);
+                            otherChatDB[id] = { name: name, type: 'group', isLeader: false, members: memArr, avatar: randomAvatar, online: true, msgs: [], themeKey: 'default' };
+                            db.collection('userChats').doc(memUid).set({ chatData: JSON.stringify(otherChatDB) });
+                        });
+                    }
+                });
+            });
 
-            chatDB[id] = {
-                name: name, type: 'group', isLeader: true, members: checked, avatar: randomAvatar, online: true, msgs: []
-            };
-            
-            document.getElementById('newGroupName').value = '';
-            saveChatDB();
-            toggleModal('createGroupModal');
-            showToast(`Group "${name}" created!`);
-            
-            renderSidebar();
-            switchChat(id);
+            document.getElementById('newGroupName').value = ''; saveChatDB(); toggleModal('createGroupModal'); showToast(`Group "${name}" created!`); switchChat(id);
         }
 
-        // --- LOGIC THÔNG TIN NHÓM (GROUP INFO) ---
+        // --- NÂNG CẤP INFO CHAT ---
         function openGroupInfo() {
-            const chat = chatDB[activeChatId];
-            if (chat.type === 'cloud') {
-                showToast("My Cloud info cannot be edited."); return;
-            }
+            const chat = chatDB[activeChatId]; 
+            if (chat.type === 'cloud') { showToast("My Cloud info cannot be edited."); return; }
 
             document.getElementById('giNameInput').value = chat.name;
-            document.getElementById('giAvatarImg').src = chat.avatar;
+            let displayAvatar = chat.avatar; if(chat.type === 'user' && globalUsersCache[chat.name]) displayAvatar = globalUsersCache[chat.name].avatar;
+            document.getElementById('giAvatarImg').src = displayAvatar;
             document.getElementById('giLeaderTag').textContent = chat.isLeader ? "(You are Leader)" : "";
             
             const delBtn = document.getElementById('giDeleteBtn');
+            const avatarWrap = document.getElementById('giAvatarContainer');
+            const camIcon = document.getElementById('giCameraIcon');
+            const nameLabel = document.getElementById('giNameLabel');
+
             if(chat.type === 'user') {
-                delBtn.textContent = "Delete Conversation";
+                delBtn.textContent = "Block User / Archive Chat";
+                avatarWrap.onclick = null; camIcon.style.display = 'none'; nameLabel.innerHTML = '<i class="fas fa-pen"></i> Edit Nickname';
             } else {
                 delBtn.textContent = chat.isLeader ? "Delete Group" : "Leave Group";
+                avatarWrap.onclick = () => document.getElementById('giAvatarInput').click(); camIcon.style.display = 'flex'; nameLabel.innerHTML = '<i class="fas fa-pen"></i> Edit Group Name';
             }
 
-            // Render Danh sách thành viên
-            const list = document.getElementById('giMemberList');
-            list.innerHTML = '';
-            if(chat.type === 'group') {
-                chat.members.forEach((mem, index) => {
-                    let kickHtml = chat.isLeader ? `<i class="fas fa-user-times kick-btn" onclick="kickMember('${index}')" title="Kick Member"></i>` : ``;
-                    list.insertAdjacentHTML('beforeend', `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${mem}</span> ${kickHtml}</div>`);
-                });
-            } else {
-                list.innerHTML = `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${chat.name}</span></div>`;
-            }
-
+            const list = document.getElementById('giMemberList'); list.innerHTML = '';
+            if(chat.type === 'group') { chat.members.forEach((mem, index) => { let kickHtml = chat.isLeader ? `<i class="fas fa-user-times kick-btn" onclick="kickMember('${index}')" title="Kick Member"></i>` : ``; list.insertAdjacentHTML('beforeend', `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${mem}</span> ${kickHtml}</div>`); }); } else { list.innerHTML = `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${chat.name}</span></div>`; }
             toggleModal('groupInfoModal');
+        }
+
+        function handleCustomThemeUpload(event) {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) { changeChatTheme(`url('${e.target.result}')`); }
+            reader.readAsDataURL(file);
+        }
+
+        function changeChatTheme(themeKey) {
+            if(!chatDB[activeChatId]) return;
+            chatDB[activeChatId].themeKey = themeKey; saveChatDB(); showToast("Chat theme updated!"); switchChat(activeChatId);
+            
+            if(chatDB[activeChatId].type === 'user') {
+                db.collection('users').where('username', '==', chatDB[activeChatId].name).get().then(snap => {
+                    if(!snap.empty) {
+                        let otherUid = snap.docs[0].id;
+                        db.collection('userChats').doc(otherUid).get().then(doc2 => {
+                            let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
+                            let targetId = null;
+                            for(let id in otherChatDB) { if(otherChatDB[id].type === 'user' && otherChatDB[id].name === currentUser.username) { targetId = id; break; } }
+                            if(targetId) { otherChatDB[targetId].themeKey = themeKey; db.collection('userChats').doc(otherUid).set({ chatData: JSON.stringify(otherChatDB) }); }
+                        });
+                    }
+                });
+            }
         }
 
         function updateGroupDetails(type, event) {
             const chat = chatDB[activeChatId];
-            if(type === 'avatar') {
-                const file = event.target.files[0];
-                if(!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    chat.avatar = e.target.result;
-                    document.getElementById('giAvatarImg').src = chat.avatar;
-                    saveChatDB();
-                    showToast("Avatar updated!");
-                    renderSidebar(); switchChat(activeChatId);
-                }
+            if(type === 'avatar' && chat.type === 'group') {
+                const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+                reader.onload = function(e) { chat.avatar = e.target.result; document.getElementById('giAvatarImg').src = chat.avatar; saveChatDB(); showToast("Avatar updated!"); switchChat(activeChatId); }
                 reader.readAsDataURL(file);
-            } else { 
-                chat.name = document.getElementById('giNameInput').value.trim() || 'Unnamed';
-                saveChatDB();
-                showToast("Name updated!");
-                renderSidebar(); switchChat(activeChatId);
+            } else if (type === 'name') { 
+                chat.name = document.getElementById('giNameInput').value.trim() || 'Unnamed'; saveChatDB(); showToast("Name updated!"); switchChat(activeChatId); 
             }
         }
 
-        function kickMember(index) {
-            const chat = chatDB[activeChatId];
-            const kicked = chat.members.splice(index, 1);
-            saveChatDB();
-            showToast(`${kicked} removed from group.`);
-            openGroupInfo(); 
-            renderSidebar(); switchChat(activeChatId); 
+        function kickMember(index) { const chat = chatDB[activeChatId]; const kicked = chat.members.splice(index, 1); saveChatDB(); showToast(`${kicked} removed.`); openGroupInfo(); switchChat(activeChatId); }
+        
+        function blockOrLeaveGroup() { 
+            const chat = chatDB[activeChatId]; const name = chat.name; 
+            delete chatDB[activeChatId]; saveChatDB(); toggleModal('groupInfoModal'); showToast(chat.type === 'user' ? `Chat with ${name} archived.` : `${name} left successfully.`); 
+            activeChatId = 'cloud'; switchChat(activeChatId); 
         }
 
-        function deleteOrLeaveGroup() {
-            const name = chatDB[activeChatId].name;
-            delete chatDB[activeChatId];
-            saveChatDB();
-            toggleModal('groupInfoModal');
-            showToast(`${name} deleted/left successfully.`);
-            activeChatId = 'cloud'; 
-            renderSidebar(); switchChat(activeChatId);
-        }
-
-        // ==========================================
-        // REALISTIC CALL LOGIC
-        // ==========================================
-        let callTimeout;
+        // CALL LOGIC 
+        let callTimeout; let callInterval;
         function startCall(type) {
             if(activeChatId === 'cloud') { showToast("Cannot call My Cloud."); return; }
+            const chat = chatDB[activeChatId]; const overlay = document.getElementById('callOverlay'); const bg = document.getElementById('callVideoBg');
+            let displayAvatar = chat.avatar; if(chat.type === 'user' && globalUsersCache[chat.name]) displayAvatar = globalUsersCache[chat.name].avatar;
+            document.getElementById('callName').textContent = chat.name; document.getElementById('callAvatarImg').src = displayAvatar; document.getElementById('callStatusText').textContent = "Ringing... Waiting for answer";
+            if(type === 'video') { bg.style.display = 'block'; document.getElementById('callVideoMainImg').src = displayAvatar; document.getElementById('callVideoMyImg').src = currentUser.avatar; } else { bg.style.display = 'none'; }
             
-            const chat = chatDB[activeChatId];
-            const overlay = document.getElementById('callOverlay');
-            const bg = document.getElementById('callVideoBg');
-            
-            document.getElementById('callName').textContent = chat.name;
-            document.getElementById('callAvatarImg').src = chat.avatar;
-            document.getElementById('callStatusText').textContent = "Calling... Waiting for answer";
-            
-            if(type === 'video') {
-                bg.style.display = 'block';
-                document.getElementById('callVideoMainImg').src = chat.avatar;
-                document.getElementById('callVideoMyImg').src = currentUser.avatar;
-            } else {
-                bg.style.display = 'none';
-            }
-            
-            overlay.style.display = 'flex';
-            setTimeout(() => overlay.style.opacity = 1, 10);
-            
-            // Giả lập nghe máy sau 4 giây
-            callTimeout = setTimeout(() => {
-                document.getElementById('callStatusText').textContent = "00:01";
-                // Bắt đầu đếm giây (Demo)
-            }, 4000);
+            overlay.style.display = 'flex'; setTimeout(() => overlay.style.opacity = 1, 10);
+            let seconds = 0; callTimeout = setTimeout(() => { callInterval = setInterval(() => { seconds++; document.getElementById('callStatusText').textContent = `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`; }, 1000); }, 3000);
         }
-        
-        function endCall() {
-            clearTimeout(callTimeout);
-            const overlay = document.getElementById('callOverlay');
-            document.getElementById('callStatusText').textContent = "Call Ended";
-            setTimeout(() => {
-                overlay.style.opacity = 0;
-                setTimeout(() => overlay.style.display = 'none', 300);
-            }, 1000);
-        }
+        function endCall() { clearTimeout(callTimeout); clearInterval(callInterval); document.getElementById('callStatusText').textContent = "Call Ended"; setTimeout(() => { document.getElementById('callOverlay').style.opacity = 0; setTimeout(() => document.getElementById('callOverlay').style.display = 'none', 300); }, 1000); }
 
         // ==========================================
-        // 3. PROFILE EDIT LOGIC KÉO THẢ (GIỮ NGUYÊN)
+        // 3. PROFILE TỐI ƯU VÀ TABS CÁ NHÂN
         // ==========================================
+        let currentProfileTab = 'posts';
+        
+        function switchProfileTab(tab, el) {
+            currentProfileTab = tab;
+            document.querySelectorAll('.pf-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderProfilePosts();
+        }
+
+        function renderProfilePosts() {
+            const myArea = document.getElementById('myProfilePostsArea');
+            myArea.innerHTML = '';
+            let filtered = [];
+            
+            if (currentProfileTab === 'posts') {
+                filtered = globalFeedData.filter(p => p.authorUid === currentUser.uid);
+            } else if (currentProfileTab === 'replies') {
+                filtered = globalFeedData.filter(p => p.comments.some(c => c.name === currentUser.username));
+            } else if (currentProfileTab === 'media') {
+                filtered = globalFeedData.filter(p => p.authorUid === currentUser.uid && p.image != null);
+            } else if (currentProfileTab === 'likes') {
+                filtered = globalFeedData.filter(p => p.likes.includes(currentUser.uid));
+            }
+            
+            if(filtered.length === 0) {
+                myArea.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 40px;">No matching posts found.</div>';
+                return;
+            }
+            
+            filtered.forEach(p => { myArea.insertAdjacentHTML('beforeend', createPostHtml(p)); });
+        }
+
+        function openProfile() {
+            db.collection('users').doc(currentUser.uid).get().then(doc => {
+                if(doc.exists) {
+                    let d = doc.data();
+                    document.getElementById('pfFollowingCount').textContent = d.following ? d.following.length : 0;
+                    document.getElementById('pfFollowerCount').textContent = d.followers ? d.followers.length : 0;
+                }
+            });
+            renderProfilePosts();
+            toggleOverlay('profileOverlay');
+        }
+
+        function updateProfileUI() {
+            document.getElementById('pfAvatarImg').src = currentUser.avatar; document.getElementById('feedMyAvatar').src = currentUser.avatar;
+            document.getElementById('pfCover').style.backgroundImage = `url('${currentUser.cover}')`;
+            document.getElementById('profileName').textContent = currentUser.username;
+            document.getElementById('profileHandle').textContent = "@" + currentUser.username.toLowerCase();
+            document.getElementById('pfBioTxt').textContent = currentUser.bio || "No bio yet.";
+            document.getElementById('pfLocTxt').textContent = currentUser.location || "Earth";
+            document.getElementById('pfWebTxt').textContent = currentUser.website || "None";
+            document.getElementById('pfJoinTxt').textContent = "Joined " + (currentUser.joinDate || "Recently");
+        }
+
         function toggleEditProfile() {
-            const pf = document.getElementById('profileOverlay');
-            pf.classList.toggle('is-editing');
+            const pf = document.getElementById('profileOverlay'); pf.classList.toggle('is-editing');
             const isEdit = pf.classList.contains('is-editing');
             document.getElementById('editProfileBtn').style.display = isEdit ? 'none' : 'inline-block';
             document.getElementById('saveProfileBtn').style.display = isEdit ? 'inline-block' : 'none';
+            document.getElementById('pfBioTxt').contentEditable = isEdit; document.getElementById('pfLocTxt').contentEditable = isEdit; document.getElementById('pfWebTxt').contentEditable = isEdit;
+        }
+
+        function saveProfileChanges() {
+            toggleEditProfile(); 
+            const newBio = document.getElementById('pfBioTxt').textContent; const newLoc = document.getElementById('pfLocTxt').textContent; const newWeb = document.getElementById('pfWebTxt').textContent;
+            db.collection('users').doc(currentUser.uid).update({ bio: newBio, location: newLoc, website: newWeb }).then(() => {
+                currentUser.bio = newBio; currentUser.location = newLoc; currentUser.website = newWeb; showToast("Profile info saved!");
+            });
         }
 
         function handleProfileUpload(event, type) {
-            const file = event.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
+            const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
             reader.onload = function(e) {
                 if(type === 'cover') {
-                    const cover = document.getElementById('pfCover');
-                    cover.style.backgroundImage = `url('${e.target.result}')`;
-                    cover.style.backgroundPosition = '50% 50%'; 
-                    if(currentUser) { currentUser.cover = e.target.result; localStorage.setItem('stablecast_users', JSON.stringify({...JSON.parse(localStorage.getItem('stablecast_users')), [currentUser.username]: currentUser})); }
+                    document.getElementById('pfCover').style.backgroundImage = `url('${e.target.result}')`;
+                    if(currentUser) { currentUser.cover = e.target.result; db.collection('users').doc(currentUser.uid).update({ cover: e.target.result }); }
                 } else {
-                    const avatar = document.getElementById('pfAvatarImg');
-                    avatar.src = e.target.result;
-                    avatar.style.objectPosition = '50% 50%'; 
+                    document.getElementById('pfAvatarImg').style.objectPosition = '50% 50%'; document.getElementById('pfAvatarImg').src = e.target.result;
+                    document.getElementById('feedMyAvatar').src = e.target.result;
                     if(currentUser) { 
-                        currentUser.avatar = e.target.result; 
-                        localStorage.setItem('stablecast_users', JSON.stringify({...JSON.parse(localStorage.getItem('stablecast_users')), [currentUser.username]: currentUser})); 
+                        currentUser.avatar = e.target.result; db.collection('users').doc(currentUser.uid).update({ avatar: e.target.result }); 
+                        for(let id in chatDB) { chatDB[id].msgs.forEach(m => { if(m.isMe) m.avatar = e.target.result; }); } saveChatDB(); if(activeChatId) switchChat(activeChatId, true); 
                     }
-                    for(let id in chatDB) {
-                        chatDB[id].msgs.forEach(m => { if(m.isMe) m.avatar = e.target.result; });
-                    }
-                    saveChatDB();
-                    if(activeChatId) switchChat(activeChatId); 
                 }
-            }
-            reader.readAsDataURL(file);
+            }; reader.readAsDataURL(file);
         }
 
         let isDraggingProf = false, dragTargetProf = null, startXP, startYP, bgPx = 50, bgPy = 50, avPx = 50, avPy = 50; 
-        document.getElementById('pfCover').addEventListener('mousedown', (e) => {
-            if(!document.getElementById('profileOverlay').classList.contains('is-editing')) return;
-            isDraggingProf = true; dragTargetProf = 'cover'; startXP = e.clientX; startYP = e.clientY; e.preventDefault();
-        });
-        document.getElementById('pfAvatarImg').addEventListener('mousedown', (e) => {
-            if(!document.getElementById('profileOverlay').classList.contains('is-editing')) return;
-            isDraggingProf = true; dragTargetProf = 'avatar'; startXP = e.clientX; startYP = e.clientY; e.preventDefault();
-        });
+        document.getElementById('pfCover').addEventListener('mousedown', (e) => { if(!document.getElementById('profileOverlay').classList.contains('is-editing')) return; isDraggingProf = true; dragTargetProf = 'cover'; startXP = e.clientX; startYP = e.clientY; e.preventDefault(); });
+        document.getElementById('pfAvatarImg').addEventListener('mousedown', (e) => { if(!document.getElementById('profileOverlay').classList.contains('is-editing')) return; isDraggingProf = true; dragTargetProf = 'avatar'; startXP = e.clientX; startYP = e.clientY; e.preventDefault(); });
         window.addEventListener('mousemove', (e) => {
-            if(!isDraggingProf) return;
-            const dx = e.clientX - startXP; const dy = e.clientY - startYP;
-            startXP = e.clientX; startYP = e.clientY;
-            if(dragTargetProf === 'cover') {
-                bgPx -= dx * 0.2; bgPy -= dy * 0.2; bgPx = Math.max(0, Math.min(100, bgPx)); bgPy = Math.max(0, Math.min(100, bgPy));
-                document.getElementById('pfCover').style.backgroundPosition = `${bgPx}% ${bgPy}%`;
-            } else if (dragTargetProf === 'avatar') {
-                avPx -= dx * 0.5; avPy -= dy * 0.5; avPx = Math.max(0, Math.min(100, avPx)); avPy = Math.max(0, Math.min(100, avPy));
-                document.getElementById('pfAvatarImg').style.objectPosition = `${avPx}% ${avPy}%`;
-            }
+            if(!isDraggingProf) return; const dx = e.clientX - startXP; const dy = e.clientY - startYP; startXP = e.clientX; startYP = e.clientY;
+            if(dragTargetProf === 'cover') { bgPx -= dx * 0.2; bgPy -= dy * 0.2; bgPx = Math.max(0, Math.min(100, bgPx)); bgPy = Math.max(0, Math.min(100, bgPy)); document.getElementById('pfCover').style.backgroundPosition = `${bgPx}% ${bgPy}%`; } 
+            else if (dragTargetProf === 'avatar') { avPx -= dx * 0.5; avPy -= dy * 0.5; avPx = Math.max(0, Math.min(100, avPx)); avPy = Math.max(0, Math.min(100, avPy)); document.getElementById('pfAvatarImg').style.objectPosition = `${avPx}% ${avPy}%`; }
         });
         window.addEventListener('mouseup', () => { isDraggingProf = false; dragTargetProf = null; });
 
         // ==========================================
-        // 4. CHART & AI ENGINE (GIỮ NGUYÊN 100%)
+        // 4. COMMUNITY FEED ENGINE 
         // ==========================================
-        let globalNewsArrayBase = [
-            { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "https://cointelegraph.com" },
-            { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "https://coindesk.com" },
-            { title: "Whale activity spikes as $500M USDT moves to Binance", source: "CryptoQuant", time: "12 mins ago", sentiment: "neg", url: "https://cryptoquant.com" }
-        ];
+        let globalFeedData = [];
 
+        function openCommunityFeed() { toggleOverlay('feedOverlay'); }
+
+        let postImgData = null;
+        function previewPostImage(event) {
+            const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+            reader.onload = (e) => { postImgData = e.target.result; document.getElementById('postPreviewImg').src = postImgData; document.getElementById('postPreviewContainer').style.display = 'inline-block'; }; reader.readAsDataURL(file);
+        }
+        function removePostImage() { postImgData = null; document.getElementById('postPreviewContainer').style.display = 'none'; document.getElementById('postImgInput').value = ''; }
+
+        function publishPost() {
+            let text = document.getElementById('postInputTxt').value.trim();
+            if(!text && !postImgData) return;
+            const newPost = { authorUid: currentUser.uid, authorName: currentUser.username, authorAvatar: currentUser.avatar, content: text, image: postImgData, timestamp: Date.now(), likes: [], comments: [] };
+            db.collection('posts').add(newPost).then(() => { document.getElementById('postInputTxt').value = ''; removePostImage(); showToast("Post published globally!"); });
+        }
+
+        function createPostHtml(p) {
+            let pid = p.id;
+            let isLiked = p.likes.includes(currentUser.uid); let likeStyle = isLiked ? 'color: var(--down-color);' : ''; let likeIcon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+            let imgHtml = p.image ? `<img src="${p.image}">` : '';
+            let deleteBtn = p.authorUid === currentUser.uid ? `<i class="fas fa-trash-alt" style="color:var(--down-color); cursor:pointer; float:right; opacity:0.7; transition:0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7" onclick="deletePost('${pid}')" title="Delete Post"></i>` : '';
+            let dateStr = new Date(p.timestamp).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+
+            return `
+                <div class="feed-item">
+                    <div class="feed-header"><div class="friend-avatar" style="width:40px; height:40px;"><img src="${p.authorAvatar}"></div><div style="flex:1;"><div class="feed-author">${p.authorName}</div><div class="feed-time">${dateStr}</div></div>${deleteBtn}</div>
+                    <div class="feed-content">${p.content}${imgHtml}</div>
+                    <div class="feed-interaction">
+                        <div class="feed-action" style="${likeStyle}" onclick="toggleLike('${pid}')"><i class="${likeIcon}"></i> ${p.likes.length}</div>
+                        <div class="feed-action" onclick="document.getElementById('cmd_${pid}').style.display='block'"><i class="far fa-comment"></i> ${p.comments.length}</div>
+                        <div class="feed-action" onclick="openShareModal('${pid}')"><i class="fas fa-share"></i> Share</div>
+                    </div>
+                    <div class="comment-section" id="cmd_${pid}">${p.comments.map(c => `<div class="comment-item"><b style="color:#fff;">${c.name}:</b> <span style="color:#ccc;">${c.text}</span></div>`).join('')}<div class="comment-input-box"><div class="friend-avatar" style="width:25px; height:25px; border:none;"><img src="${currentUser.avatar}"></div><input type="text" id="cmtInput_${pid}" class="comment-input" placeholder="Write a reply..." onkeypress="if(event.key === 'Enter') postComment('${pid}')"></div></div>
+                </div>`;
+        }
+
+        function initFeedEngine() {
+            db.collection('posts').orderBy('timestamp', 'desc').onSnapshot((snap) => {
+                globalFeedData = [];
+                const area = document.getElementById('feedPostsArea'); area.innerHTML = ''; 
+                
+                if(snap.empty) { area.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 50px;">Be the first to post!</div>'; return; }
+                
+                snap.forEach(doc => {
+                    let p = doc.data(); p.id = doc.id;
+                    globalFeedData.push(p);
+                    area.insertAdjacentHTML('beforeend', createPostHtml(p));
+                });
+                
+                if(document.getElementById('profileOverlay').style.display === 'flex') renderProfilePosts();
+            });
+        }
+
+        function toggleLike(pid) { db.collection('posts').doc(pid).get().then(doc => { let likes = doc.data().likes; if(likes.includes(currentUser.uid)) { likes = likes.filter(id => id !== currentUser.uid); } else { likes.push(currentUser.uid); } db.collection('posts').doc(pid).update({ likes: likes }); }); }
+        function postComment(pid) { let txt = document.getElementById(`cmtInput_${pid}`).value.trim(); if(!txt) return; db.collection('posts').doc(pid).update({ comments: firebase.firestore.FieldValue.arrayUnion({ name: currentUser.username, text: txt }) }).then(() => { document.getElementById(`cmtInput_${pid}`).value = ''; }); }
+        function deletePost(pid) { if(confirm("Are you sure you want to delete this post?")) { db.collection('posts').doc(pid).delete().then(() => { showToast("Post deleted successfully."); }); } }
+
+        let currentSharePid = null;
+        function openShareModal(pid) {
+            currentSharePid = pid; const list = document.getElementById('shareFriendList'); list.innerHTML = ''; let hasFriends = false;
+            for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<div class="modal-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${chatDB[id].avatar}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"><span style="color:#fff;">${chatDB[id].name}</span></div><button class="cg-btn modal-create" style="padding: 5px 15px;" onclick="sendShare('${id}')">Send</button></div>`); } }
+            if(!hasFriends) list.innerHTML = '<div style="color:#888; text-align:center; padding: 20px;">Add friends to share posts!</div>';
+            toggleModal('shareModal');
+        }
+        function sendShare(chatId) {
+            const prevChat = activeChatId; activeChatId = chatId;
+            appendMsgToDB("🚀 Check out this post in the Global Feed!", "text");
+            activeChatId = prevChat; showToast("Post sent to chat!"); toggleModal('shareModal');
+        }
+
+        // ==========================================
+        // 5. CHART & AI ENGINE 
+        // ==========================================
+        let globalNewsArrayBase = [ { title: "Bitcoin approaches key resistance level amidst market uncertainty", source: "CoinTelegraph", time: "Just now", sentiment: "pos", url: "https://cointelegraph.com" }, { title: "SEC delays decision on latest Ethereum ETF applications", source: "CoinDesk", time: "5 mins ago", sentiment: "neg", url: "https://coindesk.com" } ];
         let lastTimeIdxNews = -1;
-
         function renderNewsFeed() {
-            const feed = document.getElementById('newsFeed');
-            if(!feed || globalNewsArrayBase.length === 0) return;
-            let timeIndex = Math.floor(Date.now() / 6000);
-            if(timeIndex === lastTimeIdxNews) return; 
-            lastTimeIdxNews = timeIndex;
-
+            const feed = document.getElementById('newsFeed'); if(!feed || globalNewsArrayBase.length === 0) return;
+            let timeIndex = Math.floor(Date.now() / 6000); if(timeIndex === lastTimeIdxNews) return; lastTimeIdxNews = timeIndex;
             let html = ''; let startIndex = timeIndex % globalNewsArrayBase.length;
             for(let i = 0; i < Math.min(4, globalNewsArrayBase.length); i++) {
                 const item = globalNewsArrayBase[(startIndex + i) % globalNewsArrayBase.length];
-                const label = item.sentiment === 'pos' ? "BULLISH" : "BEARISH";
-                const sentClass = item.sentiment === 'pos' ? "sent-pos" : "sent-neg";
-                html += `<a href="${item.url}" target="_blank" class="news-item"><div class="news-title">${item.title}</div><div class="news-meta"><span><i class="fas fa-newspaper"></i> ${item.source} • ${item.time}</span><span class="sentiment-tag ${sentClass}">${label}</span></div></a>`;
-            }
-            feed.innerHTML = html;
+                html += `<a href="${item.url}" target="_blank" class="news-item"><div class="news-title">${item.title}</div><div class="news-meta"><span><i class="fas fa-newspaper"></i> ${item.source} • ${item.time}</span><span class="sentiment-tag ${item.sentiment === 'pos' ? "sent-pos" : "sent-neg"}">${item.sentiment === 'pos' ? "BULLISH" : "BEARISH"}</span></div></a>`;
+            } feed.innerHTML = html;
         }
-
-        function initNewsEngine() {
-            renderNewsFeed(); setInterval(renderNewsFeed, 1000); 
-            fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN').then(res => res.json()).then(data => {
-                if(data && data.Data && data.Data.length > 0) {
-                    globalNewsArrayBase = data.Data.map(article => {
-                        let sent = article.title.toLowerCase().match(/(drop|bear|crash|hack|sec|ban|sell|fall|down|worry|plunge|fraud|delay)/) ? "neg" : "pos";
-                        const date = new Date(article.published_on * 1000);
-                        return { title: article.title, source: article.source_info.name, time: ("0"+date.getHours()).slice(-2)+":"+("0"+date.getMinutes()).slice(-2), sentiment: sent, url: article.url };
-                    });
-                    lastTimeIdxNews = -1; renderNewsFeed();
-                }
-            }).catch(e => console.log("Using local fallback news."));
-        }
+        function initNewsEngine() { renderNewsFeed(); setInterval(renderNewsFeed, 1000); }
 
         async function startCoreEngine() {
             let history = [], aiHistory = [], labels = [];
-
-            try {
-                const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100');
-                const data = await res.json();
-                history = data.map(d => parseFloat(d[4])); labels = data.map((_, i) => i);
-                aiHistory = history.map(p => p + (Math.sin(p) - 0.5) * (p * 0.0015)); 
-            } catch (e) {
-                let price = 43250; history = Array.from({length: 100}, (_, i) => { price+=Math.sin(i)*100; return price; });
-                aiHistory = history.map(p => p + Math.cos(p)*50); labels = Array.from({length: 100}, (_,i) => i);
-            }
+            try { const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100'); const data = await res.json(); history = data.map(d => parseFloat(d[4])); labels = data.map((_, i) => i); aiHistory = history.map(p => p + (Math.sin(p) - 0.5) * (p * 0.0015)); } 
+            catch (e) { let price = 43250; history = Array.from({length: 100}, (_, i) => { price+=Math.sin(i)*100; return price; }); aiHistory = history.map(p => p + Math.cos(p)*50); labels = Array.from({length: 100}, (_,i) => i); }
 
             Chart.defaults.color = '#8492a6'; Chart.defaults.font.family = "'JetBrains Mono', monospace";
             const ctxP = document.getElementById('priceChart').getContext('2d');
-            const pChart = new Chart(ctxP, {
-                type: 'line', data: { labels: labels, datasets: [
-                    { label: 'Real', data: history, borderColor: '#00d283', borderWidth: 2.5, pointRadius: 0, fill: true, backgroundColor: (ctx) => { const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400); grad.addColorStop(0, 'rgba(0,210,131,0.25)'); grad.addColorStop(1, 'rgba(0,210,131,0)'); return grad; }, tension: 0.2 },
-                    { label: 'AI', data: aiHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [6,6], pointRadius: 0, fill: false, tension: 0.2 }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', grid:{color:'rgba(255,255,255,0.05)'}}} }
-            });
-
+            const pChart = new Chart(ctxP, { type: 'line', data: { labels: labels, datasets: [ { label: 'Real', data: history, borderColor: '#00d283', borderWidth: 2.5, pointRadius: 0, fill: true, backgroundColor: (ctx) => { const grad = ctx.chart.ctx.createLinearGradient(0,0,0,400); grad.addColorStop(0, 'rgba(0,210,131,0.25)'); grad.addColorStop(1, 'rgba(0,210,131,0)'); return grad; }, tension: 0.2 }, { label: 'AI', data: aiHistory, borderColor: '#3b82f6', borderWidth: 2, borderDash: [6,6], pointRadius: 0, fill: false, tension: 0.2 } ]}, options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', grid:{color:'rgba(255,255,255,0.05)'}}} } });
             const ctxI = document.getElementById('indicatorChart').getContext('2d');
-            const iChart = new Chart(ctxI, {
-                type: 'line', data: { labels: labels, datasets: [{ label: 'RSI', data: calcRSI(history), borderColor: '#3b82f6', borderWidth: 1.5, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', min:0, max:100, grid:{color:'rgba(255,255,255,0.05)'}}} }
-            });
+            const iChart = new Chart(ctxI, { type: 'line', data: { labels: labels, datasets: [{ label: 'RSI', data: calcRSI(history), borderColor: '#3b82f6', borderWidth: 1.5, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: {legend: false}, scales: {x:{display:false}, y:{position:'right', min:0, max:100, grid:{color:'rgba(255,255,255,0.05)'}}} } });
 
             const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data); const currentPrice = parseFloat(data.c); const changePercent = parseFloat(data.P);
-                history.shift(); history.push(currentPrice);
-                const rsiData = calcRSI(history); const macdArray = calcMACD(history);
-                const predPrice = updateAI(rsiData[rsiData.length-1], macdArray[macdArray.length-1], changePercent, currentPrice);
-                aiHistory.shift(); aiHistory.push(predPrice);
-                pChart.data.datasets[0].data = history; pChart.data.datasets[1].data = aiHistory; pChart.update(); 
-                iChart.data.datasets[0].data = rsiData; iChart.update();
-
+                history.shift(); history.push(currentPrice); const rsiData = calcRSI(history); const macdArray = calcMACD(history);
+                aiHistory.shift(); aiHistory.push(updateAI(rsiData[rsiData.length-1], macdArray[macdArray.length-1], changePercent, currentPrice));
+                pChart.data.datasets[0].data = history; pChart.data.datasets[1].data = aiHistory; pChart.update(); iChart.data.datasets[0].data = rsiData; iChart.update();
                 const elP = document.getElementById('mainPrice'); elP.innerText = currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
-                elP.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)";
-                elP.style.textShadow = changePercent >= 0 ? "0 0 20px rgba(0, 210, 131, 0.4)" : "0 0 20px rgba(255, 59, 94, 0.4)";
-                
-                const elC = document.getElementById('priceChange'); elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-                elC.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)";
+                elP.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)"; elP.style.textShadow = changePercent >= 0 ? "0 0 20px rgba(0, 210, 131, 0.4)" : "0 0 20px rgba(255, 59, 94, 0.4)";
+                const elC = document.getElementById('priceChange'); elC.innerText = (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%"; elC.style.color = changePercent >= 0 ? "var(--up-color)" : "var(--down-color)";
                 updateOrderBook(currentPrice);
             };
         }
-
         function calcEMA(data, period) { let k = 2/(period+1), ema=data[0], res=[]; data.forEach(p => { ema = p*k + ema*(1-k); res.push(ema); }); return res; }
         function calcMACD(data) { let ema12 = calcEMA(data, 12), ema26 = calcEMA(data, 26), macd = []; for(let i=0; i<data.length; i++) macd.push(ema12[i] - ema26[i]); return macd; }
         function calcRSI(data) { let res = Array(14).fill(50); for(let i=14; i<data.length; i++) { let up = 0, down = 0; for(let j=i-14; j<i; j++) { let diff = data[j+1] - data[j]; if(diff > 0) up += diff; else down -= diff; } res.push(down === 0 ? 100 : 100 - (100 / (1 + up / down))); } return res; }
-        
         function updateOrderBook(p) { 
-            let h = ""; 
-            for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:var(--down-color)">${(p+i*1.5).toFixed(2)}</span> <span style="color:#aaa">${(Math.abs(Math.sin(p*i))*2).toFixed(3)}</span></div>`; 
+            let h = ""; for(let i=5; i>0; i--) h += `<div class="ob-row bg-red-soft"><span style="color:var(--down-color)">${(p+i*1.5).toFixed(2)}</span> <span style="color:#aaa">${(Math.abs(Math.sin(p*i))*2).toFixed(3)}</span></div>`; 
             h += `<div style="text-align:center; color:#fff; font-size:1.1rem; padding: 6px 0; border-top:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05); margin:6px 0;">${p.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>`; 
             for(let i=1; i<=5; i++) h += `<div class="ob-row bg-green-soft"><span style="color:var(--up-color)">${(p-i*1.5).toFixed(2)}</span> <span style="color:#aaa">${(Math.abs(Math.cos(p*i))*2).toFixed(3)}</span></div>`; 
             document.getElementById('orderBook').innerHTML = h; 
         }
-
         function updateAI(rsi, macd, chg, price) {
             let sig = "HOLD", col = "#8492a6", hexOpacity = "33", pseudoRand1 = Math.abs(Math.sin(price*100)), pseudoRand2 = Math.abs(Math.cos(price*100)), conf = 45 + pseudoRand1*15, predOffset = (pseudoRand2-0.5)*(price*0.001);
             if (rsi > 65 || (macd < 0 && chg < -0.5)) { sig = "SELL"; col = "#ff3b5e"; hexOpacity = "66"; conf = 65 + pseudoRand1*15; predOffset = -(price*(0.005+pseudoRand2*0.005)); if(rsi > 75) { sig = "STRONG SELL"; conf += 5; } } 
             else if (rsi < 35 || (macd > 0 && chg > 0.5)) { sig = "BUY"; col = "#00d283"; hexOpacity = "66"; conf = 65 + pseudoRand1*15; predOffset = (price*(0.005+pseudoRand2*0.005)); if(rsi < 25) { sig = "STRONG BUY"; conf += 5; } }
             if(conf > 88.5) conf = 88.5 - pseudoRand1; const predPrice = price + predOffset;
-            let sl = sig.includes("BUY") ? price*0.985 : (sig.includes("SELL") ? price*1.015 : price*0.99), tp = sig.includes("BUY") ? price*1.03 : (sig.includes("SELL") ? price*0.97 : price*1.01);
-            
             const sigBox = document.getElementById('signalBox'); document.getElementById('aiSignal').innerText = sig; document.getElementById('aiSignal').style.color = col; document.getElementById('aiSignal').style.textShadow = `0 0 20px ${col}${hexOpacity}`; sigBox.style.borderColor = col; sigBox.style.boxShadow = `inset 0 0 25px ${col}33`;
-            document.getElementById('aiConf').innerText = conf.toFixed(1) + "%"; const circle = document.querySelector('.conf-circle'); circle.style.borderColor = col; circle.style.boxShadow = `0 0 30px ${col}55, inset 0 0 15px ${col}22`;
+            document.getElementById('aiConf').innerText = conf.toFixed(1) + "%"; document.querySelector('.conf-circle').style.borderColor = col; document.querySelector('.conf-circle').style.boxShadow = `0 0 30px ${col}55, inset 0 0 15px ${col}22`;
             document.getElementById('aiPredPrice').innerText = predPrice.toLocaleString('en-US', {minimumFractionDigits: 2}); document.getElementById('aiPredPrice').style.color = col; document.getElementById('aiPredPrice').style.textShadow = `0 0 20px ${col}55`;
-            document.getElementById('slVal').innerText = sl.toLocaleString('en-US', {minimumFractionDigits: 2}); document.getElementById('tpVal').innerText = tp.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('slVal').innerText = (sig.includes("BUY") ? price*0.985 : (sig.includes("SELL") ? price*1.015 : price*0.99)).toLocaleString('en-US', {minimumFractionDigits: 2}); document.getElementById('tpVal').innerText = (sig.includes("BUY") ? price*1.03 : (sig.includes("SELL") ? price*0.97 : price*1.01)).toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById('rsiVal').innerText = rsi.toFixed(2); document.getElementById('rsiVal').style.color = rsi > 70 ? "var(--down-color)" : (rsi < 30 ? "var(--up-color)" : "#fff");
             document.getElementById('macdVal').innerText = macd.toFixed(2); document.getElementById('macdVal').style.color = macd > 0 ? "var(--up-color)" : "var(--down-color)";
             return predPrice; 
