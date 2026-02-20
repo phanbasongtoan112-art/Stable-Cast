@@ -14,6 +14,8 @@
     
     <link rel="apple-touch-icon" href="https://img.freepik.com/premium-vector/cube-logo-design-abstract-cube-logo-design_219523-224.jpg">
     
+    <link rel="manifest" href='data:application/manifest+json,{"name":"StableCast","short_name":"StableCast","display":"standalone","background_color":"#050608","theme_color":"#050608","icons":[{"src":"https://img.freepik.com/premium-vector/cube-logo-design-abstract-cube-logo-design_219523-224.jpg","sizes":"512x512","type":"image/jpeg"}]}'>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -142,7 +144,7 @@
         .mobile-back-btn { display: none; cursor: pointer; font-size: 1.4rem; color: var(--text-muted); transition: 0.3s; margin-right: 10px;}
         .mobile-back-btn:hover { color: var(--accent-color); }
 
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; z-index: 5; position: relative;}
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; z-index: 5; position: relative; scroll-behavior: smooth;}
         .msg-wrapper { display: flex; gap: 12px; align-items: flex-end; max-width: 80%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .msg-wrapper.sent { align-self: flex-end; flex-direction: row-reverse; }
@@ -280,6 +282,7 @@
         .toast-msg { background: rgba(13, 16, 23, 0.9); border-left: 4px solid var(--accent-color); color: #fff; padding: 15px 20px; border-radius: 8px; font-family: 'JetBrains Mono'; font-size: 0.85rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); animation: slideInRight 0.3s ease-out forwards; display: flex; align-items: center; gap: 10px;}
         @keyframes slideInRight { from {transform: translateX(100%); opacity: 0;} to {transform: translateX(0); opacity: 1;} }
 
+        /* TỐI ƯU MOBILE UX */
         @media (max-width: 1024px) {
             body { overflow-y: auto; height: auto; }
             .main-app { height: auto; }
@@ -294,6 +297,9 @@
             .chat-area { width: 100%; height: 100%; display: none; } 
             .show-mobile-chat .social-sidebar { display: none !important; }
             .show-mobile-chat .chat-area { display: flex !important; }
+            
+            /* Ẩn nút X khi đang trong Chat trên Mobile */
+            .show-mobile-chat #chatOverlayContainer > .overlay-close { display: none !important; }
             
             .mobile-back-btn { display: block !important; }
             .msg-wrapper { max-width: 95%; }
@@ -461,7 +467,8 @@
                 <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted);" onclick="toggleModal('shareModal')"></i>
             </div>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0;">Send to your friends:</p>
-            <div class="modal-list" id="shareFriendList"></div>
+            <div class="modal-list" id="shareFriendList">
+                </div>
         </div>
     </div>
 
@@ -577,9 +584,13 @@
 
     <div id="addFriendOverlay" class="full-overlay">
         <div class="overlay-close" onclick="toggleOverlay('addFriendOverlay')"><i class="fas fa-times"></i></div>
-        <div class="overlay-container profile-wrapper" style="max-width: 500px; max-height: 70vh;">
-             <h3 style="color: #fff; padding: 20px; font-family:'Rajdhani'; border-bottom: 1px solid rgba(255,255,255,0.1); margin:0; font-size: 1.5rem;"><i class="fas fa-globe-americas" style="color:var(--accent-color);"></i> Global Network</h3>
-             <div class="friend-list" id="globalUserList" style="padding: 20px; overflow-y: auto;"></div>
+        <div class="overlay-container profile-wrapper" style="max-width: 500px; max-height: 80vh;">
+             
+             <h3 style="color: #fff; padding: 20px 20px 10px; font-family:'Rajdhani'; margin:0; font-size: 1.5rem;"><i class="fas fa-bell" style="color:var(--accent-color);"></i> Friend Requests</h3>
+             <div class="friend-list" id="friendRequestsList" style="padding: 0 20px; max-height: 200px;"></div>
+
+             <h3 style="color: #fff; padding: 20px 20px 10px; font-family:'Rajdhani'; border-top: 1px solid rgba(255,255,255,0.1); margin:0; font-size: 1.5rem;"><i class="fas fa-globe-americas" style="color:var(--accent-color);"></i> Global Network</h3>
+             <div class="friend-list" id="globalUserList" style="padding: 0 20px 20px; overflow-y: auto;"></div>
         </div>
     </div>
 
@@ -679,27 +690,29 @@
         }
 
         function toggleModal(id) { const modal = document.getElementById(id); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; }
+        
+        // SỬA LỖI SCROLL BLEED TRÊN MOBILE
         function toggleOverlay(id) {
             const overlay = document.getElementById(id);
             if (overlay.style.display === 'flex') {
                 overlay.style.opacity = 0; setTimeout(() => overlay.style.display = 'none', 300);
+                document.body.style.overflow = 'auto'; // Cho phép cuộn lại nền
                 if(id === 'profileOverlay' && document.getElementById('profileOverlay').classList.contains('is-editing')) toggleEditProfile(); 
-            } else { overlay.style.display = 'flex'; setTimeout(() => overlay.style.opacity = 1, 10); }
+            } else { 
+                overlay.style.display = 'flex'; setTimeout(() => overlay.style.opacity = 1, 10); 
+                document.body.style.overflow = 'hidden'; // Khóa cuộn nền khi mở modal
+            }
         }
 
-        // ==========================================
         // QUYỀN THÔNG BÁO PUSH NOTIFICATION
-        // ==========================================
         function requestNotificationPermission() {
-            if ("Notification" in window) {
-                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-                    Notification.requestPermission();
-                }
+            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
             }
         }
         function fireNotification(title, body) {
             if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/1173/1173269.png' });
+                new Notification(title, { body: body, icon: 'https://img.freepik.com/premium-vector/cube-logo-design-abstract-cube-logo-design_219523-224.jpg' });
             }
         }
 
@@ -709,6 +722,11 @@
         let authMode = 'login'; 
         let currentUser = null;
         let isAppInitialized = false;
+
+        // Cập nhật trạng thái Offline khi tắt tab
+        window.addEventListener('beforeunload', function (e) {
+            if (currentUser) { db.collection('users').doc(currentUser.uid).update({ online: false }); }
+        });
 
         window.addEventListener('offline', () => {
             document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-wifi" style="color:var(--down-color);"></i> OFFLINE';
@@ -750,7 +768,7 @@
                     
                     auth.createUserWithEmailAndPassword(email, p).then((userCredential) => {
                         const uid = userCredential.user.uid;
-                        const defaultUser = { username: rawU, avatar: 'https://i.pravatar.cc/150?u='+rawU, cover: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000', bio: 'AI Student at FPT University. Crypto enthusiast. 🚀', location: 'Vietnam', website: 'stablecast.vn', joinDate: new Date().toLocaleDateString('en-US', {month:'short', year:'numeric'}), followers: [], following: [], online: true };
+                        const defaultUser = { username: rawU, avatar: 'https://i.pravatar.cc/150?u='+rawU, cover: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000', bio: 'AI Student at FPT University. Crypto enthusiast. 🚀', location: 'Vietnam', website: 'stablecast.vn', joinDate: new Date().toLocaleDateString('en-US', {month:'short', year:'numeric'}), followers: [], following: [], friendRequests: [], online: true };
                         db.collection('users').doc(uid).set(defaultUser).then(() => { msg.style.color = "var(--up-color)"; msg.textContent = "Success! Please Login."; setTimeout(() => toggleMode('login'), 1500); });
                     }).catch((error) => { msg.style.color = "var(--down-color)"; msg.textContent = "Password must be at least 6 characters."; });
                 });
@@ -804,32 +822,39 @@
                 renderSidebar(); if(chatDB[activeChatId]) switchChat(activeChatId, true);
             });
 
+            // TỐI ƯU HIỂN THỊ REAL-TIME CHAT
             db.collection('userChats').doc(currentUser.uid).onSnapshot((doc) => {
                 if(doc.exists && doc.data().chatData) {
-                    chatDB = JSON.parse(doc.data().chatData);
+                    let newChatDB = JSON.parse(doc.data().chatData);
                     
                     if(!isFirstLoad) {
-                        for(let id in chatDB) {
-                            let currLen = chatDB[id].msgs.length;
-                            let prevLen = prevChatDBLength[id] || 0;
+                        for(let id in newChatDB) {
+                            let currLen = newChatDB[id].msgs ? newChatDB[id].msgs.length : 0;
+                            let prevLen = (chatDB[id] && chatDB[id].msgs) ? chatDB[id].msgs.length : 0;
                             if(currLen > prevLen) {
-                                let newestMsg = chatDB[id].msgs[currLen - 1];
-                                if(!newestMsg.isMe) {
+                                let newestMsg = newChatDB[id].msgs[currLen - 1];
+                                if(!newestMsg.isMe && newestMsg.sender !== 'System') {
                                     if(document.getElementById('socialOverlay').style.display !== 'flex' || activeChatId !== id) {
                                         unreadCount++; updateMsgBadge(); 
+                                        showToast(`New message from ${newestMsg.sender}`);
+                                        fireNotification(`Message from ${newestMsg.sender}`, newestMsg.text.includes('<img') ? '[Image]' : newestMsg.text);
                                     }
-                                    fireNotification(`New message from ${newestMsg.sender}`, newestMsg.text.includes('<img') ? '[Image sent]' : newestMsg.text);
                                 }
                             }
-                            prevChatDBLength[id] = currLen;
                         }
-                    } else {
-                        for(let id in chatDB) prevChatDBLength[id] = chatDB[id].msgs.length;
                     }
+                    chatDB = newChatDB;
                 } else {
-                    chatDB = { 'cloud': { name: 'My Cloud', type: 'cloud', isLeader: false, members: [], desc: 'Saved messages & files', msgs: [], themeKey: 'default' } };
+                    if(Object.keys(chatDB).length === 0) {
+                        chatDB = { 'cloud': { name: 'My Cloud', type: 'cloud', isLeader: false, members: [], desc: 'Saved messages & files', msgs: [], themeKey: 'default' } };
+                        saveChatDB();
+                    }
                 }
-                renderSidebar(); if(chatDB[activeChatId]) { switchChat(activeChatId, true); } else { switchChat('cloud', true); }
+                
+                renderSidebar(); 
+                if(chatDB[activeChatId] && document.getElementById('socialOverlay').style.display === 'flex') { 
+                    switchChat(activeChatId, true); 
+                }
                 isFirstLoad = false;
             });
         }
@@ -845,8 +870,9 @@
                 if(chat.type === 'user' && globalUsersCache[chat.name]) { displayAvatar = globalUsersCache[chat.name].avatar; isOnline = globalUsersCache[chat.name].online; }
 
                 let avatarHTML = chat.type === 'cloud' ? `<div class="friend-avatar" style="background: var(--accent-color); border:none;"><i class="fas fa-cloud"></i></div>` : `<div class="friend-avatar"><img src="${displayAvatar}">${isOnline ? `<div class="status-dot"></div>` : `<div class="status-dot offline"></div>`}</div>`;
-                let lastMsg = chat.msgs.length > 0 ? chat.msgs[chat.msgs.length-1].text : (chat.desc || 'No messages yet');
+                let lastMsg = chat.msgs && chat.msgs.length > 0 ? chat.msgs[chat.msgs.length-1].text : (chat.desc || 'No messages yet');
                 if(lastMsg.includes('<a')) lastMsg = '[Sent a file]'; if(lastMsg.includes('<img')) lastMsg = '[Sent an image]';
+                
                 html += `<div class="friend-item ${activeCls}" onclick="switchChat('${id}')">${avatarHTML}<div class="friend-info"><h4>${chat.name}</h4><p>${lastMsg}</p></div></div>`;
             } list.innerHTML = html;
         }
@@ -868,7 +894,7 @@
                 document.getElementById('currentChatStatus').textContent = chat.type === 'group' ? `${chat.members.length + 1} Members` : (isOnline ? 'Online' : 'Offline');
             }
 
-            // XỬ LÝ THEME TÁCH LỚP (HEADER KO BỊ ĐEN)
+            // XỬ LÝ THEME TÁCH LỚP 
             const box = document.getElementById('chatMessagesBox');
             const bgDiv = document.getElementById('chatAreaBg');
             const overlayDiv = document.getElementById('chatAreaOverlay');
@@ -883,7 +909,7 @@
             bgDiv.style.backgroundImage = bgStyle;
             if(bgStyle !== '') { overlayDiv.style.display = 'block'; } else { overlayDiv.style.display = 'none'; }
 
-            if(chat.msgs.length === 0) { box.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px; z-index:1; position:relative;">This is the start of your history with ${chat.name}</div>`;
+            if(!chat.msgs || chat.msgs.length === 0) { box.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px; z-index:1; position:relative;">This is the start of your history with ${chat.name}</div>`;
             } else {
                 chat.msgs.forEach(m => {
                     let wrapperCls = m.isMe ? 'sent' : 'received'; let msgCls = m.isMe ? 'msg-sent' : 'msg-received';
@@ -912,10 +938,11 @@
             if(!chatDB[activeChatId]) return;
             let time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
-            chatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: true }); 
-            prevChatDBLength[activeChatId] = chatDB[activeChatId].msgs.length; 
+            // 1. Lưu vào máy mình
+            chatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: true });
             saveChatDB(); 
             
+            // 2. Bắn sang máy người nhận (Giao tiếp Real-time 2 chiều)
             let chat = chatDB[activeChatId];
             if(chat.type === 'user') {
                 db.collection('users').where('username', '==', chat.name).get().then(snap => {
@@ -923,15 +950,22 @@
                         let otherUid = snap.docs[0].id;
                         db.collection('userChats').doc(otherUid).get().then(doc2 => {
                             let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
+                            
                             let targetId = null;
                             for(let id in otherChatDB) { if(otherChatDB[id].type === 'user' && otherChatDB[id].name === currentUser.username) { targetId = id; break; } }
-                            if(!targetId) { targetId = 'user_' + Date.now(); otherChatDB[targetId] = { name: currentUser.username, type: 'user', isLeader: false, members: [], avatar: currentUser.avatar, online: true, msgs: [], themeKey: 'default' }; }
+                            if(!targetId) {
+                                targetId = 'user_' + Date.now();
+                                otherChatDB[targetId] = { name: currentUser.username, type: 'user', isLeader: false, members: [], avatar: currentUser.avatar, online: true, msgs: [] };
+                            }
+                            
+                            // Nhét tin nhắn vào máy người kia với isMe = false
                             otherChatDB[targetId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: false });
                             db.collection('userChats').doc(otherUid).set({ chatData: JSON.stringify(otherChatDB) });
                         });
                     }
                 });
             } else if (chat.type === 'group') {
+                // Group chat logic: Broadcast to all members
                 chat.members.forEach(memName => {
                     db.collection('users').where('username', '==', memName).get().then(snap => {
                         if(!snap.empty) {
@@ -950,35 +984,100 @@
         }
 
         // ==========================================
-        // TÍNH NĂNG ADD FRIEND 
+        // HỆ THỐNG KẾT BẠN (FRIEND REQUEST SYSTEM)
         // ==========================================
         function openGlobalAddFriend() {
             toggleOverlay('addFriendOverlay');
-            const list = document.getElementById('globalUserList'); list.innerHTML = '<div style="color:#fff; text-align:center;">Scanning Global Network...</div>';
             
-            db.collection('users').get().then((querySnapshot) => {
-                list.innerHTML = ''; let hasUsers = false;
-                querySnapshot.forEach((doc) => {
-                    let uData = doc.data(); let u = uData.username; if(u === currentUser.username) return; 
-                    let alreadyAdded = false; for(let id in chatDB) { if(chatDB[id].type === 'user' && chatDB[id].name === u) { alreadyAdded = true; break; } }
-                    
-                    if(!alreadyAdded) {
-                        hasUsers = true;
-                        list.insertAdjacentHTML('beforeend', `<div class="friend-item" style="cursor:default; background: rgba(0,0,0,0.3); margin-bottom: 10px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:15px; width: 100%;"><div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${uData.avatar}"></div><div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${u}</h4><p style="color:var(--text-muted); font-size:0.75rem; margin:0;">Suggested for you</p></div><button class="pf-btn-save" style="display:block; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor:pointer;" onclick="addFriendGlobal('${doc.id}', '${u}', '${uData.avatar}')"><i class="fas fa-user-plus"></i> Add</button></div></div>`);
-                    }
+            db.collection('users').doc(currentUser.uid).get().then(myDoc => {
+                let myData = myDoc.data();
+                let myRequests = myData.friendRequests || [];
+
+                // 1. Render Danh sách lời mời
+                const reqList = document.getElementById('friendRequestsList'); reqList.innerHTML = '';
+                if(myRequests.length > 0) {
+                    myRequests.forEach(req => {
+                        reqList.insertAdjacentHTML('beforeend', `
+                            <div class="friend-item" style="background: rgba(59, 130, 246, 0.1); margin-bottom: 10px; padding: 15px; border: 1px solid var(--accent-color);">
+                                <div style="display:flex; align-items:center; gap:15px; width: 100%;">
+                                    <div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${req.avatar}"></div>
+                                    <div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${req.username}</h4><p style="color:var(--up-color); font-size:0.75rem; margin:0;">Wants to connect</p></div>
+                                    <div style="display:flex; gap: 8px;">
+                                        <button class="pf-btn-save" style="display:block; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor:pointer;" onclick="acceptRequest('${req.uid}', '${req.username}', '${req.avatar}')"><i class="fas fa-check"></i></button>
+                                        <button class="pf-btn" style="display:block; margin:0; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; border-color: rgba(255, 59, 94, 0.5); color: var(--down-color);" onclick="rejectRequest('${req.uid}', '${req.username}', '${req.avatar}')"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+                } else {
+                    reqList.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding: 10px 0;">No pending requests</div>';
+                }
+
+                // 2. Render Mạng lưới người dùng
+                const globalList = document.getElementById('globalUserList'); globalList.innerHTML = '<div style="color:#fff; text-align:center;">Scanning Global Network...</div>';
+                db.collection('users').get().then((querySnapshot) => {
+                    globalList.innerHTML = ''; let hasUsers = false;
+                    querySnapshot.forEach((doc) => {
+                        let uData = doc.data(); let uUid = doc.id; let u = uData.username; if(u === currentUser.username) return; 
+                        
+                        let alreadyAdded = false; for(let id in chatDB) { if(chatDB[id].type === 'user' && chatDB[id].name === u) { alreadyAdded = true; break; } }
+                        let requestSent = uData.friendRequests && uData.friendRequests.some(r => r.uid === currentUser.uid);
+                        let requestReceived = myRequests.some(r => r.uid === uUid);
+
+                        if(!alreadyAdded && !requestReceived) {
+                            hasUsers = true;
+                            let btnHtml = requestSent 
+                                ? `<button class="pf-btn" style="margin:0; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; color:#888;" disabled>Sent</button>`
+                                : `<button class="pf-btn-save" style="display:block; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor:pointer;" onclick="sendFriendRequest('${uUid}', '${u}')"><i class="fas fa-user-plus"></i> Add</button>`;
+
+                            globalList.insertAdjacentHTML('beforeend', `<div class="friend-item" style="cursor:default; background: rgba(0,0,0,0.3); margin-bottom: 10px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:15px; width: 100%;"><div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${uData.avatar}"></div><div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${u}</h4><p style="color:var(--text-muted); font-size:0.75rem; margin:0;">Suggested for you</p></div>${btnHtml}</div></div>`);
+                        }
+                    });
+                    if(!hasUsers) globalList.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0;">No new users found in the network.</div>`;
                 });
-                if(!hasUsers) list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0;">No new users found in the network.</div>`;
             });
         }
 
-        function addFriendGlobal(otherUid, username, avatar) {
-            const id = 'user_' + Date.now();
-            chatDB[id] = { name: username, type: 'user', isLeader: false, members: [], avatar: avatar, online: true, msgs: [], themeKey: 'default' };
-            saveChatDB(); toggleOverlay('addFriendOverlay'); showToast(`You and ${username} are now connected!`);
-            db.collection('users').doc(currentUser.uid).update({ following: firebase.firestore.FieldValue.arrayUnion(otherUid) });
-            db.collection('users').doc(otherUid).update({ followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
+        function sendFriendRequest(targetUid, targetUsername) {
+            db.collection('users').doc(targetUid).update({
+                friendRequests: firebase.firestore.FieldValue.arrayUnion({ uid: currentUser.uid, username: currentUser.username, avatar: currentUser.avatar })
+            }).then(() => {
+                showToast(`Friend request sent to ${targetUsername}!`);
+                openGlobalAddFriend(); // Refresh UI
+            });
         }
 
+        function acceptRequest(reqUid, reqUsername, reqAvatar) {
+            // Xóa khỏi list request của mình
+            db.collection('users').doc(currentUser.uid).update({ friendRequests: firebase.firestore.FieldValue.arrayRemove({ uid: reqUid, username: reqUsername, avatar: reqAvatar }) });
+            
+            // Tạo Chat Box ở máy mình
+            const chatId = 'user_' + Date.now();
+            chatDB[chatId] = { name: reqUsername, type: 'user', isLeader: false, members: [], avatar: reqAvatar, online: true, msgs: [], themeKey: 'default' };
+            saveChatDB();
+
+            // Gửi box rỗng qua máy người kia để xác nhận
+            db.collection('userChats').doc(reqUid).get().then(doc => {
+                let otherChatDB = doc.exists && doc.data().chatData ? JSON.parse(doc.data().chatData) : {};
+                otherChatDB[chatId] = { name: currentUser.username, type: 'user', isLeader: false, members: [], avatar: currentUser.avatar, online: true, msgs: [{sender: 'System', avatar: 'https://cdn-icons-png.flaticon.com/512/3128/3128304.png', text: `${currentUser.username} accepted your friend request!`, time: new Date().toLocaleTimeString(), isMe: false}], themeKey: 'default' };
+                db.collection('userChats').doc(reqUid).set({ chatData: JSON.stringify(otherChatDB) });
+            });
+
+            // Tăng Follower
+            db.collection('users').doc(currentUser.uid).update({ followers: firebase.firestore.FieldValue.arrayUnion(reqUid) });
+            db.collection('users').doc(reqUid).update({ following: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
+
+            showToast(`You and ${reqUsername} are now connected!`); openGlobalAddFriend();
+        }
+
+        function rejectRequest(reqUid, reqUsername, reqAvatar) {
+            db.collection('users').doc(currentUser.uid).update({ friendRequests: firebase.firestore.FieldValue.arrayRemove({ uid: reqUid, username: reqUsername, avatar: reqAvatar }) }).then(() => {
+                showToast(`Request from ${reqUsername} rejected.`); openGlobalAddFriend();
+            });
+        }
+
+        // CREATE GROUP
         function openCreateGroupModal() {
             const list = document.getElementById('cgMemberList'); list.innerHTML = ''; let hasFriends = false;
             for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<label class="modal-item"><input type="checkbox" value="${chatDB[id].name}"> ${chatDB[id].name}</label>`); } }
