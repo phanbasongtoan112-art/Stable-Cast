@@ -11,12 +11,12 @@
     <meta name="apple-mobile-web-app-title" content="StableCast">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%233b82f6' d='M239.1 6.3l-208 78c-18.7 7-31.1 25-31.1 45v225.1c0 18.2 10.3 34.8 26.5 42.9l208 104c13.5 6.8 29.4 6.8 42.9 0l208-104c16.2-8.1 26.5-24.8 26.5-42.9V129.3c0-20-12.4-37.9-31.1-44.9l-208-78C262 2.2 250 2.2 239.1 6.3zM256 68.4l192 72v.3l-192 83.2-192-83.2v-.3l192-72zm-32 158.5v192.6l-160-80V171.8l160 55.1zm64 192.6V226.9l160-55.1v167.6l-160 80z'/></svg>" type="image/svg+xml">
+    
     <link rel="apple-touch-icon" href="https://img.freepik.com/premium-vector/cube-logo-design-abstract-cube-logo-design_219523-224.jpg">
     <link rel="manifest" href='data:application/manifest+json,{"name":"StableCast","short_name":"StableCast","display":"standalone","background_color":"#050608","theme_color":"#050608","icons":[{"src":"https://img.freepik.com/premium-vector/cube-logo-design-abstract-cube-logo-design_219523-224.jpg","sizes":"512x512","type":"image/jpeg"}]}'>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -31,11 +31,9 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* Đã chuyển Font Body sang font chuẩn của Apple/Facebook để dễ đọc Chat/Feed */
         body { background: var(--bg-dark); background-image: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
         
-        /* Giữ nguyên font điện tử cho các con số, biểu đồ, nút bấm */
-        .main-price, .ob-row, .conf-value, .param-val, .market-ticker, .chat-time, .feed-time, #sysLatency, #sysRam, #sysOrigin { font-family: 'JetBrains Mono', monospace; }
+        .main-price, .ob-row, .conf-value, .param-val, .market-ticker, .chat-time, .feed-time, #sysLatency, #sysRam, #sysOrigin, .on-chain-font { font-family: 'JetBrains Mono', monospace; }
         h1, h2, h3, h4, .brand, .feed-author, .pf-name, .panel-header, .signal-text { font-family: 'Rajdhani', sans-serif; }
         
         ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 5px; } ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
@@ -48,15 +46,12 @@
         .login-box::before { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--up-color), transparent); animation: scanline 3s linear infinite; }
         @keyframes scanline { 0% {left: -100%;} 100% {left: 100%;} }
         .login-box h2 { color: #fff; margin-bottom: 30px; letter-spacing: 3px; border-bottom: 2px solid var(--up-color); display: inline-block; padding-bottom: 10px; text-shadow: 0 0 15px rgba(0, 210, 131, 0.5); font-family: 'JetBrains Mono', monospace; transition: 0.3s;}
-        
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; font-family: 'JetBrains Mono', monospace;}
         .input-group input { width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--up-color); font-size: 1rem; outline: none; transition: all 0.3s; font-family: 'JetBrains Mono', monospace; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
         .input-group input:focus { border-color: var(--up-color); box-shadow: 0 0 15px rgba(0, 210, 131, 0.3), inset 0 2px 5px rgba(0,0,0,0.5); }
-        
         button#mainAuthBtn { width: 100%; padding: 14px; margin-top: 10px; background: linear-gradient(90deg, #00d283, #009960); color: #000; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.3s; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 210, 131, 0.4); }
         button#mainAuthBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 210, 131, 0.6); }
-        
         .toggle-auth { margin-top: 25px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-right: 15px;}
         .toggle-auth:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         #loginMsg { margin-top: 15px; font-size: 0.85rem; font-weight: 600; min-height: 20px; font-family: 'JetBrains Mono', monospace;}
@@ -125,7 +120,7 @@
         .overlay-close { position: fixed; top: 20px; right: 20px; font-size: 1.5rem; color: #888; cursor: pointer; transition: 0.3s; z-index: 99999; background: rgba(0,0,0,0.6); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);}
         .overlay-close:hover { color: var(--down-color); transform: scale(1.1); background: rgba(0,0,0,0.9); border-color: var(--down-color);}
 
-        /* --- CHAT UI --- */
+        /* CHAT UI */
         .social-sidebar { width: 300px; background: rgba(0,0,0,0.5); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; position: relative; z-index: 10;}
         .social-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: bold; color: #fff; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; font-family: 'Rajdhani';}
         .friend-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px;}
@@ -202,8 +197,6 @@
         .modal-create:hover { background: #2563eb; transform: translateY(-2px);}
         .modal-delete { background: rgba(255, 59, 94, 0.1); color: var(--down-color); border: 1px solid rgba(255, 59, 94, 0.3); }
         .modal-delete:hover { background: var(--down-color); color: #fff; box-shadow: 0 4px 15px rgba(255, 59, 94, 0.4); transform: translateY(-2px);}
-        .kick-btn { color: var(--down-color); padding: 5px; transition: 0.3s; cursor: pointer; }
-        .kick-btn:hover { transform: scale(1.2); text-shadow: 0 0 5px var(--down-color); }
 
         /* CALL OVERLAY */
         #callOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,6,8,0.95); backdrop-filter: blur(25px); z-index: 30000; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
@@ -217,7 +210,7 @@
         .hangup-btn { width: 65px; height: 65px; border-radius: 50%; background: var(--down-color); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff; cursor: pointer; box-shadow: 0 5px 20px rgba(255, 59, 94, 0.5); transition: 0.3s; margin-top: auto; margin-bottom: 10vh; z-index: 10; align-self: center;}
         .hangup-btn:hover { transform: scale(1.1); background: #ff1a43; }
 
-        /* --- PROFILE --- */
+        /* PROFILE */
         .profile-wrapper { width: 100%; max-width: 650px; margin: auto; display: flex; flex-direction: column; background: rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; overflow-x: hidden; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);}
         .pf-cover { height: 200px; width: 100%; background-color: #1a1a1a; background-image: url('https://images.unsplash.com/photo-1621504450181-5d356f61d307?q=80&w=1000&auto=format&fit=crop'); background-size: cover; background-position: 50% 50%; position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;}
         .pf-edit-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; font-size: 2rem; color: #fff; transition: 0.3s; z-index: 5;}
@@ -253,7 +246,7 @@
         .pf-tab.active { color: #fff; }
         .pf-tab.active::after { content: ''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 4px; background: var(--accent-color); border-radius: 4px 4px 0 0; box-shadow: 0 -2px 10px rgba(59,130,246,0.5);}
 
-        /* --- COMMUNITY FEED UI --- */
+        /* COMMUNITY FEED UI */
         .feed-container { max-width: 850px; margin: 0 auto; width: 100%; padding: 20px; overflow-y: auto; max-height: 90vh; }
         .post-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 20px; display:flex; gap:15px; }
         .post-input-area { flex: 1; display:flex; flex-direction: column; gap:10px;}
@@ -281,11 +274,11 @@
         .comment-section { margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 15px; display: none;}
         .comment-item { display: flex; gap: 10px; margin-bottom: 12px; font-size: 0.9rem;}
         .comment-input-box { display: flex; gap: 10px; align-items: center; margin-top: 15px;}
-        .comment-input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 20px; color: #fff; outline: none;}
+        .comment-input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 20px; color: #fff; outline: none; font-family: inherit;}
 
         /* CUSTOM TOAST NOTIFICATION */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-msg { background: rgba(13, 16, 23, 0.9); border-left: 4px solid var(--accent-color); color: #fff; padding: 15px 20px; border-radius: 8px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); animation: slideInRight 0.3s ease-out forwards; display: flex; align-items: center; gap: 10px;}
+        .toast-msg { background: rgba(13, 16, 23, 0.9); border-left: 4px solid var(--accent-color); color: #fff; padding: 15px 20px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); animation: slideInRight 0.3s ease-out forwards; display: flex; align-items: center; gap: 10px;}
         @keyframes slideInRight { from {transform: translateX(100%); opacity: 0;} to {transform: translateX(0); opacity: 1;} }
 
         /* TỐI ƯU MOBILE UX */
@@ -385,6 +378,13 @@
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Network Latency</span> <span id="sysLatency" style="color:var(--up-color); text-shadow: 0 0 8px var(--up-color);">12ms</span></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Tensor RAM</span> <span id="sysRam">14.2 GB</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Data Origin</span> <span id="sysOrigin" style="color:#fff;">Binance WSS</span></div>
+                </div>
+                
+                <div class="panel-header" style="margin-top:25px;"><span>Derivatives (Coinglass)</span> <i class="fas fa-chart-pie"></i></div>
+                <div style="font-size:0.8rem; color:#aaa; font-weight: 500;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Open Interest (OI)</span> <span id="cgOi" class="on-chain-font">Loading...</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Long/Short Ratio</span> <span id="cgLsRatio" class="on-chain-font">Loading...</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>24H Liquidations</span> <span id="cgLiq" class="on-chain-font" style="color:var(--down-color);">Loading...</span></div>
                 </div>
             </div>
 
@@ -765,6 +765,11 @@
         let currentUser = null;
         let isAppInitialized = false;
 
+        // Cập nhật trạng thái Offline khi tắt tab
+        window.addEventListener('beforeunload', function (e) {
+            if (currentUser) { db.collection('users').doc(currentUser.uid).update({ online: false }); }
+        });
+
         window.addEventListener('offline', () => {
             document.getElementById('tickerStatus').innerHTML = '<i class="fas fa-wifi" style="color:var(--down-color);"></i> OFFLINE';
             document.getElementById('tickerStatus').style.color = 'var(--down-color)';
@@ -780,7 +785,10 @@
             if (user && !isAppInitialized) {
                 const msg = document.getElementById('loginMsg');
                 if(msg) { msg.style.color = "var(--up-color)"; msg.textContent = "SESSION RESTORED. INITIALIZING..."; }
-                db.collection('users').doc(user.uid).get().then((doc) => { if (doc.exists) { currentUser = { uid: user.uid, ...doc.data() }; enterApp(); } });
+                
+                db.collection('users').doc(user.uid).get().then((doc) => {
+                    if (doc.exists) { currentUser = { uid: user.uid, ...doc.data() }; enterApp(); }
+                });
             }
         });
 
@@ -823,7 +831,7 @@
             const msg = document.getElementById('loginMsg'); if(msg) { msg.style.color = "var(--up-color)"; msg.textContent = "ACCESS GRANTED. INITIALIZING..."; }
             
             db.collection('users').doc(currentUser.uid).update({ online: true });
-            updateProfileUI(); requestNotificationPermission(); initChatEngine(); initDiagnostics(); initFeedEngine();
+            updateProfileUI(); requestNotificationPermission(); initChatEngine(); initDiagnostics(); initFeedEngine(); fetchCoinglassData();
 
             setTimeout(() => {
                 document.getElementById('loginOverlay').style.opacity = 0;
@@ -834,6 +842,22 @@
         function initDiagnostics() {
             setInterval(() => { const latency = Math.floor(Math.random() * 15) + 8; const elLat = document.getElementById('sysLatency'); elLat.textContent = latency + 'ms'; if(latency > 18) { elLat.style.color = '#f59e0b'; elLat.style.textShadow = '0 0 8px #f59e0b'; } else { elLat.style.color = 'var(--up-color)'; elLat.style.textShadow = '0 0 8px var(--up-color)'; } }, 2000);
             setInterval(() => { document.getElementById('sysRam').textContent = (14.0 + Math.random() * 0.8).toFixed(2) + ' GB'; }, 3000);
+        }
+
+        // TÍCH HỢP DỮ LIỆU PHÁI SINH (MÔ PHỎNG TỪ COINGLASS ĐỂ BÁO CÁO)
+        function fetchCoinglassData() {
+            // Trong môi trường Production (Có Backend), bạn sẽ dùng lệnh fetch() gọi API Coinglass ở đây.
+            // Ví dụ: fetch('https://open-api.coinglass.com/public/v2/open_interest', {headers: {coinglassSecret: 'YOUR_API_KEY'}})
+            setInterval(() => {
+                const oi = (Math.random() * (19.5 - 19.0) + 19.0).toFixed(2); // Tỷ đô
+                const lsRatio = (Math.random() * (1.05 - 0.95) + 0.95).toFixed(4); // Long/Short Ratio
+                const liq = (Math.random() * (150 - 50) + 50).toFixed(1); // Triệu đô thanh lý
+                
+                document.getElementById('cgOi').innerText = '$' + oi + 'B';
+                document.getElementById('cgLsRatio').innerText = lsRatio;
+                document.getElementById('cgLsRatio').style.color = lsRatio >= 1 ? 'var(--up-color)' : 'var(--down-color)';
+                document.getElementById('cgLiq').innerText = '$' + liq + 'M';
+            }, 3500);
         }
 
         // ==========================================
@@ -874,6 +898,11 @@
                                         fireNotification(`Message from ${newestMsg.sender}`, newestMsg.text.includes('<img') ? '[Image]' : newestMsg.text);
                                     }
                                 }
+                            }
+                            
+                            // Giữ lại cấu hình Theme cũ ở máy cục bộ để không bị đè
+                            if(chatDB[id] && chatDB[id].themeKey && newChatDB[id].type === 'user') {
+                                newChatDB[id].themeKey = chatDB[id].themeKey;
                             }
                         }
                     }
@@ -928,12 +957,13 @@
                 document.getElementById('currentChatStatus').textContent = chat.type === 'group' ? `${chat.members.length + 1} Members` : (isOnline ? 'Online' : 'Offline');
             }
 
-            // XỬ LÝ THEME TÁCH LỚP 
             const box = document.getElementById('chatMessagesBox');
             const bgDiv = document.getElementById('chatAreaBg');
             const overlayDiv = document.getElementById('chatAreaOverlay');
-            box.innerHTML = '';
             
+            let isAtBottom = box.scrollHeight - box.scrollTop <= box.clientHeight + 50;
+
+            box.innerHTML = '';
             let tKey = chat.themeKey || 'default';
             let bgStyle = ''; let bubbleStyle = 'linear-gradient(135deg, #3b82f6, #2563eb)';
 
@@ -954,7 +984,8 @@
                     let inlineStyle = m.isMe ? `style="background: ${bubbleStyle};"` : '';
                     box.insertAdjacentHTML('beforeend', `<div class="msg-wrapper ${wrapperCls}"><div class="msg-avatar"><img src="${safeAvatar}"></div><div class="msg ${msgCls}" ${inlineStyle}>${senderName}${m.text}<div class="msg-time">${m.time}</div></div></div>`);
                 });
-            } box.scrollTop = box.scrollHeight;
+            } 
+            if(isAtBottom || !isAutoRefresh) box.scrollTop = box.scrollHeight;
         }
 
         function toggleEmojiPicker() { const picker = document.getElementById('emojiPicker'); picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid'; }
@@ -972,7 +1003,6 @@
             if(!chatDB[activeChatId]) return;
             let time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
-            // XỬ LÝ LỖI MẤT TIN NHẮN (LẤY MỚI RỒI LƯU)
             db.collection('userChats').doc(currentUser.uid).get().then(myDoc => {
                 let myChatDB = myDoc.exists && myDoc.data().chatData ? JSON.parse(myDoc.data().chatData) : chatDB;
                 myChatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: true });
@@ -994,7 +1024,7 @@
                                 }
                                 
                                 otherChatDB[targetId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: false });
-                                db.collection('userChats').doc(otherUid).set({ chatData: JSON.stringify(otherChatDB) });
+                                db.collection('userChats').doc(otherUid).update({ chatData: JSON.stringify(otherChatDB) });
                             });
                         }
                     });
@@ -1007,7 +1037,7 @@
                                     let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
                                     if(otherChatDB[activeChatId]) {
                                         otherChatDB[activeChatId].msgs.push({ sender: currentUser.username, avatar: currentUser.avatar, text: content, time: time, isMe: false });
-                                        db.collection('userChats').doc(memUid).set({ chatData: JSON.stringify(otherChatDB) });
+                                        db.collection('userChats').doc(memUid).update({ chatData: JSON.stringify(otherChatDB) });
                                     }
                                 });
                             }
@@ -1035,7 +1065,7 @@
                             <div class="friend-item" style="background: rgba(59, 130, 246, 0.1); margin-bottom: 10px; padding: 15px; border: 1px solid var(--accent-color);">
                                 <div style="display:flex; align-items:center; gap:15px; width: 100%;">
                                     <div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${req.avatar}"></div>
-                                    <div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${req.username}</h4><p style="color:var(--up-color); font-size:0.75rem; margin:0;">Wants to connect</p></div>
+                                    <div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${req.username}</h4><p style="color:var(--up-color); font-size:0.75rem; margin:0; font-family:'JetBrains Mono';">Wants to connect</p></div>
                                     <div style="display:flex; gap: 8px;">
                                         <button class="pf-btn-save" style="display:block; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor:pointer;" onclick="acceptRequest('${req.uid}', '${req.username}', '${req.avatar}')"><i class="fas fa-check"></i></button>
                                         <button class="pf-btn" style="display:block; margin:0; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; border-color: rgba(255, 59, 94, 0.5); color: var(--down-color);" onclick="rejectRequest('${req.uid}', '${req.username}', '${req.avatar}')"><i class="fas fa-times"></i></button>
@@ -1045,11 +1075,11 @@
                         `);
                     });
                 } else {
-                    reqList.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding: 10px 0;">No pending requests</div>';
+                    reqList.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding: 10px 0; font-family:\'JetBrains Mono\';">No pending requests</div>';
                 }
 
                 // 2. Render Mạng lưới người dùng
-                const globalList = document.getElementById('globalUserList'); globalList.innerHTML = '<div style="color:#fff; text-align:center;">Scanning Global Network...</div>';
+                const globalList = document.getElementById('globalUserList'); globalList.innerHTML = '<div style="color:#fff; text-align:center; font-family:\'JetBrains Mono\';">Scanning Global Network...</div>';
                 db.collection('users').get().then((querySnapshot) => {
                     globalList.innerHTML = ''; let hasUsers = false;
                     querySnapshot.forEach((doc) => {
@@ -1062,13 +1092,13 @@
                         if(!alreadyAdded && !requestReceived) {
                             hasUsers = true;
                             let btnHtml = requestSent 
-                                ? `<button class="pf-btn" style="margin:0; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; color:#888;" disabled>Sent</button>`
-                                : `<button class="pf-btn-save" style="display:block; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor:pointer;" onclick="sendFriendRequest('${uUid}', '${u}')"><i class="fas fa-user-plus"></i> Add</button>`;
+                                ? `<button class="pf-btn" style="margin:0; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; color:#888; font-family:'JetBrains Mono';" disabled>Sent</button>`
+                                : `<button class="pf-btn-save" style="display:block; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor:pointer; font-family:'JetBrains Mono';" onclick="sendFriendRequest('${uUid}', '${u}')"><i class="fas fa-user-plus"></i> Add</button>`;
 
-                            globalList.insertAdjacentHTML('beforeend', `<div class="friend-item" style="cursor:default; background: rgba(0,0,0,0.3); margin-bottom: 10px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:15px; width: 100%;"><div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${uData.avatar}"></div><div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${u}</h4><p style="color:var(--text-muted); font-size:0.75rem; margin:0;">Suggested for you</p></div>${btnHtml}</div></div>`);
+                            globalList.insertAdjacentHTML('beforeend', `<div class="friend-item" style="cursor:default; background: rgba(0,0,0,0.3); margin-bottom: 10px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:15px; width: 100%;"><div class="friend-avatar" style="width:50px;height:50px;border:none;"><img src="${uData.avatar}"></div><div style="flex: 1;"><h4 style="color:#fff; margin:0 0 5px; font-family:'Rajdhani', sans-serif; font-size:1.1rem;">${u}</h4><p style="color:var(--text-muted); font-size:0.75rem; margin:0; font-family:'JetBrains Mono';">Suggested for you</p></div>${btnHtml}</div></div>`);
                         }
                     });
-                    if(!hasUsers) globalList.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0;">No new users found in the network.</div>`;
+                    if(!hasUsers) globalList.innerHTML = `<div style="text-align:center; color:#888; font-size:0.8rem; padding: 20px 0; font-family:\'JetBrains Mono\';">No new users found in the network.</div>`;
                 });
             });
         }
@@ -1091,8 +1121,8 @@
 
             db.collection('userChats').doc(reqUid).get().then(doc => {
                 let otherChatDB = doc.exists && doc.data().chatData ? JSON.parse(doc.data().chatData) : {};
-                otherChatDB[chatId] = { name: currentUser.username, type: 'user', isLeader: false, members: [], avatar: currentUser.avatar, online: true, msgs: [{sender: 'System', avatar: 'https://cdn-icons-png.flaticon.com/512/3128/3128304.png', text: `${currentUser.username} accepted your friend request!`, time: new Date().toLocaleTimeString(), isMe: false}], themeKey: 'default' };
-                db.collection('userChats').doc(reqUid).set({ chatData: JSON.stringify(otherChatDB) });
+                otherChatDB[chatId] = { name: currentUser.username, type: 'user', isLeader: false, members: [], avatar: currentUser.avatar, online: true, msgs: [{sender: 'System', avatar: 'https://img.freepik.com/premium-vector/cube-logo-design-abstract-cube-logo-design_219523-224.jpg', text: `${currentUser.username} accepted your friend request!`, time: new Date().toLocaleTimeString(), isMe: false}], themeKey: 'default' };
+                db.collection('userChats').doc(reqUid).update({ chatData: JSON.stringify(otherChatDB) });
             });
 
             db.collection('users').doc(currentUser.uid).update({ followers: firebase.firestore.FieldValue.arrayUnion(reqUid) });
@@ -1110,8 +1140,8 @@
         // CREATE GROUP
         function openCreateGroupModal() {
             const list = document.getElementById('cgMemberList'); list.innerHTML = ''; let hasFriends = false;
-            for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<label class="modal-item"><input type="checkbox" value="${chatDB[id].name}"> ${chatDB[id].name}</label>`); } }
-            if(!hasFriends) list.innerHTML = `<div style="color:#888; font-size:0.8rem; text-align:center;">Add some friends first!</div>`;
+            for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<label class="modal-item"><input type="checkbox" value="${chatDB[id].name}"> <span style="font-family:'JetBrains Mono';">${chatDB[id].name}</span></label>`); } }
+            if(!hasFriends) list.innerHTML = `<div style="color:#888; font-size:0.8rem; text-align:center; font-family:'JetBrains Mono';">Add some friends first!</div>`;
             toggleModal('createGroupModal');
         }
 
@@ -1131,7 +1161,7 @@
                             let otherChatDB = doc2.exists && doc2.data().chatData ? JSON.parse(doc2.data().chatData) : {};
                             let memArr = checked.filter(n => n !== memName); memArr.push(currentUser.username);
                             otherChatDB[id] = { name: name, type: 'group', isLeader: false, members: memArr, avatar: randomAvatar, online: true, msgs: [], themeKey: 'default' };
-                            db.collection('userChats').doc(memUid).set({ chatData: JSON.stringify(otherChatDB) });
+                            db.collection('userChats').doc(memUid).update({ chatData: JSON.stringify(otherChatDB) });
                         });
                     }
                 });
@@ -1164,7 +1194,7 @@
             }
 
             const list = document.getElementById('giMemberList'); list.innerHTML = '';
-            if(chat.type === 'group') { chat.members.forEach((mem, index) => { let kickHtml = chat.isLeader ? `<i class="fas fa-user-times kick-btn" onclick="kickMember('${index}')" title="Kick Member"></i>` : ``; list.insertAdjacentHTML('beforeend', `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${mem}</span> ${kickHtml}</div>`); }); } else { list.innerHTML = `<div class="modal-item"><span style="color:#fff;"><i class="fas fa-user"></i> ${chat.name}</span></div>`; }
+            if(chat.type === 'group') { chat.members.forEach((mem, index) => { let kickHtml = chat.isLeader ? `<i class="fas fa-user-times kick-btn" onclick="kickMember('${index}')" title="Kick Member"></i>` : ``; list.insertAdjacentHTML('beforeend', `<div class="modal-item"><span style="color:#fff; font-family:'JetBrains Mono';"><i class="fas fa-user"></i> ${mem}</span> ${kickHtml}</div>`); }); } else { list.innerHTML = `<div class="modal-item"><span style="color:#fff; font-family:'JetBrains Mono';"><i class="fas fa-user"></i> ${chat.name}</span></div>`; }
             toggleModal('groupInfoModal');
         }
 
@@ -1255,7 +1285,7 @@
             }
             
             if(filtered.length === 0) {
-                myArea.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 40px;">No matching posts found.</div>';
+                myArea.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 40px; font-family:\'JetBrains Mono\';">No matching posts found.</div>';
                 return;
             }
             
@@ -1374,7 +1404,7 @@
                 globalFeedData = [];
                 const area = document.getElementById('feedPostsArea'); area.innerHTML = ''; 
                 
-                if(snap.empty) { area.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 50px;">Be the first to post!</div>'; return; }
+                if(snap.empty) { area.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 50px; font-family:\'JetBrains Mono\';">Be the first to post!</div>'; return; }
                 
                 snap.forEach(doc => {
                     let p = doc.data(); p.id = doc.id;
@@ -1393,8 +1423,8 @@
         let currentSharePid = null;
         function openShareModal(pid) {
             currentSharePid = pid; const list = document.getElementById('shareFriendList'); list.innerHTML = ''; let hasFriends = false;
-            for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<div class="modal-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${chatDB[id].avatar}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"><span style="color:#fff;">${chatDB[id].name}</span></div><button class="cg-btn modal-create" style="padding: 5px 15px;" onclick="sendShare('${id}')">Send</button></div>`); } }
-            if(!hasFriends) list.innerHTML = '<div style="color:#888; text-align:center; padding: 20px;">Add friends to share posts!</div>';
+            for(let id in chatDB) { if(chatDB[id].type === 'user') { hasFriends = true; list.insertAdjacentHTML('beforeend', `<div class="modal-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${chatDB[id].avatar}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"><span style="color:#fff; font-family:'JetBrains Mono';">${chatDB[id].name}</span></div><button class="cg-btn modal-create" style="padding: 5px 15px;" onclick="sendShare('${id}')">Send</button></div>`); } }
+            if(!hasFriends) list.innerHTML = '<div style="color:#888; text-align:center; padding: 20px; font-family:\'JetBrains Mono\';">Add friends to share posts!</div>';
             toggleModal('shareModal');
         }
         function sendShare(chatId) {
@@ -1414,7 +1444,7 @@
             let html = ''; let startIndex = timeIndex % globalNewsArrayBase.length;
             for(let i = 0; i < Math.min(4, globalNewsArrayBase.length); i++) {
                 const item = globalNewsArrayBase[(startIndex + i) % globalNewsArrayBase.length];
-                html += `<a href="${item.url}" target="_blank" class="news-item"><div class="news-title">${item.title}</div><div class="news-meta"><span><i class="fas fa-newspaper"></i> ${item.source} • ${item.time}</span><span class="sentiment-tag ${item.sentiment === 'pos' ? "sent-pos" : "sent-neg"}">${item.sentiment === 'pos' ? "BULLISH" : "BEARISH"}</span></div></a>`;
+                html += `<a href="${item.url}" target="_blank" class="news-item"><div class="news-title">${item.title}</div><div class="news-meta"><span><i class="fas fa-newspaper"></i> ${item.source} • <span style="font-family:'JetBrains Mono';">${item.time}</span></span><span class="sentiment-tag ${item.sentiment === 'pos' ? "sent-pos" : "sent-neg"}">${item.sentiment === 'pos' ? "BULLISH" : "BEARISH"}</span></div></a>`;
             } feed.innerHTML = html;
         }
         function initNewsEngine() { renderNewsFeed(); setInterval(renderNewsFeed, 1000); }
